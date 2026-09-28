@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>V-FLO 极简智能办公系统</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- 登录 -->
+    <section id="login-view" class="login-wrap hidden">
+      <div class="login-card">
+        <div class="brand">
+          <div class="logo">V-FLO</div>
+          <h1>极简智能办公系统</h1>
+          <p>场景即提示词 · 过程即资产 · 用好成熟大模型</p>
+        </div>
+        <label>姓名 <input id="login-name" value="张工" /></label>
+        <label>部门
+          <select id="login-dept">
+            <option>项目部</option>
+            <option>商务部</option>
+            <option>工程技术部（前期）</option>
+            <option>工程技术部（后期）</option>
+            <option>屏蔽泵事业部</option>
+            <option>研发设计部</option>
+            <option>生产部</option>
+            <option>质检部</option>
+            <option>财务部</option>
+            <option>人事行政部</option>
+            <option>总经办</option>
+            <option>威标部</option>
+            <option>通用</option>
+          </select>
+        </label>
+        <label>岗位 <input id="login-pos" value="项目经理" /></label>
+        <button id="btn-login" class="primary">进入工作台</button>
+        <p class="hint">开发模式登录 · 生产环境替换为企业微信 OAuth</p>
+      </div>
+    </section>
+
+    <!-- 主界面 -->
+    <section id="main-view" class="hidden">
+      <header class="topbar">
+        <div class="brand-inline">
+          <span class="logo-sm">V-FLO</span>
+          <strong>智能办公</strong>
+        </div>
+        <nav class="tabs">
+          <button data-tab="briefing" class="tab active">简道云自动化</button>
+          <button data-tab="projects" class="tab">任务项目</button>
+          <button data-tab="scenarios" class="tab">场景广场</button>
+          <button data-tab="workspace" class="tab">工作台</button>
+          <button data-tab="assets" class="tab">知产库</button>
+          <button data-tab="admin" class="tab">管理看板</button>
+        </nav>
+        <div class="user-box">
+          <span id="user-label"></span>
+          <button id="btn-logout" class="ghost">退出</button>
+        </div>
+      </header>
+
+
+      <!-- 简道云自动化 -->
+      <main id="tab-briefing" class="tab-panel">
+        <div class="proj-banner">
+          <strong>两全其美：</strong>沟通在企业微信，账本在简道云，生成与推送在这里。
+          每天 5 分钟：口述要点 → 一键生成 → 确认后写入简道云（任务/知识库）。
+        </div>
+        <div class="toolbar">
+          <select id="bf-type">
+            <option value="morning">早宣（当日任务规划）</option>
+            <option value="evening">晚总（完成情况+问题清单）</option>
+            <option value="weekly_plan">周计划</option>
+            <option value="weekly_summary">周总结</option>
+            <option value="project_closure">项目结项+知识沉淀</option>
+          </select>
+          <span id="jdy-mode" class="muted"></span>
+        </div>
+        <div class="ws-form" id="bf-form"></div>
+        <div class="ws-btns">
+          <button id="btn-bf-gen" class="primary">生成文稿</button>
+          <button id="btn-bf-copy" class="secondary">复制企微短版</button>
+          <button id="btn-bf-push" class="secondary">推送简道云（确认后）</button>
+        </div>
+        <div id="bf-output" class="ws-output" contenteditable="true"
+             data-placeholder="生成结果预览。可编辑后推送简道云；企微短版可直接粘贴到群。"></div>
+      </main>
+
+      <!-- 任务项目 -->
+      <main id="tab-projects" class="tab-panel">
+        <div class="proj-banner">
+          <strong>标准开工：</strong>
+          ① 建任务资料文件夹（所有相关资料放进去）
+          → ② 在 <b>Mimo V2.6 新建项目</b>并绑定
+          → ③ 选择场景卡推进工作流
+        </div>
+        <div class="toolbar">
+          <input id="tp-name" placeholder="任务名称（建议与文件夹同名）" />
+          <input id="tp-folder" placeholder="资料文件夹路径，如 D:/V-FLO任务/俄罗斯泵站" />
+          <button id="btn-tp-create" class="primary" style="width:auto">创建任务项目</button>
+        </div>
+        <div class="toolbar">
+          <input id="tp-materials" placeholder="资料清单（用逗号分隔），如 技术规格书.pdf, 澄清函.docx, 进度.xlsx" style="flex:1" />
+        </div>
+        <h3 style="margin:12px 0 8px;font-size:14px">我的任务项目</h3>
+        <div id="tp-list" class="proj-list"></div>
+      </main>
+
+      <!-- 场景广场 -->
+      <main id="tab-scenarios" class="tab-panel hidden">
+        <div class="toolbar">
+          <input id="sc-search" placeholder="搜索场景名称 / 编号…" />
+          <select id="sc-dept"><option value="">全部部门</option></select>
+          <select id="sc-model">
+            <option value="">全部模型</option>
+            <option value="mimo">Mimo V2.6</option>
+            <option value="deepseek">DeepSeek</option>
+            <option value="kimi">Kimi 3</option>
+          </select>
+        </div>
+        <div id="sc-grid" class="card-grid"></div>
+      </main>
+
+      <!-- 工作台 -->
+      <main id="tab-workspace" class="tab-panel hidden">
+        <div class="ws-layout">
+          <aside class="ws-side">
+            <h3>我的会话</h3>
+            <div id="session-list"></div>
+            <button id="btn-new-free" class="secondary">+ 自由对话</button>
+          </aside>
+          <section class="ws-main">
+            <div class="ws-header">
+              <div>
+                <h2 id="ws-title">选择场景或开始自由对话</h2>
+                <p id="ws-sub" class="muted"></p>
+              </div>
+              <div class="ws-actions">
+                <select id="ws-model">
+                  <option value="mimo">Mimo V2.6（快）</option>
+                  <option value="deepseek">DeepSeek（准）</option>
+                  <option value="kimi">Kimi 3（长）</option>
+                </select>
+              </div>
+            </div>
+            <div id="ws-form" class="ws-form"></div>
+            <div class="ws-extra">
+              <textarea id="ws-extra" placeholder="补充要求（可选）：例如语气更正式、控制在一页…"></textarea>
+            </div>
+            <div class="ws-btns">
+              <button id="btn-generate" class="primary">生成初稿</button>
+              <button id="btn-finalize" class="secondary">保存人工定稿（沉淀资产）</button>
+              <button id="btn-archive" class="ghost">归档到知产库</button>
+            </div>
+            <div id="ws-output" class="ws-output" contenteditable="true" data-placeholder="生成结果将显示在此，可直接编辑修改…"></div>
+            <div class="rating-row">
+              <span>本次质量：</span>
+              <button class="star" data-r="1">1</button>
+              <button class="star" data-r="2">2</button>
+              <button class="star" data-r="3">3</button>
+              <button class="star" data-r="4">4</button>
+              <button class="star" data-r="5">5</button>
+            </div>
+          </section>
+        </div>
+      </main>
+
+      <!-- 知产库 -->
+      <main id="tab-assets" class="tab-panel hidden">
+        <div class="toolbar">
+          <select id="as-scope">
+            <option value="all">全部可见</option>
+            <option value="mine">我的产出</option>
+            <option value="dept">本部门</option>
+            <option value="company">公司精选</option>
+          </select>
+          <input id="as-search" placeholder="搜索标题或内容…" />
+          <button id="btn-reload-assets" class="secondary">刷新</button>
+        </div>
+        <div id="asset-list" class="asset-list"></div>
+      </main>
+
+      <!-- 管理看板 -->
+      <main id="tab-admin" class="tab-panel hidden">
+        <div id="admin-stats" class="stats-grid"></div>
+        <div class="two-col">
+          <div>
+            <h3>场景热度 Top10</h3>
+            <div id="admin-top"></div>
+          </div>
+          <div>
+            <h3>部门使用分布</h3>
+            <div id="admin-dept"></div>
+          </div>
+        </div>
+      </main>
+    </section>
+
+    <!-- 场景详情弹层 -->
+    <div id="modal" class="modal hidden">
+      <div class="modal-card">
+        <button class="modal-close" id="modal-close">×</button>
+        <div id="modal-body"></div>
+      </div>
+    </div>
+    <div id="toast" class="toast hidden"></div>
+  </div>
+  <script src="/static/app.js"></script>
+</body>
+</html>
