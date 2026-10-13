@@ -54,8 +54,8 @@ DEPT_RULES: list[dict] = [
         "deepseek", "kimi",
         "六块齐全、逾期有责任人与动作、与简道云任务可对账",
         [
-            {"code": "KPI-SAL-04", "name": "订单交付准时率", "weight": "7-18%", "dimension": "V-价值创造"},
-            {"code": "KPI-SAL-CLARIFY", "name": "澄清闭环及时率", "weight": "12%", "dimension": "F-流程效率"},
+            {"code": "KPI-SAL-04", "name": "订单交付准时率", "weight": "7-18%", "dimension": "V-价值创造", "source": "简道云[销售订单/出库]"},
+            {"code": "KPI-SAL-CLARIFY", "name": "澄清闭环及时率", "weight": "12%", "dimension": "F-流程效率", "source": "简道云[任务管理]"},
         ],
         [
             {"key": "project", "label": "项目/订单号", "required": True, "placeholder": ""},
@@ -85,8 +85,8 @@ DEPT_RULES: list[dict] = [
         "deepseek", "kimi",
         "付款/验收/违约/质保/争议/出口管制六块覆盖；不替代法务",
         [
-            {"code": "KPI-SAL-REVIEW", "name": "商务条款审核质量", "weight": "15%", "dimension": "O-优化创新"},
-            {"code": "KPI-SAL-05", "name": "客户投诉次数", "weight": "7-10%", "dimension": "F-流程效率"},
+            {"code": "KPI-SAL-REVIEW", "name": "商务条款审核质量", "weight": "15%", "dimension": "O-优化创新", "source": "简道云/评审记录"},
+            {"code": "KPI-SAL-05", "name": "客户投诉次数", "weight": "7-10%", "dimension": "F-流程效率", "source": "简道云[跟进记录]"},
         ],
         [
             {"key": "clauses", "label": "条款文本", "required": True, "placeholder": "粘贴合同相关条款"},
@@ -113,8 +113,8 @@ DEPT_RULES: list[dict] = [
         "deepseek", "kimi",
         "D1–D8 齐全；根因有验证；禁编造检测数据；纠正预防可跟踪",
         [
-            {"code": "KPI-QA-01", "name": "质量合格率", "weight": "18-20%", "dimension": "V-价值创造"},
-            {"code": "KPI-QA-03", "name": "客户投诉次数", "weight": "8%", "dimension": "F-流程效率"},
+            {"code": "KPI-QA-01", "name": "质量合格率", "weight": "18-20%", "dimension": "V-价值创造", "source": "简道云[质量记录]"},
+            {"code": "KPI-QA-03", "name": "客户投诉次数", "weight": "8%", "dimension": "F-流程效率", "source": "简道云[跟进记录]"},
         ],
         [
             {"key": "problem", "label": "问题描述", "required": True, "placeholder": "现象/数量/批次/发现环节"},
@@ -142,8 +142,8 @@ DEPT_RULES: list[dict] = [
         "kimi", "deepseek",
         "帕累托清晰；改进项可进简道云「流程改进项目」",
         [
-            {"code": "KPI-QA-IMP", "name": "流程改进项目数", "weight": "8-10%", "dimension": "O-优化创新"},
-            {"code": "KPI-QA-DOC", "name": "文档记录完整度", "weight": "10-15%", "dimension": "O-优化创新"},
+            {"code": "KPI-QA-IMP", "name": "流程改进项目数", "weight": "8-10%", "dimension": "O-优化创新", "source": "简道云[项目结项/意见箱]"},
+            {"code": "KPI-QA-DOC", "name": "文档记录完整度", "weight": "10-15%", "dimension": "O-优化创新", "source": "简道云[内部资料]"},
         ],
         [
             {"key": "month", "label": "月份", "required": True, "placeholder": "2026-09"},
@@ -169,8 +169,8 @@ DEPT_RULES: list[dict] = [
         "deepseek", "kimi",
         "清单可考核；澄清 3 工作日闭环；与客户文件要求逐条对应",
         [
-            {"code": "KPI-ENG-FILE", "name": "技术文件编制数", "weight": "25-30%", "dimension": "V-价值创造"},
-            {"code": "KPI-ENG-ONLINE", "name": "项目按时完成率", "weight": "30%", "dimension": "V-价值创造"},
+            {"code": "KPI-ENG-FILE", "name": "技术文件编制数", "weight": "25-30%", "dimension": "V-价值创造", "source": "简道云[任务管理]"},
+            {"code": "KPI-ENG-ONLINE", "name": "项目按时完成率", "weight": "30%", "dimension": "V-价值创造", "source": "简道云[项目管理]"},
         ],
         [
             {"key": "order", "label": "订单/项目", "required": True, "placeholder": ""},
@@ -198,8 +198,8 @@ DEPT_RULES: list[dict] = [
         "deepseek", "kimi",
         "性能不编造；结构特征与选型一致；待计算项显式列出",
         [
-            {"code": "KPI-PMP-FILE", "name": "技术文件编制数", "weight": "20%", "dimension": "V-价值创造"},
-            {"code": "KPI-PMP-REVIEW", "name": "设计评审通过率", "weight": "15%", "dimension": "V-价值创造"},
+            {"code": "KPI-PMP-FILE", "name": "技术文件编制数", "weight": "20%", "dimension": "V-价值创造", "source": "简道云[任务管理]"},
+            {"code": "KPI-PMP-REVIEW", "name": "设计评审通过率", "weight": "15%", "dimension": "V-价值创造", "source": "简道云[任务/评审]"},
         ],
         [
             {"key": "duty", "label": "工况", "required": True,
@@ -227,8 +227,8 @@ DEPT_RULES: list[dict] = [
         "deepseek", "mimo",
         "处置三选一明确（返工/让步/报废）；验证闭环；可进简道云任务",
         [
-            {"code": "KPI-RND-03", "name": "NCR处置参与及时率", "weight": "10%", "dimension": "V-价值创造"},
-            {"code": "KPI-RND-IMP", "name": "流程改进项目数", "weight": "10%", "dimension": "O-优化创新"},
+            {"code": "KPI-RND-03", "name": "NCR处置参与及时率", "weight": "10%", "dimension": "V-价值创造", "source": "简道云[任务管理]"},
+            {"code": "KPI-RND-IMP", "name": "流程改进项目数", "weight": "10%", "dimension": "O-优化创新", "source": "简道云[项目结项/意见箱]"},
         ],
         [
             {"key": "ncr", "label": "NCR事实", "required": True, "placeholder": "产品/工序/缺陷/数量/标准要求"},
@@ -254,8 +254,8 @@ DEPT_RULES: list[dict] = [
         "mimo", "deepseek",
         "产量有数；异常有升级；对接计划员与质量",
         [
-            {"code": "KPI-PRD-01", "name": "任务完成数", "weight": "8-15%", "dimension": "V-价值创造"},
-            {"code": "KPI-PRD-DOC", "name": "文档记录完整度", "weight": "15%", "dimension": "O-优化创新"},
+            {"code": "KPI-PRD-01", "name": "任务完成数", "weight": "8-15%", "dimension": "V-价值创造", "source": "简道云[任务管理]"},
+            {"code": "KPI-PRD-DOC", "name": "文档记录完整度", "weight": "15%", "dimension": "O-优化创新", "source": "简道云[内部资料/任务附件]"},
         ],
         [
             {"key": "team", "label": "班组/产线", "required": True, "placeholder": ""},
@@ -282,8 +282,8 @@ DEPT_RULES: list[dict] = [
         "deepseek", "mimo",
         "不涉及编造金额；检查项可勾选；与税期联动",
         [
-            {"code": "KPI-FIN-01", "name": "财务报表出具及时率", "weight": "15-18%", "dimension": "V-价值创造"},
-            {"code": "KPI-FIN-03", "name": "凭证差错次数", "weight": "15-20%", "dimension": "V-价值创造"},
+            {"code": "KPI-FIN-01", "name": "财务报表出具及时率", "weight": "15-18%", "dimension": "V-价值创造", "source": "简道云[开票/回款]"},
+            {"code": "KPI-FIN-03", "name": "凭证差错次数", "weight": "15-20%", "dimension": "V-价值创造", "source": "简道云[付款/回款单]"},
         ],
         [
             {"key": "period", "label": "期间", "required": True, "placeholder": "2026-09"},
@@ -308,8 +308,8 @@ DEPT_RULES: list[dict] = [
         "kimi", "mimo",
         "职责可考核；面试题可评分；对齐四维绩效",
         [
-            {"code": "KPI-HR-01", "name": "招聘完成数", "weight": "15-20%", "dimension": "V-价值创造"},
-            {"code": "KPI-HR-03", "name": "人才储备完成度", "weight": "10%", "dimension": "O-优化创新"},
+            {"code": "KPI-HR-01", "name": "招聘完成数", "weight": "15-20%", "dimension": "V-价值创造", "source": "简道云[任务-招聘类]"},
+            {"code": "KPI-HR-03", "name": "人才储备完成度", "weight": "10%", "dimension": "O-优化创新", "source": "简道云[任务-人才储备]"},
         ],
         [
             {"key": "position", "label": "岗位名称", "required": True, "placeholder": ""},
@@ -335,9 +335,9 @@ DEPT_RULES: list[dict] = [
         "deepseek", "kimi",
         "数据不编造；决策选项含利弊与回滚；支撑决策质量评分",
         [
-            {"code": "KPI-GM-01", "name": "销售额/回款额", "weight": "15-20%", "dimension": "V-价值创造"},
-            {"code": "KPI-GM-DECIDE", "name": "决策质量", "weight": "15%", "dimension": "L-连接协同"},
-            {"code": "KPI-GM-INSIGHT", "name": "业务洞察", "weight": "10-12%", "dimension": "L-连接协同"},
+            {"code": "KPI-GM-01", "name": "销售额/回款额", "weight": "15-20%", "dimension": "V-价值创造", "source": "简道云[CRM-订单/回款]"},
+            {"code": "KPI-GM-DECIDE", "name": "决策质量", "weight": "15%", "dimension": "L-连接协同", "source": "简道云[任务-决策评审/AI评分]"},
+            {"code": "KPI-GM-INSIGHT", "name": "业务洞察", "weight": "10-12%", "dimension": "L-连接协同", "source": "简道云[市场活动/线索]"},
         ],
         [
             {"key": "period", "label": "期间", "required": True, "placeholder": ""},
@@ -363,9 +363,9 @@ DEPT_RULES: list[dict] = [
         "deepseek", "kimi",
         "五要素完整；验收可测；不空泛",
         [
-            {"code": "KPI-AI-PLAN", "name": "任务规划完整度", "weight": "8%", "dimension": "O-优化创新"},
-            {"code": "KPI-AI-01", "name": "任务完成率", "weight": "12%", "dimension": "V-价值创造"},
-            {"code": "KPI-AI-04", "name": "智能体开发项目参与数", "weight": "8%", "dimension": "V-价值创造"},
+            {"code": "KPI-AI-PLAN", "name": "任务规划完整度", "weight": "8%", "dimension": "O-优化创新", "source": "简道云[任务-五要素完整]"},
+            {"code": "KPI-AI-01", "name": "任务完成率", "weight": "12%", "dimension": "V-价值创造", "source": "简道云[任务管理]"},
+            {"code": "KPI-AI-04", "name": "智能体开发项目参与数", "weight": "8%", "dimension": "V-价值创造", "source": "简道云[关联项目]"},
         ],
         [
             {"key": "request", "label": "业务需求描述", "required": True, "placeholder": "口语描述即可"},
@@ -393,8 +393,8 @@ DEPT_RULES: list[dict] = [
         "mimo", "kimi",
         "行动项到人到日；分歧显式；与会各方口径一致",
         [
-            {"code": "KPI-GEN-AI", "name": "工作完成质量(AI)", "weight": "5-16%", "dimension": "L-连接协同"},
-            {"code": "KPI-GEN-DOC", "name": "文档记录完整度", "weight": "5-16%", "dimension": "O-优化创新"},
+            {"code": "KPI-GEN-AI", "name": "工作完成质量(AI)", "weight": "5-16%", "dimension": "L-连接协同", "source": "简道云[任务-AI评分]"},
+            {"code": "KPI-GEN-DOC", "name": "文档记录完整度", "weight": "5-16%", "dimension": "O-优化创新", "source": "简道云[内部资料]"},
         ],
         [
             {"key": "meeting", "label": "会议名称/主题", "required": True, "placeholder": ""},

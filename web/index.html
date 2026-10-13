@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>V-FLO 极简智能办公系统</title>
-  <link rel="stylesheet" href="/static/styles.css" />
+  <link rel="stylesheet" href="/static/styles.css?v=20261012.3" />
 </head>
 <body>
   <div id="app">
@@ -16,6 +16,7 @@
           <h1>极简智能办公系统</h1>
           <p>场景即提示词 · 过程即资产 · 用好成熟大模型</p>
         </div>
+        <div id="dev-login-box">
         <label>姓名 <input id="login-name" value="张工" /></label>
         <label>部门
           <select id="login-dept">
@@ -36,7 +37,16 @@
         </label>
         <label>岗位 <input id="login-pos" value="项目经理" /></label>
         <button id="btn-login" class="primary">进入工作台</button>
-        <p class="hint">开发模式登录 · 生产环境替换为企业微信 OAuth</p>
+        </div>
+        <div id="wecom-login-box" class="hidden" style="margin-top:14px">
+          <div class="login-divider"><span>或</span></div>
+          <button id="btn-wecom-login" class="secondary" style="width:100%">
+            <svg viewBox="0 0 24 24" width="16" height="16" style="vertical-align:-2px;margin-right:6px" fill="currentColor"><path d="M12 2C6.48 2 2 6.02 2 11c0 2.9 1.57 5.5 4 7.1V22l3.6-2c.77.2 1.58.3 2.4.3 5.52 0 10-4.02 10-9s-4.48-9-10-9zm-4 8.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm8 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/></svg>
+            企业微信扫码登录
+          </button>
+          <p class="hint" style="margin-top:8px">将跳转企业微信官方授权页，用企业微信 App 扫码</p>
+        </div>
+        <p class="hint" id="login-mode-hint">开发模式登录 · 生产环境替换为企业微信 OAuth</p>
       </div>
     </section>
 
@@ -48,12 +58,15 @@
           <strong>智能办公</strong>
         </div>
         <nav class="tabs">
-          <button data-tab="briefing" class="tab active">简道云自动化</button>
-          <button data-tab="projects" class="tab">任务项目</button>
-          <button data-tab="scenarios" class="tab">场景广场</button>
-          <button data-tab="workspace" class="tab">工作台</button>
-          <button data-tab="assets" class="tab">知产库</button>
-          <button data-tab="admin" class="tab">管理看板</button>
+          <button data-tab="today" class="tab active">📋 今日安排</button>
+          <button data-tab="briefing" class="tab">📮 简道云</button>
+          <button data-tab="projects" class="tab">📁 任务项目</button>
+          <button data-tab="scenarios" class="tab">🧩 场景广场</button>
+          <button data-tab="workspace" class="tab">✍️ 工作台</button>
+          <button data-tab="chat" class="tab">💬 智能对话</button>
+          <button data-tab="assets" class="tab">📚 知产库</button>
+          <button data-tab="compliance" class="tab">🛡️ 出口管制</button>
+          <button data-tab="admin" class="tab">📊 管理看板</button>
         </nav>
         <div class="user-box">
           <span id="user-label"></span>
@@ -62,8 +75,40 @@
       </header>
 
 
+      <!-- 今日工作安排（手册 1.5，首页默认） -->
+      <main id="tab-today" class="tab-panel">
+        <div class="proj-banner">
+          <strong>今日工作安排：</strong>过去该做未做 + 新输入 + 今日固定/他人要求，已按 B0–B4 排好时间轴。
+          早宣说计划，今日安排帮你把计划排进一天。
+        </div>
+        <div class="today-capture">
+          <textarea id="tc-text" rows="2"
+            placeholder="说人话即可：上午10点项目例会；下午3点前回客户澄清函；明天交周报初稿…"></textarea>
+          <div class="ws-btns">
+            <button id="btn-tc-parse" class="primary" style="width:auto">拆解任务</button>
+            <button id="btn-tc-voice" class="secondary hidden" style="width:auto" title="浏览器语音识别（中文）">🎤 语音录入</button>
+            <button id="btn-tc-ingest" class="secondary" style="width:auto" disabled>确认入池</button>
+            <label class="leader-toggle"><input type="checkbox" id="td-leader" /> 领导模式（先排他人/部门任务）</label>
+            <button id="btn-td-sync" class="ghost" style="width:auto" title="从简道云任务管理拉取我的任务">⇅ 同步简道云</button>
+            <button id="btn-td-refresh" class="ghost" style="width:auto">刷新</button>
+          </div>
+          <div id="tc-cands"></div>
+        </div>
+        <div id="td-summary" class="stats-grid"></div>
+        <div class="two-col">
+          <div>
+            <h3>时间轴（B0 固定不可打乱）</h3>
+            <div id="td-timeline"></div>
+          </div>
+          <div>
+            <h3>溢出（建议改期或明日优先）</h3>
+            <div id="td-overflow"></div>
+          </div>
+        </div>
+      </main>
+
       <!-- 简道云自动化 -->
-      <main id="tab-briefing" class="tab-panel">
+      <main id="tab-briefing" class="tab-panel hidden">
         <div class="proj-banner">
           <strong>两全其美：</strong>沟通在企业微信，账本在简道云，生成与推送在这里。
           每天 5 分钟：口述要点 → 一键生成 → 确认后写入简道云（任务/知识库）。
@@ -86,6 +131,35 @@
         </div>
         <div id="bf-output" class="ws-output" contenteditable="true"
              data-placeholder="生成结果预览。可编辑后推送简道云；企微短版可直接粘贴到群。"></div>
+        <h3 style="margin:12px 0 6px;font-size:14px">企微短版预览（复制前请先确认）</h3>
+        <div id="bf-card" class="ws-output bf-card" data-placeholder="生成后此处展示企微短版内容"></div>
+        <h3 style="margin:12px 0 6px;font-size:14px">我的推送历史
+          <button id="btn-bf-dept-stats" class="ghost hidden" style="width:auto;padding:3px 10px;font-size:12px;margin-left:8px"
+            title="部门经理视图：本部门早宣/晚总推送量与今日已推送名单">📊 本部门推送统计</button>
+        </h3>
+        <div id="bf-dept-stats" class="hidden" style="margin-bottom:10px"></div>
+        <div id="bf-history" class="asset-list"></div>
+
+        <!-- 简道云数据镜像（单向拉取：简道云 → 本系统；本地浏览不打 JDY API） -->
+        <h3 style="margin:18px 0 8px;font-size:14px">🗂 简道云数据镜像
+          <span id="jdy-sync-hint" class="muted" style="font-weight:400"></span>
+        </h3>
+        <div id="jdy-overview" class="stats-grid"></div>
+        <div class="toolbar">
+          <select id="jdy-kind">
+            <option value="task">任务管理</option>
+            <option value="knowledge">知识库</option>
+          </select>
+          <input id="jdy-search" placeholder="搜索标题…" />
+          <button id="btn-jdy-reload" class="secondary">刷新</button>
+          <button id="btn-jdy-sync" class="primary hidden" style="width:auto"
+            title="立即从简道云全量拉取一次（admin/部门经理）">⇄ 立即同步</button>
+        </div>
+        <div id="jdy-list" class="asset-list"></div>
+        <details id="jdy-logs-box" class="ws-params hidden" style="margin-top:10px">
+          <summary>🧾 同步日志（最近 20 条）</summary>
+          <div id="jdy-logs" style="padding:10px 14px"></div>
+        </details>
       </main>
 
       <!-- 任务项目 -->
@@ -98,9 +172,10 @@
         </div>
         <div class="toolbar">
           <input id="tp-name" placeholder="任务名称（建议与文件夹同名）" />
-          <input id="tp-folder" placeholder="资料文件夹路径，如 D:/V-FLO任务/俄罗斯泵站" />
+          <input id="tp-folder" placeholder="资料文件夹路径，如 D:/V-FLO任务/20260927-项目周报-俄罗斯泵站" />
           <button id="btn-tp-create" class="primary" style="width:auto">创建任务项目</button>
         </div>
+        <p class="hint" style="margin:2px 4px">文件夹命名规范（手册 §1.2）：<code>日期-任务-项目名</code>，如 20260927-项目周报-俄罗斯泵站</p>
         <div class="toolbar">
           <input id="tp-materials" placeholder="资料清单（用逗号分隔），如 技术规格书.pdf, 澄清函.docx, 进度.xlsx" style="flex:1" />
         </div>
@@ -118,6 +193,13 @@
             <option value="mimo">Mimo V2.6</option>
             <option value="deepseek">DeepSeek</option>
             <option value="kimi">Kimi 3</option>
+          </select>
+          <select id="sc-stage"><option value="">全部业务流</option></select>
+          <select id="sc-maturity">
+            <option value="">全部规则</option>
+            <option value="production">成熟规则·production</option>
+            <option value="validated">成熟规则·validated</option>
+            <option value="draft">探索中·draft</option>
           </select>
         </div>
         <div id="sc-grid" class="card-grid"></div>
@@ -138,23 +220,64 @@
                 <p id="ws-sub" class="muted"></p>
               </div>
               <div class="ws-actions">
+                <span id="ws-review-status" class="badge exp hidden"></span>
                 <select id="ws-model">
                   <option value="mimo">Mimo V2.6（快）</option>
                   <option value="deepseek">DeepSeek（准）</option>
                   <option value="kimi">Kimi 3（长）</option>
                 </select>
+                <button id="btn-compare" class="ghost" style="width:auto" title="换一个模型：同输入再生成一份并排对比">⇄ 换一个模型对比</button>
               </div>
             </div>
-            <div id="ws-form" class="ws-form"></div>
+            <!-- 智能输入：说人话即可，AI 自动识别参数，不再面对一堆填空 -->
+            <div class="smart-box">
+              <textarea id="ws-smart" rows="3"
+                placeholder="💬 用一段话描述您的需求，AI 自动识别参数并生成初稿。例如：帮我写一份俄罗斯泵站项目的周报，本周完成了技术协议澄清，进度 70%…"></textarea>
+              <div class="smart-bar">
+                <button id="btn-smart-fill" class="secondary" title="从上方描述中自动识别场景参数">✨ 智能识别参数</button>
+                <span id="ws-smart-hint" class="muted">选中场景卡后，描述越具体，识别越准</span>
+              </div>
+              <div id="ws-chips" class="smart-chips" title="点击参数条可展开修改"></div>
+            </div>
+            <details id="ws-params" class="ws-params">
+              <summary>🔧 参数明细（AI 自动填充，可展开核对/修改）</summary>
+              <div id="ws-form" class="ws-form"></div>
+            </details>
             <div class="ws-extra">
               <textarea id="ws-extra" placeholder="补充要求（可选）：例如语气更正式、控制在一页…"></textarea>
+              <label class="leader-toggle" title="附件3 §3.4：个人隐私场景仅记录元数据，内容不入库；审计轨迹仍保留">
+                <input type="checkbox" id="ws-privacy" /> 仅元数据留痕（隐私场景）
+              </label>
             </div>
             <div class="ws-btns">
-              <button id="btn-generate" class="primary">生成初稿</button>
+              <button id="btn-generate" class="primary" title="快捷键 Ctrl/Cmd + Enter">生成初稿</button>
               <button id="btn-finalize" class="secondary">保存人工定稿（沉淀资产）</button>
+              <select id="ws-visibility" style="width:auto" title="归档可见范围（密级）">
+                <option value="private">仅自己（秘密级）</option>
+                <option value="dept" selected>本部门</option>
+                <option value="company">公司精选</option>
+              </select>
               <button id="btn-archive" class="ghost">归档到知产库</button>
+              <button id="btn-copy" class="ghost">复制</button>
+              <button id="btn-export" class="ghost">导出 Word</button>
             </div>
-            <div id="ws-output" class="ws-output" contenteditable="true" data-placeholder="生成结果将显示在此，可直接编辑修改…"></div>
+            <div id="ws-review-row" class="ws-btns hidden" style="background:#fff7e6;padding:8px;border-radius:8px">
+              <span class="muted">成熟规则审核（须经理/授权人操作，不能自审自放）：</span>
+              <input id="ws-review-note" placeholder="审核意见（可选）" style="flex:1" />
+              <button id="btn-approve" class="primary" style="width:auto">✔ 审核放行</button>
+              <button id="btn-revise" class="secondary" style="width:auto">退回修改</button>
+              <button id="btn-reject" class="ghost" style="width:auto">否决</button>
+            </div>
+            <div class="ws-panes">
+              <div class="ws-pane">
+                <div id="ws-pane-a-label" class="muted pane-label"></div>
+                <div id="ws-output" class="ws-output" contenteditable="true" data-placeholder="生成结果将显示在此，可直接编辑修改…"></div>
+              </div>
+              <div class="ws-pane hidden" id="ws-pane-b">
+                <div id="ws-pane-b-label" class="muted pane-label"></div>
+                <div id="ws-output-b" class="ws-output" data-placeholder="对比稿（另一模型同输入输出，仅供参考）"></div>
+              </div>
+            </div>
             <div class="rating-row">
               <span>本次质量：</span>
               <button class="star" data-r="1">1</button>
@@ -167,8 +290,63 @@
         </div>
       </main>
 
+      <!-- 智能对话（类 DeepSeek Harness：上传文件 + 多轮对话 + 换模型 + 历史记录） -->
+      <main id="tab-chat" class="tab-panel hidden">
+        <div class="chat-layout">
+          <aside class="chat-side">
+            <div class="chat-side-head">
+              <h3>历史对话</h3>
+              <button id="btn-chat-new" class="primary" style="width:auto">＋ 新对话</button>
+            </div>
+            <input id="chat-search" placeholder="搜索对话标题…" />
+            <div id="chat-session-list"></div>
+          </aside>
+          <section class="chat-main">
+            <div class="chat-header">
+              <div>
+                <h2 id="chat-title">选择左侧历史，或新建对话</h2>
+                <p id="chat-sub" class="muted"></p>
+              </div>
+              <div class="chat-actions">
+                <select id="chat-model" title="切换对话模型（仅影响下一条消息）">
+                  <option value="mimo">Mimo V2.6（快）</option>
+                  <option value="deepseek">DeepSeek（准）</option>
+                  <option value="kimi">Kimi 3（长）</option>
+                </select>
+                <button id="btn-chat-towork" class="secondary" style="width:auto"
+                  title="跳转到工作台：对最近一条 AI 回复进行定稿/归档（沉淀数字资产）">→ 送到工作台</button>
+                <button id="btn-chat-rename" class="ghost" style="width:auto">改名</button>
+                <button id="btn-chat-close" class="ghost" style="width:auto"
+                  title="留痕规范：可关不可删">关闭对话</button>
+              </div>
+            </div>
+            <div id="chat-thread" class="chat-thread">
+              <div class="chat-empty muted">
+                💬 这是多轮对话模式：可上传文件（AI 读取内容后回答）、随时切换模型、历史自动留存。<br/>
+                从「🧩 场景广场」卡片点「💬 对话」可让 AI 直接代入该岗位的提示词。
+              </div>
+            </div>
+            <div class="chat-composer">
+              <div id="chat-chips" class="chat-chips"></div>
+              <textarea id="chat-input" rows="3"
+                placeholder="输入消息…（Enter 发送，Shift+Enter 换行；可先点 📎 上传文件再提问）"></textarea>
+              <div class="chat-composer-bar">
+                <input type="file" id="chat-file" class="hidden" multiple
+                  accept=".txt,.md,.csv,.log,.json,.docx,.xlsx,.pdf" />
+                <button id="btn-chat-attach" class="ghost" style="width:auto">📎 上传文件</button>
+                <span class="muted" style="font-size:12px">txt/md/csv/log/json/docx/xlsx/pdf · 单文件 ≤10MB · 单次 ≤5 个</span>
+                <span style="flex:1"></span>
+                <button id="btn-chat-send" class="primary">发送</button>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+
       <!-- 知产库 -->
       <main id="tab-assets" class="tab-panel hidden">
+        <h3 style="margin:4px 0 8px;font-size:14px">场景卡市场（使用次数 · 平均评分 · 最近改进）</h3>
+        <div id="sc-market" class="asset-list" style="margin-bottom:14px"></div>
         <div class="toolbar">
           <select id="as-scope">
             <option value="all">全部可见</option>
@@ -182,10 +360,42 @@
         <div id="asset-list" class="asset-list"></div>
       </main>
 
+      <!-- 出口管制（附件1 §二 五道闸：G1 主体识别 → G2 初筛 → G5 留痕） -->
+      <main id="tab-compliance" class="tab-panel hidden">
+        <div class="proj-banner">
+          <strong>出口管制初筛（签约前强制）：</strong>没有审查单（或结论未关闭）不签约、不发运、不发技术资料。
+          两用物项无正式分类结论，按「不能出口」处理。最终放行由合规官书面作出。
+        </div>
+        <div class="ws-form">
+          <label>客户名称 *<textarea data-ec="customer_name" rows="1"></textarea></label>
+          <label>中间商（如无留空）<textarea data-ec="middleman" rows="1"></textarea></label>
+          <label>目的地/签约国 *<textarea data-ec="country" rows="1" placeholder="如 俄罗斯 / IR"></textarea></label>
+          <label>运抵国<textarea data-ec="arrival_country" rows="1"></textarea></label>
+          <label>最终用户所在国<textarea data-ec="end_user_country" rows="1"></textarea></label>
+          <label>最终用户<textarea data-ec="end_user" rows="1"></textarea></label>
+          <label class="full">最终用途<textarea data-ec="end_use" rows="2" placeholder="民用/工业用途书面说明"></textarea></label>
+          <label class="full">产品描述<textarea data-ec="product_desc" rows="2" placeholder="型号、参数、材质（屏蔽泵/密封/变频等将触发两用物项升级分类）"></textarea></label>
+          <label>HS 编码<textarea data-ec="hs_code" rows="1"></textarea></label>
+        </div>
+        <div class="ws-btns">
+          <button id="btn-ec-screen" class="primary">提交初筛（生成审查单）</button>
+        </div>
+        <div id="ec-result"></div>
+        <h3 style="margin:14px 0 8px;font-size:14px">审查单列表（不可删改，留存 ≥5 年）</h3>
+        <div id="ec-list" class="asset-list"></div>
+      </main>
+
       <!-- 管理看板 -->
       <main id="tab-admin" class="tab-panel hidden">
         <div id="admin-stats" class="stats-grid"></div>
-        <div class="two-col">
+        <!-- 用户管理（RBAC）：角色分配/账号停用，仅 admin -->
+        <h3 style="margin:14px 0 8px;font-size:14px">👥 用户管理（角色与账号状态）</h3>
+        <div class="toolbar">
+          <input id="um-search" placeholder="搜索姓名 / 部门 / 企微账号…" />
+          <button id="btn-um-reload" class="secondary">刷新</button>
+        </div>
+        <div id="admin-users"></div>
+        <div class="two-col" style="margin-top:16px">
           <div>
             <h3>场景热度 Top10</h3>
             <div id="admin-top"></div>
@@ -193,6 +403,16 @@
           <div>
             <h3>部门使用分布</h3>
             <div id="admin-dept"></div>
+          </div>
+        </div>
+        <div class="two-col">
+          <div>
+            <h3>场景性价比（调用 × tokens）</h3>
+            <div id="admin-costs"></div>
+          </div>
+          <div>
+            <h3>早宣/晚总推送量（部门经理视图）</h3>
+            <div id="admin-briefing"></div>
           </div>
         </div>
       </main>
@@ -207,6 +427,6 @@
     </div>
     <div id="toast" class="toast hidden"></div>
   </div>
-  <script src="/static/app.js"></script>
+  <script src="/static/app.js?v=20261012.3"></script>
 </body>
 </html>

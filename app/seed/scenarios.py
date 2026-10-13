@@ -17,6 +17,7 @@ WORKFLOW_MAP = {'SC-PRJ-001': ('项目执行-周报', '①收集本周事实 ②
 
 # KPI 维度缩写：V=价值创造 F=流程效率 L=连接协同 O=优化创新
 # source 对应简道云模块（便于后续对接取数）
+# example_input/example_output 由 AI 起草（v2.1），待各部门业务 Owner 审改签字
 
 
 def K(code, name, weight, dim, source):
@@ -55,6 +56,7 @@ SCENARIOS: list[dict] = [
         "quality_notes": "风险必须有应对与日期；下周计划到人到日；结论明确是否影响节点。",
         "example_input": "俄罗斯XX泵站；进展：GA图提交9/25；风险：客户延迟确认材质；下周：跟进确认，李腾龙，10/2前",
         "example_output": "（结构完整周报，风险表含责任人与建议）",
+        "output_format": "markdown",
     },
     {
         "code": "SC-PRJ-002", "title": "投标技术方案初稿（前期询价）", "department": "项目部", "category": "project",
@@ -80,6 +82,10 @@ SCENARIOS: list[dict] = [
             "3. 澄清问题清单（问客户）\n4. 商务要点（交期/付款/质保/验收）\n5. 风险提示（含出口管制需确认项）\n"
             "约束：不编造参数；缺失参数列入澄清；涉及出口目的地时提示先做合规初筛。"
         ),
+        "quality_notes": "参数不得编造，缺失参数必须列入澄清清单；涉出口目的地时提示合规初筛。",
+        "example_input": "RFQ-2026-018；范围：屏蔽泵2台，介质液氨，Q=25m³/h，H=80m，API685，交期20周；客户：俄罗斯某石化公司；策略：技术差异化",
+        "example_output": "（需求摘要+方案章节骨架+澄清问题清单+商务要点+风险提示的投标方案初稿）",
+        "output_format": "markdown",
     },
     {
         "code": "SC-PRJ-003", "title": "技术澄清回复函（中俄/中英）", "department": "项目部", "category": "project",
@@ -102,6 +108,10 @@ SCENARIOS: list[dict] = [
             "输出正式澄清回复：逐条编号对应；结论明确（可满足/有条件满足/需澄清）；"
             "有不确定处写[待确认]；文末附「需客户确认事项」。禁止编造标准号与参数。"
         ),
+        "quality_notes": "逐条编号对应客户问题；结论明确（可满足/有条件满足/需澄清）；不确定处标[待确认]，禁止编造标准号。",
+        "example_input": "语言：中文；客户问题：1.泵是否满足API685？2.能否12周交货？；我方要点：1.满足并可附业绩表 2.常规16周，可评估加急",
+        "example_output": "（逐条编号对应的正式澄清回复函，文末附需客户确认事项）",
+        "output_format": "email",
     },
     {
         "code": "SC-PRJ-004", "title": "合同执行通知/交接包", "department": "项目部", "category": "project",
@@ -123,6 +133,10 @@ SCENARIOS: list[dict] = [
             "合同：{{contract_no}}\n关键条款：{{key_terms}}\n技术要点：{{tech_points}}\n\n"
             "输出：1) 合同要点摘录 2) 交底各部门事项表 3) 文件交付清单骨架 4) 风险与出口合规提示 5) 里程碑建议。"
         ),
+        "quality_notes": "条款摘录忠于合同原文；交底事项到部门到事；含风险与出口合规提示。",
+        "example_input": "合同号：VF-2026-088；关键条款：交期20周/预付30%/目的地哈萨克斯坦/逾期罚0.5%每周；技术要点：屏蔽泵+变频控制成套供货",
+        "example_output": "（合同要点摘录+部门交底事项表+文件交付清单骨架+合规提示+里程碑建议的交接包）",
+        "output_format": "document",
     },
     {
         "code": "SC-PRJ-005", "title": "项目进度风险摘要", "department": "项目部", "category": "project",
@@ -143,6 +157,10 @@ SCENARIOS: list[dict] = [
             "节点：{{milestone}}\n事实：{{facts}}\n\n"
             "输出：总体红黄绿判断；风险矩阵表；需管理层拍板事项；7天行动清单。"
         ),
+        "quality_notes": "只基于输入事实判断，不推测编造；红黄绿结论明确；行动清单到人到日、7天内可执行。",
+        "example_input": "节点：GA图批复；事实：提交已10天未批复，进度65%落后计划5天，材质确认缺项",
+        "example_output": "（红黄绿结论+风险矩阵表+待拍板事项+7天行动清单的一页风险摘要）",
+        "output_format": "markdown",
     },
     {
         "code": "SC-PRJ-006", "title": "俄罗斯项目文件解读", "department": "项目部", "category": "project",
@@ -159,6 +177,10 @@ SCENARIOS: list[dict] = [
             "你是熟悉俄罗斯项目的资深技术翻译。\n关注点：{{focus}}\n\n原文：\n{{source_text}}\n\n"
             "输出：中文摘要；关键条款表(原文|中文|备注)；与我方冲突点；建议回复要点。不确定译文标[待确认]。"
         ),
+        "quality_notes": "译文忠于原文，不确定处标[待确认]；冲突点须引用原文条款对照说明。",
+        "example_input": "俄文：Срок поставки — не более 20 недель с даты вступления контракта в силу...；关注点：交期与验收",
+        "example_output": "（中文摘要+关键条款中俄对照表+冲突点+建议回复要点）",
+        "output_format": "markdown",
     },
     {
         "code": "SC-PRJ-007", "title": "知识库沉淀与经验归档（支撑AI评分）", "department": "项目部", "category": "project",
@@ -183,6 +205,9 @@ SCENARIOS: list[dict] = [
             "文风要体现技术深度与可维护性（AI评分维度），避免流水账。"
         ),
         "quality_notes": "必须有可复用规则；写清适用范围；避免只写“顺利完成”。",
+        "example_input": "主题：俄项目GA图批复周期长的应对；经过：客户批复平均21天，经预审会议+双语摘要缩短至10天；经验：提交前约批复会议、随附双语摘要",
+        "example_output": "（背景—问题—解决过程—可复用规则—适用范围—关联场景的入库条目）",
+        "output_format": "markdown",
     },
 
     # ================= 商务部 =================
@@ -207,6 +232,10 @@ SCENARIOS: list[dict] = [
             "你是 V-FLO 商务部销售运营助理。生成销售周报。\n周期：{{period}}\n数据：{{numbers}}\n亮点困难：{{highlights}}\n\n"
             "输出：核心指标表（对照回款/订单/新客）；漏斗分析；Top机会；风险单；下周打法。数据缺失写“未提供”。"
         ),
+        "quality_notes": "数据缺失写“未提供”，不得估算编造；核心指标与回款/订单/新客目标对照。",
+        "example_input": "周期：2026-W39；数据：签约2单180万/回款95万/新增客户3家；亮点困难：俄客户付款延迟",
+        "example_output": "（核心指标表+漏斗分析+Top机会+风险单+下周打法的结构化周报）",
+        "output_format": "markdown",
     },
     {
         "code": "SC-SAL-002", "title": "客户邮件（中/英/俄/波斯语等）", "department": "商务部", "category": "sales",
@@ -227,6 +256,10 @@ SCENARIOS: list[dict] = [
             "你是 V-FLO 国际商务写作专家。\n语言：{{language}}\n目的：{{purpose}}\n要点：{{key_points}}\n\n"
             "输出完整邮件（主题+正文+落款）。语气专业克制；含行动号召；不承诺未授权事项。"
         ),
+        "quality_notes": "语气专业克制；含明确行动号召；不承诺未授权事项。",
+        "example_input": "语言：English；目的：催客户批复数据表；要点：已提交10天/影响排产/请本周五前回复",
+        "example_output": "（主题+正文+落款的完整邮件，含明确行动号召）",
+        "output_format": "email",
     },
     {
         "code": "SC-SAL-003", "title": "合同/协议条款初审清单", "department": "商务部", "category": "sales",
@@ -246,6 +279,10 @@ SCENARIOS: list[dict] = [
             "输出：高中低风险表（条款/风险/影响/建议表述）；出口管制与制裁条款是否覆盖；"
             "结尾注明需法务/合规官复核。"
         ),
+        "quality_notes": "按高/中/低风险分级并给出建议表述；出口管制与制裁条款覆盖性必查；结尾注明需法务复核。",
+        "example_input": "条款：付款30%预付70%发货前；验收：到港后30天；违约：逾期0.3%/周；争议：新加坡仲裁",
+        "example_output": "（高/中/低风险表+出口管制覆盖检查+法务复核提示的初审清单）",
+        "output_format": "table",
     },
     {
         "code": "SC-SAL-004", "title": "项目跟单六块看板摘要", "department": "商务部", "category": "sales",
@@ -265,6 +302,10 @@ SCENARIOS: list[dict] = [
             "你是 V-FLO 项目跟单助理。按六块生成跟单摘要。\n项目：{{project}}\n现状：{{six_blocks}}\n\n"
             "输出：六块状态表（状态/卡点/责任人/下一步/截止日）；逾期预警；需升级事项。"
         ),
+        "quality_notes": "六块状态齐全不遗漏；逾期项有预警与升级去向；下一步到人到日。",
+        "example_input": "项目：VF-2026-066哈萨克泵站；六块：文件待批复|生产80%|检验未排|收款70%|澄清2项未关|发货待定",
+        "example_output": "（六块状态表+逾期预警+需升级事项的项目会摘要）",
+        "output_format": "table",
     },
     {
         "code": "SC-SAL-005", "title": "采购比价与交期催办", "department": "商务部", "category": "sales",
@@ -285,6 +326,10 @@ SCENARIOS: list[dict] = [
             "若比价：输出比价表+总拥有成本+定点建议。若催交：输出对供方催交函+内部升级建议。"
             "涉及出口目的地物料时提示合规筛查。"
         ),
+        "quality_notes": "比价须含总拥有成本与明确定点建议；催交函正式留痕并给内部升级路径；涉出口物料提示合规筛查。",
+        "example_input": "用途：比价；信息：机械密封，A厂8.5万/12周，B厂7.9万/16周，C厂9.2万/10周含备件包",
+        "example_output": "（比价表+总拥有成本+定点建议；或对供方催交函+内部升级建议）",
+        "output_format": "table",
     },
     {
         "code": "SC-SAL-006", "title": "市场活动总结与业务洞察", "department": "商务部", "category": "sales",
@@ -304,6 +349,10 @@ SCENARIOS: list[dict] = [
             "你是 V-FLO 市场分析师。写活动总结并输出业务洞察。\n活动：{{activity}}\n信息：{{notes}}\n\n"
             "输出：事实摘要—洞察（行业/竞争/客户）—线索转化建议—需沉淀知识库条目。洞察必须有证据支撑。"
         ),
+        "quality_notes": "洞察必须有事实证据支撑；区分事实与推断；线索转化建议可执行。",
+        "example_input": "活动：2026俄罗斯ECWATECH水处理展；信息：到访客户23家，竞品推新品，客户关注交期与售后",
+        "example_output": "（事实摘要+行业/竞争/客户洞察+线索转化建议+入库条目建议）",
+        "output_format": "markdown",
     },
 
     # ================= 工程技术部（前期） =================
@@ -325,6 +374,10 @@ SCENARIOS: list[dict] = [
             "你是 V-FLO 前期技术工程师，熟悉流程泵选型。\n工况：{{duty_point}}\n候选：{{candidates}}\n\n"
             "输出：工况理解；对比表（性能/材质/标准/交期/价格）；推荐与理由；需澄清问题。禁止编造性能曲线数据。"
         ),
+        "quality_notes": "禁止编造性能曲线数据；推荐须给明确理由；不确定参数列入需澄清问题。",
+        "example_input": "工况：Q=120m³/h，H=55m，含硫污水，80°C，1.6MPa；候选：ZE100-250/国产CHL/进口CR",
+        "example_output": "（工况理解+候选对比表+推荐与理由+需澄清问题清单）",
+        "output_format": "table",
     },
     {
         "code": "SC-ENG-002", "title": "报价成本核算表骨架", "department": "工程技术部（前期）", "category": "dev",
@@ -341,6 +394,10 @@ SCENARIOS: list[dict] = [
             "你是成本核算助理。生成报价成本表骨架。\nBOM：{{bom}}\n目标毛利：{{target_margin}}\n\n"
             "输出：材料/加工/外购/包装运费/税费/毛利结构表；敏感项标注；定价建议。"
         ),
+        "quality_notes": "成本分项齐全（材料/加工/外购/包装运费/税费/毛利）；敏感项有标注；不虚构单价。",
+        "example_input": "BOM：泵体铸件2件/机封2套/电机2台/变频器1台；目标毛利：18%",
+        "example_output": "（分项成本结构表+敏感项标注+定价建议的成本表骨架）",
+        "output_format": "table",
     },
     {
         "code": "SC-ENG-003", "title": "需求解析与澄清问题清单", "department": "工程技术部（前期）", "category": "dev",
@@ -354,6 +411,10 @@ SCENARIOS: list[dict] = [
             "你是需求解析专家。\n内容：\n{{spec}}\n\n"
             "输出：项目信息表；关键参数表(规定值/单位/强制|推荐)；歧义项；必须澄清的问题（按优先级）。"
         ),
+        "quality_notes": "关键参数须含规定值/单位/强制或推荐属性；歧义项单列；澄清问题按优先级排序。",
+        "example_input": "规格书片段：泵须符合API610，NPSHr≤3m，过流件双相钢，文件须英文提交……",
+        "example_output": "（项目信息表+关键参数表+歧义项+按优先级排序的澄清问题清单）",
+        "output_format": "table",
     },
 
     # ================= 工程技术部（后期） =================
@@ -375,6 +436,10 @@ SCENARIOS: list[dict] = [
             "你是后期交付工程师。生成交付文件清单与进度计划。\n订单：{{order}}\n要求文件：{{req_docs}}\n\n"
             "输出：文件清单表(编号/名称/责任人/提交日/状态)；澄清关闭规则(3工作日)；风险项。"
         ),
+        "quality_notes": "文件清单到编号/责任人/提交日/状态；澄清关闭规则明确3个工作日。",
+        "example_input": "订单：VF-2026-066；要求文件：数据表/GA图/PID/安装手册/材质证书，英文，批复制",
+        "example_output": "（文件清单表+3工作日澄清关闭规则+风险项的交付计划）",
+        "output_format": "table",
     },
     {
         "code": "SC-ENG-012", "title": "客户批复意见处理单", "department": "工程技术部（后期）", "category": "dev",
@@ -394,6 +459,10 @@ SCENARIOS: list[dict] = [
             "你是后期文件工程师。生成批复处理单。\n意见：{{comments}}\n处理：{{our_action}}\n\n"
             "输出：逐条(意见/处理/是否修改文件/负责人/完成日)；需再次澄清项；版本升级提示。"
         ),
+        "quality_notes": "逐条对应不遗漏；每条明确是否修改文件、负责人与完成日；需再澄清项单列。",
+        "example_input": "客户意见：1.GA图补地脚螺栓尺寸 2.数据表材质改SS316；我方处理：1.三维修改后升版 2.与采购确认后回复",
+        "example_output": "（逐条处理单：意见/处理/是否改文件/负责人/完成日+版本升级提示）",
+        "output_format": "table",
     },
     {
         "code": "SC-ENG-013", "title": "三维模型修改说明", "department": "工程技术部（后期）", "category": "dev",
@@ -410,6 +479,10 @@ SCENARIOS: list[dict] = [
             "你是三维设计助理。生成修改说明与核对清单。\n修改：{{change}}\n零件：{{parts}}\n\n"
             "输出：修改项表；受影响图纸/BOM；核对清单；需设计确认项。"
         ),
+        "quality_notes": "修改项与受影响图纸/BOM一一对应；核对清单可逐项打钩；不确定项标需设计确认。",
+        "example_input": "修改：底座开孔距500改520，新增吊耳2个；零件：底座/泵盖/进出口法兰",
+        "example_output": "（修改项表+受影响图纸/BOM清单+核对清单+需设计确认项）",
+        "output_format": "table",
     },
 
     # ================= 屏蔽泵事业部 =================
@@ -431,6 +504,10 @@ SCENARIOS: list[dict] = [
             "你是屏蔽泵设计工程师。给出选型建议与数据表骨架。\n工况：{{duty}}\n标准：{{std}}\n\n"
             "输出：选型逻辑；推荐型号特征；数据表字段骨架；需计算/确认项（水力/热力/电磁）。不编造曲线。"
         ),
+        "quality_notes": "选型逻辑可追溯；数据表字段齐全；不编造曲线与性能数据，待计算/确认项显式列出。",
+        "example_input": "工况：介质液氨，Q=25m³/h，H=80m，-33°C，NPSHa=2.5m；标准：API685",
+        "example_output": "（选型逻辑+推荐型号特征+数据表字段骨架+需计算/确认项清单）",
+        "output_format": "markdown",
     },
     {
         "code": "SC-PMP-002", "title": "设计计算书结构与校核清单", "department": "屏蔽泵事业部", "category": "dev",
@@ -447,6 +524,10 @@ SCENARIOS: list[dict] = [
             "你是屏蔽泵技术专家。输出计算书结构与校核清单。\n对象：{{design}}\n\n"
             "输出：水力/热力/转子动力学/电磁/强度章节骨架；校核项清单；评审关注点。"
         ),
+        "quality_notes": "计算书章节覆盖水力/热力/转子动力学/电磁/强度；校核项可逐条检查；评审关注点明确。",
+        "example_input": "设计对象：45kW屏蔽泵，输送LPG，防爆ExdIIBT4，380V",
+        "example_output": "（五类计算章节骨架+校核项清单+评审关注点）",
+        "output_format": "markdown",
     },
 
     # ================= 研发设计部 =================
@@ -468,6 +549,10 @@ SCENARIOS: list[dict] = [
             "你是研发项目经理。生成项目计划骨架。\n项目：{{project}}\n目标：{{goals}}\n\n"
             "输出：WBS；里程碑；资源；风险；评审节点；与简道云任务字段对齐的建议（标题/起止/负责人/优先级/所属项目）。"
         ),
+        "quality_notes": "WBS与里程碑完整；任务字段与简道云五要素对齐（标题/起止/负责人/优先级/所属项目）。",
+        "example_input": "项目：高效屏蔽泵水力模型开发；目标：效率提升3%，2026Q4完成样机验证",
+        "example_output": "（WBS+里程碑+资源+风险+评审节点+简道云字段建议的项目计划骨架）",
+        "output_format": "markdown",
     },
     {
         "code": "SC-RND-002", "title": "NCR处置建议书", "department": "研发设计部", "category": "dev",
@@ -487,6 +572,10 @@ SCENARIOS: list[dict] = [
             "你是研发质量工程师。输出NCR处置建议。\n事实：{{ncr}}\n线索：{{cause}}\n\n"
             "输出：问题定义—原因假设—处置方案(返工/让步/报废)—纠正预防—需验证项。禁止编造检测数据。"
         ),
+        "quality_notes": "处置方案三选一明确（返工/让步/报废）并有纠正预防；禁止编造检测数据；需验证项单列。",
+        "example_input": "NCR事实：泵体铸件X光探伤2处气孔超标；线索：近期更换树脂砂供应商",
+        "example_output": "（问题定义—原因假设—处置方案—纠正预防—需验证项的处置建议书）",
+        "output_format": "markdown",
     },
     {
         "code": "SC-RND-003", "title": "BOM编制与变更单", "department": "研发设计部", "category": "dev",
@@ -503,6 +592,10 @@ SCENARIOS: list[dict] = [
             "你是BOM工程师。生成变更单。\n变更：{{change}}\n明细：{{items}}\n\n"
             "输出：变更原因；增删改物料表；受影响工单/采购；生效条件。"
         ),
+        "quality_notes": "增删改物料逐项列明；受影响工单/采购全覆盖；生效条件明确。",
+        "example_input": "变更：机封供应商由A改B；明细：删A-123机械密封2件，增B-456机械密封2件",
+        "example_output": "（变更原因+增删改物料表+受影响工单/采购+生效条件的变更单）",
+        "output_format": "table",
     },
 
     # ================= 生产部 =================
@@ -525,6 +618,10 @@ SCENARIOS: list[dict] = [
             "你是生产文员助理。生成生产日报。\n班组：{{line}}\n完成：{{output}}\n异常：{{issues}}\n\n"
             "输出：产量/进度表；异常与处理；需协调；明日计划。可直接作为简道云任务附件。"
         ),
+        "quality_notes": "产量/进度如实填写；异常有处理与升级去向；可直接作为简道云任务附件。",
+        "example_input": "班组：装配一班；完成：屏蔽泵装配3台，计划达成100%；异常：1台电机到货延迟，已报采购",
+        "example_output": "（产量进度表+异常与处理+需协调+明日计划的日报）",
+        "output_format": "markdown",
     },
     {
         "code": "SC-PRD-002", "title": "设备点检与故障报修单", "department": "生产部", "category": "general",
@@ -541,6 +638,10 @@ SCENARIOS: list[dict] = [
             "你是设备维修助理。生成报修/点检单。\n设备：{{equipment}}\n现象：{{symptom}}\n\n"
             "输出：现象描述；可能原因；应急措施；安全提示；报修升级建议。"
         ),
+        "quality_notes": "现象描述具体可定位；应急措施与安全提示明确；报修升级建议到层级。",
+        "example_input": "设备：2号数控车床；现象：主轴异响，800转以上明显，伴振动",
+        "example_output": "（现象描述+可能原因+应急措施+安全提示+升级建议的报修单）",
+        "output_format": "document",
     },
     {
         "code": "SC-PRD-003", "title": "工艺/作业指导要点卡", "department": "生产部", "category": "general",
@@ -554,6 +655,10 @@ SCENARIOS: list[dict] = [
             "你是工艺工程师。输出作业要点卡。\n工序：{{process}}\n\n"
             "输出：目的/适用范围/步骤/质量控制点/安全要点/常见异常处理。"
         ),
+        "quality_notes": "步骤可操作；质量控制点与安全要点明确；常见异常有处理指引。",
+        "example_input": "工序：屏蔽泵定子屏蔽套氩弧焊",
+        "example_output": "（目的/适用范围/步骤/质量控制点/安全要点/常见异常处理的作业要点卡）",
+        "output_format": "document",
     },
 
     # ================= 质检部 =================
@@ -577,6 +682,10 @@ SCENARIOS: list[dict] = [
             "你是质量工程师，编写8D报告。\n问题：{{problem}}\n围堵：{{containment}}\n分析：{{analysis}}\n\n"
             "输出完整8D(D1-D8)，未知写“待补充”，禁止编造根因与检测数据。"
         ),
+        "quality_notes": "D1–D8完整；未知项写“待补充”；禁止编造根因与检测数据。",
+        "example_input": "问题：客户反馈泵运行2周后机封泄漏，批次2026-08；围堵：同批次库存封存复检；分析：疑似O圈材质不耐介质",
+        "example_output": "（D1–D8完整的8D报告初稿，未知项标注待补充）",
+        "output_format": "markdown",
     },
     {
         "code": "SC-QA-002", "title": "质量月报/质量分析会材料", "department": "质检部", "category": "general",
@@ -595,6 +704,10 @@ SCENARIOS: list[dict] = [
             "你是质量分析助理。生成质量月报。\n数据：{{data}}\n\n"
             "输出：指标趋势；帕累托不良项；根因假设；改进项目建议(可进简道云项目结项)；下月目标。"
         ),
+        "quality_notes": "指标趋势基于所给数据；帕累托排序正确；改进项目建议可落地并可进简道云结项。",
+        "example_input": "质量数据：9月合格率98.2%，不良TOP3为气孔/尺寸超差/泄漏，客诉1起，NCR4份",
+        "example_output": "（指标趋势+帕累托不良项+根因假设+改进项目建议+下月目标的月报）",
+        "output_format": "markdown",
     },
     {
         "code": "SC-QA-003", "title": "检验记录规范填写助手", "department": "质检部", "category": "general",
@@ -613,6 +726,10 @@ SCENARIOS: list[dict] = [
             "你是质检记录助理。整理检验记录。\n内容：{{inspection}}\n\n"
             "输出：规范记录条目（项目/标准/实测/判定/检验员/时间）；缺项提醒；异常升级建议。"
         ),
+        "quality_notes": "记录条目齐全（项目/标准/实测/判定/检验员/时间）；缺项有提醒；异常有升级建议。",
+        "example_input": "检验项目：泵体水压试验，1.5倍设计压力保压10min，实测无渗漏，检验员王五",
+        "example_output": "（规范检验记录条目+缺项提醒+异常升级建议）",
+        "output_format": "table",
     },
 
     # ================= 财务部 =================
@@ -634,6 +751,10 @@ SCENARIOS: list[dict] = [
             "你是结账助理。生成报表编制检查单。\n期间：{{period}}\n进度：{{status}}\n\n"
             "输出：结账步骤检查单；常见差错点；未完成项责任人；出具时间倒排。不涉及具体金额编造。"
         ),
+        "quality_notes": "检查单覆盖结账全步骤；常见差错点列明；不编造具体金额；出具时间倒排到日。",
+        "example_input": "期间：2026-09；进度：凭证录入90%，银行对账完成，折旧未计提，出口退税待申报",
+        "example_output": "（结账步骤检查单+常见差错点+未完成项责任人+出具时间倒排）",
+        "output_format": "table",
     },
     {
         "code": "SC-FIN-002", "title": "税务申报提醒与资料清单", "department": "财务部", "category": "general",
@@ -652,6 +773,10 @@ SCENARIOS: list[dict] = [
             "你是税务助理。生成申报提醒清单。\n范围：{{taxes}}\n\n"
             "输出：税种/征期/资料清单/责任人/风险提示。含出口退税进程跟踪提醒。"
         ),
+        "quality_notes": "税种/征期/资料/责任人四要素齐全；含出口退税进程跟踪提醒；风险提示具体。",
+        "example_input": "范围：集团13家公司，增值税/企业所得税/个税/出口退税",
+        "example_output": "（税种/征期/资料清单/责任人/风险提示的申报提醒清单）",
+        "output_format": "table",
     },
     {
         "code": "SC-FIN-003", "title": "费用报销初审要点", "department": "财务部", "category": "general",
@@ -665,6 +790,10 @@ SCENARIOS: list[dict] = [
             "你是报销初审助理。\n内容：{{expense}}\n\n"
             "输出：合规性检查清单（发票/审批/标准/附件）；退回补正项；可入账摘要建议。"
         ),
+        "quality_notes": "合规检查覆盖发票/审批/标准/附件；退回补正项明确；摘要建议可直接入账。",
+        "example_input": "报销事由：莫斯科展会差旅费，机票+酒店发票3张合计2.1万，已附审批单",
+        "example_output": "（合规性检查清单+退回补正项+可入账摘要建议）",
+        "output_format": "table",
     },
 
     # ================= 人事行政部 =================
@@ -687,6 +816,10 @@ SCENARIOS: list[dict] = [
             "你是 HR 专家。生成岗位说明书与结构化面试题。\n岗位：{{position}}\n部门：{{dept}}\n要求：{{must}}\n\n"
             "输出：JD；任职资格；面试评价表(与四维绩效对齐)；5道结构化面试题与评分要点。"
         ),
+        "quality_notes": "JD与硬性要求一致；面试题结构化且附评分要点；评价表与四维绩效对齐。",
+        "example_input": "岗位：国际销售；部门：商务部；硬性要求：英语流利、俄语优先，3年泵阀外贸经验",
+        "example_output": "（JD+任职资格+面试评价表+5道结构化面试题与评分要点）",
+        "output_format": "document",
     },
     {
         "code": "SC-HR-002", "title": "培训纪要与学时统计", "department": "人事行政部", "category": "general",
@@ -707,6 +840,10 @@ SCENARIOS: list[dict] = [
             "你是培训助理。生成培训纪要。\n主题：{{training}}\n参加：{{attendees}}\n要点：{{points}}\n\n"
             "输出：纪要；学时统计表(可直接录简道云预计工时)；效果评估；后续行动。"
         ),
+        "quality_notes": "学时统计可直接录简道云预计工时；纪要含效果评估与后续行动。",
+        "example_input": "主题：出口管制合规培训；参加：销售/项目共18人，每人2学时；要点：红旗识别/EUC/制裁名单",
+        "example_output": "（培训纪要+学时统计表+效果评估+后续行动）",
+        "output_format": "markdown",
     },
     {
         "code": "SC-HR-003", "title": "绩效面谈提纲与改进计划", "department": "人事行政部", "category": "general",
@@ -727,6 +864,10 @@ SCENARIOS: list[dict] = [
             "你是绩效教练。生成面谈提纲与改进计划。\n岗位：{{role}}\n事实：{{facts}}\n\n"
             "输出：面谈结构(成绩/不足/倾听/目标)；改进计划表(目标/行动/资源/节点)；可录入简道云的团队培养任务建议。"
         ),
+        "quality_notes": "面谈基于事实依据；改进计划表到目标/行动/资源/节点；建议可录简道云团队培养任务。",
+        "example_input": "岗位：项目工程师；事实：季度任务完成12/14，1次周报迟交，获客户表扬信1封",
+        "example_output": "（面谈结构提纲+改进计划表+可录简道云的团队培养任务建议）",
+        "output_format": "markdown",
     },
     {
         "code": "SC-HR-004", "title": "制度通知与活动方案", "department": "人事行政部", "category": "general",
@@ -743,6 +884,10 @@ SCENARIOS: list[dict] = [
             "你是行政文秘。撰写正式通知/方案。\n主题：{{topic}}\n要点：{{points}}\n\n"
             "输出：标题—背景—要求—时间—责任—落款。语气庄重清晰。"
         ),
+        "quality_notes": "公文要素齐全（标题/背景/要求/时间/责任/落款）；语气庄重清晰无歧义。",
+        "example_input": "主题：2026年中秋国庆放假通知；要点：放假8天、值班安排、节前安全检查",
+        "example_output": "（标题—背景—要求—时间—责任—落款的正式通知）",
+        "output_format": "document",
     },
 
     # ================= 总经办 =================
@@ -767,6 +912,10 @@ SCENARIOS: list[dict] = [
             "输出：结论先行；关键指标红黄绿；问题根因假设；决策选项(利弊/风险/建议)；下周动作。"
             "要求体现决策质量与业务洞察，供AI评分与会议使用。"
         ),
+        "quality_notes": "结论先行；指标红黄绿基于数据；决策选项含利弊/风险/建议，体现决策质量与业务洞察。",
+        "example_input": "期间：2026-09；数据：销售800万/回款620万/交付准时率92%/客诉2起；议题：俄市场付款延迟、新品上市节奏",
+        "example_output": "（结论先行的一页纸：红黄绿指标+根因假设+决策选项+下周动作）",
+        "output_format": "markdown",
     },
     {
         "code": "SC-GM-002", "title": "战略任务分解与督办清单", "department": "总经办", "category": "general",
@@ -786,6 +935,10 @@ SCENARIOS: list[dict] = [
             "输出：任务分解表(任务名/负责人/部门/起止/优先级/所属项目/验收标准)；"
             "可直接录入简道云任务管理；督办节奏建议。"
         ),
+        "quality_notes": "任务分解含任务名/负责人/部门/起止/优先级/所属项目/验收标准，可直接录简道云；督办节奏明确。",
+        "example_input": "战略要点：2026年海外营收占比提至40%，重点突破中亚市场",
+        "example_output": "（可直接录简道云的任务分解表+督办节奏建议）",
+        "output_format": "table",
     },
     {
         "code": "SC-GM-003", "title": "重大决策评审材料", "department": "总经办", "category": "general",
@@ -802,6 +955,10 @@ SCENARIOS: list[dict] = [
             "你是决策参谋。生成决策评审材料。\n事项：{{decision}}\n方案：{{options}}\n\n"
             "输出：背景；方案对比(收益/风险/资源/周期)；敏感性；建议与触发回滚条件；需董事会/合规审批项。"
         ),
+        "quality_notes": "方案对比含收益/风险/资源/周期；有敏感性分析与回滚触发条件；需审批项明确。",
+        "example_input": "决策事项：是否在哈萨克设装配点；候选方案：A独资建厂/B与本地代理合作/C维持直接出口",
+        "example_output": "（背景+方案对比+敏感性+建议与回滚条件+需审批项的评审材料）",
+        "output_format": "document",
     },
 
     # ================= 威标部（AI） =================
@@ -826,6 +983,10 @@ SCENARIOS: list[dict] = [
             "输出必须包含简道云任务五要素：任务标题、开始时间、截止时间、负责人、优先级、所属项目；"
             "另加：验收标准、输入输出、依赖、风险。禁止空泛描述。"
         ),
+        "quality_notes": "必须含简道云任务五要素（标题/起止/负责人/优先级/所属项目）；验收标准可勾选；禁止空泛描述。",
+        "example_input": "需求：自动生成项目周报的智能体；部门：项目部/项目工程师；期望：2026-10-15前上线",
+        "example_output": "（五要素+验收标准+输入输出+依赖+风险的开发任务书）",
+        "output_format": "document",
     },
     {
         "code": "SC-AI-002", "title": "代码审查要点（工作质量AI评分）", "department": "威标部", "category": "dev",
@@ -846,6 +1007,10 @@ SCENARIOS: list[dict] = [
             "输出按严重度分级（阻断/建议/讨论），覆盖：正确性、安全、可维护性、测试、性能；"
             "结论明确是否可合并。文风体现技术深度（利于AI评分）。"
         ),
+        "quality_notes": "意见按阻断/建议/讨论分级；覆盖正确性/安全/可维护性/测试/性能；结论明确是否可合并。",
+        "example_input": "变更摘要：新增周报生成API；实现：router+service两层，含模型调用与缓存",
+        "example_output": "（按严重度分级的审查意见+是否可合并的明确结论）",
+        "output_format": "markdown",
     },
     {
         "code": "SC-AI-003", "title": "任务描述润色（拉高AI评分）", "department": "通用", "category": "general",
@@ -871,6 +1036,9 @@ SCENARIOS: list[dict] = [
             "另输出：任务五要素建议（标题/起止/负责人/优先级/所属项目）与3条验收标准。"
         ),
         "quality_notes": "改写后必须比原文更具体、可验证、可复用。",
+        "example_input": "原文：上周把客户那个图改了一下发出去了；岗位：机械工程师-后期",
+        "example_output": "（体现技术深度/彻底性/可维护性的规范任务描述+五要素建议+3条验收标准）",
+        "output_format": "markdown",
     },
 
     # ================= 出口管制合规（跨部门执行） =================
@@ -904,6 +1072,10 @@ SCENARIOS: list[dict] = [
             "4. 红旗清单\n5. 结论：完成清单后放行 / 人工审核放行 / 升级分类 / 硬性禁止\n"
             "6. 后续动作与需补材料\n禁止提供规避任何适用法规的建议。不确定处标[待合规确认]。"
         ),
+        "quality_notes": "结论四选一明确（放行/人工审核/升级分类/硬性禁止）；两用物项分类有依据；不确定处标[待合规确认]；不提供规避建议。",
+        "example_input": "客户：ABC Trading LLP；国别：哈萨克斯坦；最终用户：同客户；用途：石化厂民用注水；产品：屏蔽泵2台",
+        "example_output": "（检查清单+国家风险提示+物项分类+红旗清单+四选一结论+后续动作的审查单）",
+        "output_format": "document",
     },
     {
         "code": "SC-EXP-002", "title": "最终用户/最终用途承诺书（EUC）起草", "department": "商务部", "category": "sales",
@@ -924,6 +1096,10 @@ SCENARIOS: list[dict] = [
             "输出：声明正文（不转让、不改用途、接受核查、违约责任）；签署栏；附件清单。"
             "注明需合规官/法务审定后使用。"
         ),
+        "quality_notes": "中英双语对照；含不转让/不改用途/接受核查/违约责任条款；注明需合规官/法务审定后使用。",
+        "example_input": "主体：V-FLO与ABC Trading LLP；物项：屏蔽泵2台及备件；用途：石化注水泵站民用",
+        "example_output": "（中英双语EUC草稿：声明正文+签署栏+附件清单）",
+        "output_format": "document",
     },
     {
         "code": "SC-EXP-003", "title": "出口管制与制裁条款审查", "department": "商务部", "category": "sales",
@@ -938,6 +1114,10 @@ SCENARIOS: list[dict] = [
             "你是出口合规条款审查助理。\n条款：\n{{clauses}}\n\n"
             "输出：是否覆盖（出口许可、再出口、最终用途、制裁、审计配合、终止权）；缺口；建议补充条款。"
         ),
+        "quality_notes": "六项覆盖逐一判定（许可/再出口/最终用途/制裁/审计配合/终止权）；缺口给出具体补充条款建议。",
+        "example_input": "现有条款：买方承诺遵守适用法律；争议提交新加坡仲裁；无出口管制专项条款",
+        "example_output": "（六项覆盖检查表+缺口清单+建议补充条款）",
+        "output_format": "table",
     },
     {
         "code": "SC-EXP-004", "title": "技术资料外发合规边界确认", "department": "工程技术部（前期）", "category": "dev",
@@ -960,6 +1140,10 @@ SCENARIOS: list[dict] = [
             "输出：逐项判断（公开/内部/可能受控）；脱敏与裁剪建议；需审批层级；"
             "禁止输出受控技术参数本身。结论仅供合规官决策。"
         ),
+        "quality_notes": "逐项判断公开/内部/可能受控；不输出受控技术参数本身；审批层级明确。",
+        "example_input": "资料：GA图/PID/3D模型/安装手册；接收方：哈萨克客户；用途：基础设计审查",
+        "example_output": "（逐项受控判断表+脱敏裁剪建议+审批层级+合规官决策提示）",
+        "output_format": "table",
     },
     {
         "code": "SC-EXP-005", "title": "红旗识别与升级报告", "department": "商务部", "category": "sales",
@@ -977,6 +1161,10 @@ SCENARIOS: list[dict] = [
             "输出：红旗命中项；风险等级；必须停止的动作；升级对象与时限；需保存的证据清单。\n"
             "不得建议如何规避监管。"
         ),
+        "quality_notes": "红旗命中项引用事实；风险等级明确；停止动作与升级对象/时限具体；附证据清单；不提供规避监管建议。",
+        "example_input": "异常事实：新客户要求经第三国转运，拒绝透露最终用户，付款方为壳公司",
+        "example_output": "（红旗命中项+风险等级+必须停止动作+升级对象与时限+证据清单的报告）",
+        "output_format": "markdown",
     },
     {
         "code": "SC-EXP-006", "title": "合规培训要点与测验", "department": "人事行政部", "category": "general",
@@ -996,6 +1184,10 @@ SCENARIOS: list[dict] = [
             "你是合规培训设计师。生成培训要点与测验。\n对象：{{audience}}\n\n"
             "输出：10条必会规则；3个V-FLO场景案例（可匿名）；5道测验题与答案；培训学时建议。"
         ),
+        "quality_notes": "必会规则与V-FLO场景贴合；测验题附答案；学时建议合理可录简道云。",
+        "example_input": "培训对象：销售与项目岗位",
+        "example_output": "（10条必会规则+3个场景案例+5道测验题与答案+学时建议）",
+        "output_format": "markdown",
     },
 
     # ================= 通用办公 =================
@@ -1012,6 +1204,10 @@ SCENARIOS: list[dict] = [
             "你是商务写作助理。\n目的：{{purpose}}\n草稿：{{draft}}\n\n"
             "输出润色后的邮件；保留原意；给出更短版本。"
         ),
+        "quality_notes": "保留原意不增改事实；语气得体；附更短版本。",
+        "example_input": "目的：催供应商交期；草稿：你们的货晚了，快点发，我们等着用",
+        "example_output": "（润色后邮件+更短版本）",
+        "output_format": "email",
     },
     {
         "code": "SC-GEN-002", "title": "长文摘要与知识入库", "department": "通用", "category": "general",
@@ -1029,6 +1225,10 @@ SCENARIOS: list[dict] = [
             "你是高级文秘。\n关注点：{{focus}}\n\n文档：\n{{doc_text}}\n\n"
             "输出：一页摘要；可直接进知识库的条目（标题/标签/适用范围/要点）；建议精读章节。"
         ),
+        "quality_notes": "摘要控制在一页；入库条目含标题/标签/适用范围/要点；不曲解原文结论。",
+        "example_input": "文档：某泵阀行业白皮书节选约3000字；关注点：市场趋势",
+        "example_output": "（一页摘要+可入库条目+建议精读章节）",
+        "output_format": "markdown",
     },
     {
         "code": "SC-GEN-003", "title": "PPT大纲与讲稿", "department": "通用", "category": "general",
@@ -1044,6 +1244,10 @@ SCENARIOS: list[dict] = [
             "你是汇报教练。\n主题：{{topic}}\n听众：{{audience}}\n要点：{{key_points}}\n\n"
             "输出：页级大纲+逐页讲稿要点+行动号召。"
         ),
+        "quality_notes": "页级大纲逻辑清晰；每页有讲稿要点；结尾有行动号召。",
+        "example_input": "主题：屏蔽泵技术优势介绍；听众：潜在客户技术负责人；要点：无泄漏/低维护/API685业绩",
+        "example_output": "（页级大纲+逐页讲稿要点+行动号召）",
+        "output_format": "markdown",
     },
     {
         "code": "SC-GEN-004", "title": "数据表解读", "department": "通用", "category": "general",
@@ -1058,6 +1262,10 @@ SCENARIOS: list[dict] = [
             "你是数据分析师。\n问题：{{question}}\n数据：{{data}}\n\n"
             "输出：直接结论3条；支撑数字；异常点；图表建议；需补充数据。"
         ),
+        "quality_notes": "结论直接且由数据支撑；异常点单列；不编造数据，缺数据写需补充。",
+        "example_input": "数据：1–9月各月销售额表；问题：Q4能否完成年度目标？",
+        "example_output": "（3条直接结论+支撑数字+异常点+图表建议+需补充数据）",
+        "output_format": "markdown",
     },
 ]
 
@@ -1104,6 +1312,7 @@ def seed_scenarios(db: Session) -> int:
             default_model=item.get("default_model", "mimo"),
             fallback_model=item.get("fallback_model", "kimi"),
             quality_notes=item.get("quality_notes", ""),
+            output_format=item.get("output_format", "markdown"),
             example_input=item.get("example_input", ""),
             example_output=item.get("example_output", ""),
             kpi_links=item.get("kpi_links", []),

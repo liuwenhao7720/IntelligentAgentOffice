@@ -36,6 +36,10 @@ logs/
 backups/
 uploads/
 
+# Runtime data & local tooling state
+data/
+.docker-config/
+
 # SQLite database (use a fresh one after deploy)
 *.db
 *.db-journal

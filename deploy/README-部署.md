@@ -61,6 +61,21 @@ docker compose down   # 不删数据卷
 - [ ] 关闭不必要的系统服务
 - [ ] 日志轮转与磁盘告警（>80%）
 
+## 7.1 角色权限与企业微信扫码登录上线 checklist
+- [ ] 角色体系：staff 员工 / manager 部门经理 / compliance 合规官 / admin 管理员。
+      首个 admin 由 `DEV_ADMIN_USERS` 白名单产生，之后一律在「管理看板 → 用户管理」分配角色，
+      不再改环境变量；系统内置防误锁（不能改自己角色/停用自己）
+- [ ] 企微管理后台：将 `WECOM_REDIRECT_URI` 的域名/IP:端口 登记为自建应用的
+      「可信域名 / 授权回调域」，值需与 `.env` 完全一致（内网入口示例
+      `http://192.168.2.22:8008/api/v1/auth/wecom/callback`）
+- [ ] 服务器需能出网访问 `qyapi.weixin.qq.com`（扫码换号）；不可达时系统自动 503 降级，
+      用户可临时用开发登录（若 ENABLE_DEV_LOGIN=1）
+- [ ] 生产务必 `ENABLE_DEV_LOGIN=0`：登录页只剩扫码入口，dev 账号停止新增
+- [ ] 历史 dev 账号（dev_* 前缀）与企微账号是独立身份；全员切换扫码后，
+      在用户管理中停用不再使用的 dev 账号
+- [ ] 验证：`curl http://127.0.0.1:8000/api/v1/auth/wecom/config` 返回 `wecom_enabled:true`，
+      登录页出现「企业微信扫码登录」按钮，扫码后回落首页自动进入
+
 ## 8. 故障恢复（单机 RTO≤4h）
 1. 重装 OS + Docker
 2. 拉起 compose

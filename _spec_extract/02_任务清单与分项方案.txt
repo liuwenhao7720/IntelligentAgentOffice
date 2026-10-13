@@ -1,0 +1,226 @@
+
+
+
+V-FLO极简智能办公系统
+开发任务清单与分项开发方案
+
+按部门岗位落位 · 每项任务含方案与代码
+
+
+
+
+对应产品：《V-FLO极简智能办公系统设计方案》
+代码库：vflo-smart-office/（已可运行，冒烟通过）
+模型：Mimo V2.6 · DeepSeek Harness · Kimi 3
+编制：总架构师办公室 / 威标AI事业部
+
+零、如何使用本清单
+本清单把设计方案拆成 14 个可执行开发任务（T01–T14），每项任务给出：目标、步骤与关键实现、代码位置、验收标准。代码库 vflo-smart-office/ 已实现其中绝大部分，并通过冒烟测试（登录→场景→生成→定稿diff→知产→看板）。
+排期建议：2–3 人并行，约 10 周完成产品化加固与试点推广；本仓库可作为第 1–5 周基线。
+门禁：任何任务合并前须过《设计方案》第4章 10 条上线门禁。
+场景卡（T13）按部门由业务 Owner 签字，技术只负责结构与发布。
+
+一、开发任务总表（WBS）
+编号 | 任务 | 所属 | 人天 | 负责岗位 | 产出/代码 | 依赖
+T01 | 项目脚手架与配置 | 平台 | 2 | 后端 | app/config.py, main.py, requirements.txt | —
+T02 | 数据模型与建库 | 平台 | 3 | 后端 | app/database.py | T01
+T03 | 鉴权与组织身份 | 平台 | 3 | 后端 | app/auth.py | T02
+T04 | 三模型网关 | 平台 | 4 | 后端 | app/services/model_gateway.py | T01
+T05 | 场景卡服务 | 业务 | 4 | 后端+PO | app/routers/api.py(scenarios), seed/ | T02
+T06 | 提示词拼装与diff | 业务 | 3 | 后端 | app/services/prompt_builder.py | T05
+T07 | 会话工作台API | 业务 | 4 | 后端 | api.py(sessions/generate/finalize) | T04-T06
+T08 | 留痕与审计 | 资产 | 2 | 后端 | EditDiff/AuditLog + finalize | T07
+T09 | 知产库 | 资产 | 3 | 后端 | api.py(assets) | T08
+T10 | 权限与密级 | 安全 | 2 | 后端 | auth.py + visibility | T03,T09
+T11 | 管理看板 | 管理 | 2 | 后端 | api.py(admin/stats) | T07-T09
+T12 | 前端工作台 | 前端 | 8 | 前端 | web/index.html, app.js, styles.css | T05-T09
+T13 | 按部门场景卡30+ | 业务 | 10 | 各部门PO | app/seed/scenarios.py | T05,T06
+T14 | 测试部署与试点 | 交付 | 5 | 全员 | tests/smoke.py, README, 部署 | T01-T13
+
+合计约 55 人天（开发）+ 10 人天（业务场景卡）。产品化加固（企微OAuth、PG、契约测试、监控）另计 15–20 人天，放在试点稳定后的第二迭代。
+二、分项开发方案
+T01　项目脚手架与配置（2人天 · 后端）
+目标：统一工程骨架与三模型密钥配置，未配密钥自动 MOCK，保证任何环境可跑通。
+步骤 | 开发内容 | 关键实现
+1 | 创建 FastAPI 应用与路由挂载 | main.py：include_router(/api)，startup 时 init_db + seed
+2 | 环境变量配置 | config.Settings：数据库URL、三模型 base_url/model/key、企微、MOCK开关
+3 | 依赖锁定 | fastapi / uvicorn / sqlalchemy==1.4.54 / pydantic / httpx
+4 | 静态资源托管 | mount /static → web/，根路径返回 index.html
+
+代码位置：vflo-smart-office/app/config.py, main.py, requirements.txt, .env.example
+验收标准：uvicorn 启动后 GET /api/health 返回 ok，浏览器可打开登录页。
+T02　数据模型与建库（3人天 · 后端）
+目标：六张主表落地：用户、场景卡、会话、消息、修改diff、知产、审计。
+步骤 | 开发内容 | 关键实现
+1 | ORM 模型定义 | User/Scenario/ChatSession/SessionMessage/EditDiff/Asset/AuditLog
+2 | 场景卡字段 | code, prompt_template, variables(JSON), default/fallback_model, use_count, version
+3 | 会话与消息 | variables 快照、tokens 计量、is_final 标记人工定稿
+4 | 改写痕迹表 | ai_text / final_text / diff_summary / edit_ratio
+5 | 建库策略 | 开发 SQLite；生产改 DATABASE_URL=postgresql+psycopg://...
+
+代码位置：app/database.py
+验收标准：init_db() 可重复执行；重启不丢数据；JSON 字段可读写。
+T03　鉴权与组织身份（3人天 · 后端）
+目标：一人一号、部门岗位进会话上下文；开发登录可切换企微 OAuth。
+步骤 | 开发内容 | 关键实现
+1 | 开发登录 | POST /api/auth/dev-login 按 姓名+部门 建号，签发 Bearer token
+2 | 当前用户依赖 | current_user：Header Authorization 校验，注入 User
+3 | 管理员校验 | require_admin：管理看板、场景精选
+4 | 生产预留 | 校验逻辑替换为企微 OAuth/JWT；ENABLE_DEV_LOGIN=0 关闭开发登录
+
+代码位置：app/auth.py
+验收标准：无令牌 401；普通用户访问 /admin/stats 403；部门岗位正确落库。
+T04　三模型网关（Mimo/DeepSeek/Kimi）（4人天 · 后端）
+目标：统一调用、推荐、一键切换、故障降级、token 计量。
+步骤 | 开发内容 | 关键实现
+1 | 适配器 | OpenAI 兼容 /chat/completions；三家 base_url/model 由配置注入
+2 | 推荐规则 | TASK_MODEL_MAP：写作→kimi，代码/分析→deepseek，快答→mimo；场景卡默认优先
+3 | 降级 | 主模型异常自动 fallback，响应标记 degraded
+4 | MOCK 模式 | 无密钥时生成结构化占位稿，保证 UI 与留痕链路可验收
+5 | 流式预留 | chat_stream() 供后续 SSE 体验升级
+
+代码位置：app/services/model_gateway.py
+验收标准：三模型配置任一可用即可出稿；断开主模型可见降级提示；tokens 入库。
+T05　场景卡服务（4人天 · 后端+业务）
+目标：场景卡 CRUD 与检索：按部门/分类/关键词找卡，点开即用。
+步骤 | 开发内容 | 关键实现
+1 | 列表/详情 | GET /api/scenarios?department=&category=&q=；详情含 prompt_template
+2 | 填空变量 | variables: [{key,label,required,placeholder}] 驱动前端表单
+3 | 版本与状态 | status=draft/active/deprecated，use_count 热度统计
+4 | 部门元数据 | GET /api/scenarios/meta/departments 聚合
+
+代码位置：app/routers/api.py（/scenarios）, app/seed/scenarios.py
+验收标准：按部门过滤正确；缺必填变量时 /generate 返回 422 与 missing 列表。
+T06　提示词拼装与修改 diff（3人天 · 后端）
+目标：填空变量替换 {{var}}；AI初稿与人工定稿 diff 量化。
+步骤 | 开发内容 | 关键实现
+1 | 模板填充 | VAR_PATTERN 替换 {{项目名称}} 等；缺变量校验
+2 | 消息组装 | system=模板, 历史近6条, user=补充要求
+3 | diff 统计 | 行级新增/删除摘要 + edit_ratio(0~1)
+4 | 质量回流 | edit_ratio 聚合为管理看板“平均修改率”
+
+代码位置：app/services/prompt_builder.py
+验收标准：变量替换正确；空修改 edit_ratio=0；改一段话 ratio>0 且摘要可读。
+T07　会话工作台 API（4人天 · 后端）
+目标：创建会话 → 填空 → 生成初稿 → 编辑 → 定稿 → 评分。
+步骤 | 开发内容 | 关键实现
+1 | 创建 | POST /api/sessions 携带 scenario_id/variables/model
+2 | 生成 | POST /sessions/{id}/generate：拼提示词→网关调用→存 assistant 消息
+3 | 定稿 | POST /sessions/{id}/finalize：存 is_final 消息 + EditDiff
+4 | 评分 | POST /sessions/{id}/rating 1–5 分，反馈场景优化
+5 | 历史 | GET /api/sessions 个人时间线
+
+代码位置：app/routers/api.py（/sessions）
+验收标准：冒烟用例 SC-PRJ-001 全链路通过；缺变量被拦截；定稿产生 diff 记录。
+T08　留痕与审计（2人天 · 资产）
+目标：谁、何时、哪个场景、哪个模型、改了多少，全链路可查。
+步骤 | 开发内容 | 关键实现
+1 | 审计写入 | login/session.generate/finalize/asset.create 均写 audit_logs
+2 | diff 永久化 | finalize 强制写 edit_diffs，禁止只存最终稿
+3 | 计量 | tokens_in/out 累计到 chat_sessions
+
+代码位置：database.py(EditDiff/AuditLog), routers/api.py(_audit)
+验收标准：任意操作可在 audit_logs 查到；diff 表可回答“这稿人工改了多少”。
+T09　知产库（3人天 · 资产）
+目标：个人/部门/公司三级可见的产出沉淀与检索。
+步骤 | 开发内容 | 关键实现
+1 | 归档 | POST /api/assets 标题+内容+visibility+tags
+2 | 检索 | scope=mine/dept/company/all + 关键词
+3 | 精选 | 管理员 feature 后 visibility=company，全员可见
+
+代码位置：app/routers/api.py（/assets）
+验收标准：部门可见性正确隔离；归档后在知产库可搜到。
+T10　权限与密级（2人天 · 安全）
+目标：企微组织权限继承；秘密级仅本人+授权管理者。
+步骤 | 开发内容 | 关键实现
+1 | 角色 | staff/admin；管理接口 require_admin
+2 | 可见性 | private/dept/company 三档过滤
+3 | 敏感场景锁模型 | 场景卡可标 security，指定通道（二期字段）
+
+代码位置：auth.py, Asset.visibility, Scenario 扩展 security_level（二期）
+验收标准：越权访问返回 403/404；部门间知产互不可见。
+T11　管理看板（2人天 · 管理）
+目标：六个数：用户、会话、知产、token、平均修改率、场景热度。
+步骤 | 开发内容 | 关键实现
+1 | 聚合统计 | count/sum/avg 一次查询返回
+2 | Top 场景 | use_count 排序 Top10
+3 | 部门分布 | 按 user.department 聚合会话数
+
+代码位置：app/routers/api.py（/admin/stats）
+验收标准：与会话操作联动刷新；平均修改率随定稿变化。
+T12　前端工作台（8人天 · 前端）
+目标：登录、场景广场、工作台、知产库、看板五屏。
+步骤 | 开发内容 | 关键实现
+1 | 登录页 | 开发登录表单，token 本地保存
+2 | 场景广场 | 搜索/部门/模型筛选；卡片含推荐模型徽章；详情弹层展示提示词
+3 | 工作台 | 按 variables 渲染填空；模型切换；生成；contenteditable 编辑；定稿/归档/评分
+4 | 知产库 | scope 切换与检索
+5 | 看板 | 统计卡片 + 条形图
+
+代码位置：web/index.html, web/app.js, web/styles.css
+验收标准：完整走通：选场景→填空→生成→修改→定稿→归档→看板可见。
+T13　按部门场景卡 30+（业务资产）（10人天 · 各部门PO）
+目标：把各岗位“何时用、怎么问”固化为提示词资产。
+步骤 | 开发内容 | 关键实现
+1 | 项目事业部 | 周报/风险/俄语文件/规格提取/纪要/变更/目录/验收（8）
+2 | 营销中心 | 拜访纪要/报价话术/商务邮件/竞品/合同风险/销售周报/异议/线索（8）
+3 | 工程设计+屏蔽泵+R&D | 澄清清单/方案一页纸/变更影响/攻关记录/交底书（5）
+4 | 威标AI事业部 | 测试用例（1）
+5 | 供应链+质量+人事+运维 | 催交函/比价/8D/岗位说明/通知/排障（6）
+6 | 通用全员 | 邮件润色/长文摘要/PPT大纲/数据解读（4）
+
+代码位置：app/seed/scenarios.py
+验收标准：每张卡有业务 Owner 签字；必填变量+输出格式+质量要点齐全；试点使用率可统计。
+T14　测试、部署与试点（5人天 · 全员）
+目标：冒烟自动化 + 一键启动 + 试点反馈闭环。
+步骤 | 开发内容 | 关键实现
+1 | 冒烟测试 | tests/smoke.py：登录→场景→生成→定稿→知产→统计
+2 | 启动文档 | venv + pip install + uvicorn 三条命令
+3 | 配置清单 | .env.example 三模型密钥/企微/数据库
+4 | 试点机制 | 30–50 人两周试用；缺陷看板；场景卡 48h 响应
+
+代码位置：tests/smoke.py, README.md, requirements.txt
+验收标准：python tests/smoke.py 输出 SMOKE OK；试点部门日活≥50%。
+
+三、部门岗位 × 场景卡矩阵（T13 明细）
+部门 | 典型岗位 | 首批场景卡 | 默认模型 | 预期省时
+项目事业部 | 项目经理/项目总监/跟单/文控 | SC-PRJ-001~008 | Kimi/DeepSeek | 周报类 2h→20min
+营销中心 | 销售经理/市场总监/商务跟单 | SC-SAL-001~008 | Mimo/Kimi/DeepSeek | 邮件话术 30min→5min
+工程设计部 | 设计工程师/设计主管 | SC-ENG-001~003 | DeepSeek | 澄清清单 1h→15min
+屏蔽泵事业部 | 研发工程师/技术总监 | SC-ENG-004 | DeepSeek | 攻关记录 1h→20min
+R&D创新中心 | 研究员/技术专家 | SC-ENG-005 | Kimi | 交底书 2h→40min
+威标AI事业部 | AI开发工程师 | SC-ENG-006 | DeepSeek | 用例 1h→15min
+供应链管理部 | 采购工程师/供应链经理 | SC-SCM-001~002 | Mimo/DeepSeek | 比价分析 1h→20min
+质量保障部 | 质量工程师/质量主管 | SC-QA-001 | DeepSeek | 8D初稿 2h→30min
+人事行政部 | HR/行政 | SC-HR-001~002 | Kimi/Mimo | 公告 40min→8min
+系统运维部 | 运维工程师 | SC-OPS-001 | DeepSeek | 排障 30min→8min
+通用 | 全员 | SC-GEN-001~004 | Mimo/Kimi/DeepSeek | 日常写作 50%+
+
+四、代码库与 API 契约（已实现）
+仓库根目录：vflo-smart-office/。启动：python -m venv .venv && pip install -r requirements.txt && uvicorn app.main:app --port 8000。冒烟：python tests/smoke.py。
+方法 | 路径 | 说明
+POST | /api/auth/dev-login | 开发登录（生产换企微OAuth）
+GET | /api/auth/me | 当前用户
+GET | /api/models | 三模型可用性
+GET | /api/scenarios | 场景列表（department/category/q）
+GET | /api/scenarios/{id} | 场景详情（含提示词模板）
+POST | /api/sessions | 创建会话（scenario_id+variables+model）
+POST | /api/sessions/{id}/generate | 生成初稿（可回写 variables）
+POST | /api/sessions/{id}/finalize | 人工定稿并写 diff
+POST | /api/sessions/{id}/rating | 质量评分 1–5
+POST | /api/assets | 归档知产
+GET | /api/assets | 知产检索（mine/dept/company/all）
+GET | /api/admin/stats | 管理看板
+GET | /api/health | 健康检查
+
+五、二期加固（试点后 2 周迭代）
+企业微信 OAuth + 通讯录同步，替换开发登录。
+PostgreSQL 迁移 + 连接池 + 自动备份（对应上线门禁 1）。
+生成接口 SSE 流式输出体验。
+场景卡管理端编辑/发布/版本对比（当前以 seed 代码管理）。
+敏感信息扫描与出口场景模型锁定。
+契约测试 + CI（门禁 4/5）。
+六、给项目组的三条纪律
+1. 先用起来，再改得美。试点部门两周内必须有人每周用 3 次以上。
+2. 场景卡是业务资产，不是技术附件。改模板必须业务 Owner 点头。
+3. 人改 AI 的 diff 是金子。禁止只存最终稿、丢弃初稿。（AI生成）

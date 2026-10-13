@@ -1,0 +1,16 @@
+.git
+__pycache__/
+*.pyc
+*.db
+data/
+.buildx/
+.docker-config/
+_spec_extract/
+docs-*.md
+_patch_*.py
+_check_compose.py
+_clean_audit.py
+.env
+.env.*
+!.env.example
+!.env.deploy.example

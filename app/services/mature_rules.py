@@ -34,14 +34,14 @@ MATURE_RULES: list[dict] = [
         "fallback_model": "deepseek",
         "quality_notes": "十二条铁律必须遵守；缺信息显式假设；禁伪造业绩/图纸；经理审核放行",
         "kpi_links": [
-            {"code": "KPI-PRJ-01", "name": "项目按时完成率", "weight": "27%", "dimension": "V-价值创造"},
-            {"code": "KPI-PRJ-04", "name": "中标率", "weight": "5%", "dimension": "V-价值创造"},
-            {"code": "KPI-PRJ-03", "name": "工作完成质量(AI)", "weight": "16%", "dimension": "L-连接协同"},
+            {"code": "KPI-PRJ-01", "name": "项目按时完成率", "weight": "27%", "dimension": "V-价值创造", "source": "简道云[项目管理→投标管理]"},
+            {"code": "KPI-PRJ-04", "name": "中标率", "weight": "5%", "dimension": "V-价值创造", "source": "简道云[CRM-商机管理]"},
+            {"code": "KPI-PRJ-03", "name": "工作完成质量(AI)", "weight": "16%", "dimension": "L-连接协同", "source": "简道云[任务管理-AI评分]"},
         ],
         "variables": [
             {"key": "project_name", "label": "项目名称", "required": True, "placeholder": ""},
             {"key": "bidder", "label": "投标主体", "required": True, "placeholder": "V-FLO Pumps & Systems Co., Ltd."},
-            {"key": "stage", "label": "执行阶段", "required": True, "placeholder": "G1标书分析 / G2技术方案 / G3图纸 / G5成本 / G6投标包"},
+            {"key": "stage", "label": "执行阶段", "required": True, "placeholder": "G1标书分析 / G2技术方案 / G3图纸 / G4校核 / G5成本 / G6投标包"},
             {"key": "source_folder", "label": "标书资料文件夹", "required": True, "placeholder": "任务项目文件夹路径"},
             {"key": "key_requirements", "label": "关键要求/补充说明", "required": False, "placeholder": ""},
         ],
@@ -84,8 +84,8 @@ MATURE_RULES: list[dict] = [
         "fallback_model": "kimi",
         "quality_notes": "成本结构完整、单价来源可追溯、与设备总表一致；主管审核后放行",
         "kpi_links": [
-            {"code": "KPI-ENG-DOC", "name": "文档记录完整度", "weight": "7-10%", "dimension": "O-优化创新"},
-            {"code": "KPI-ENG-ONLINE", "name": "项目按时完成率", "weight": "15-18%", "dimension": "V-价值创造"},
+            {"code": "KPI-ENG-DOC", "name": "文档记录完整度", "weight": "7-10%", "dimension": "O-优化创新", "source": "简道云[内部资料]"},
+            {"code": "KPI-ENG-ONLINE", "name": "项目按时完成率", "weight": "15-18%", "dimension": "V-价值创造", "source": "简道云[项目管理]"},
         ],
         "variables": [
             {"key": "project_name", "label": "项目名称", "required": True, "placeholder": ""},
@@ -174,6 +174,7 @@ def generate_with_review(
     scenario: Scenario,
     variables: dict,
     model: Optional[str] = None,
+    extra_instructions: str = "",
 ) -> dict:
     """成熟规则生成：产出草稿 + 审核状态字段。
 
@@ -181,7 +182,7 @@ def generate_with_review(
     maturity=validated：自动成稿，标记 draft（沿用规则，仍建议审核）。
     maturity 其他/空：与普通场景一致。
     """
-    messages = build_messages(scenario.prompt_template, variables)
+    messages = build_messages(scenario.prompt_template, variables, extra_instructions=extra_instructions)
     m = model or scenario.default_model
     result = gateway.chat(messages, model=m)
 
@@ -211,6 +212,7 @@ def generate_with_review(
         title=f"[{scenario.code}] {scenario.title}",
         model=m,
         variables=variables,
+        review_status=review_status if review_status != "auto" else "",
     )
     db.add(session)
     db.flush()
@@ -238,20 +240,32 @@ def generate_with_review(
     }
 
 
+class ReviewForbidden(Exception):
+    """审核权限不足（自审自放或非授权角色）。"""
+
+
 def apply_review(db: Session, user, session_id: int, decision: ReviewDecision, final_text: str = "") -> dict:
-    """人工审核放行 / 退回修改 / 否决。"""
+    """人工审核放行 / 退回修改 / 否决。
+
+    权限规则（附件5 §8.3「经理/授权人放行」，用户确认的口径）：
+    - admin（管理层/授权人）可放行一切；
+    - staff 可审核放行「他人」的稿子；
+    - 任何人不得审核放行自己生成的稿子（自审自放 → 403）。
+    """
     from ..database import EditDiff
     from ..services.prompt_builder import diff_stats
 
     session = db.query(ChatSession).get(session_id)
     if not session:
         raise ValueError("会话不存在")
+    if session.user_id == user.id:
+        raise ReviewForbidden("不能审核放行自己生成的稿子，请提交经理/授权人审核")
+
     ai = next((m for m in reversed(session.messages) if m.role == "assistant"), None)
     ai_text = ai.content if ai else ""
     summary, ratio = diff_stats(ai_text, final_text or ai_text)
 
     note = f"审核人：{user.name} | {decision.action} | {decision.note}"
-    session.progress_note = note if hasattr(session, "progress_note") else None
 
     db.add(SessionMessage(
         session_id=session.id,
@@ -270,18 +284,18 @@ def apply_review(db: Session, user, session_id: int, decision: ReviewDecision, f
             edit_ratio=ratio,
         ))
 
-    status_map = {
-        "approve": "approved",
-        "revise": "revising",
-        "reject": "rejected",
-    }
-    session.status = status_map.get(decision.action, session.status)
+    # 结构化审核留痕（附件1 §2.1 G5：审批记录；附件5 §8.3 放行留痕）
+    review_map = {"approve": "approved", "revise": "revising", "reject": "rejected"}
+    session.review_status = review_map.get(decision.action, session.review_status)
+    session.reviewed_by = user.name
+    session.review_note = decision.note or ""
+    session.reviewed_at = datetime.utcnow()
     if decision.action == "approve":
         session.status = "done"
     db.commit()
     return {
         "session_id": session.id,
-        "review_status": session.status,
+        "review_status": session.review_status,
         "action": decision.action,
         "diff_summary": summary,
         "edit_ratio": ratio,

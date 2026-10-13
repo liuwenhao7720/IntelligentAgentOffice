@@ -1,0 +1,1037 @@
+### SHEET: 字段信息
+模块名称 | 表单名称【"->"代表什么文件夹下的表单】
+ | 模块 | 字段名称 | 字段ID | 字段类型 | 字段别称
+CRM | 产品管理->产品信息 | 产品编码 | _widget_1709090879273 | string
+ |  | 产品属性 | _widget_1709090879274 | string
+ |  | 产品类型 | _widget_1709090879275 | string
+ |  | 产品名称 | _widget_1615186860478 | string
+ |  | 品牌 | _widget_1615186860497 | string
+ |  | 规格型号 | _widget_1615186860550 | string
+ |  | 单位 | _widget_1615186860648 | string
+ |  | 成本单价/元 | _widget_1653921030441 | number
+ |  | 销售单价(含税)/元 | _widget_1615186860586 | number
+ |  | 增值税税率 % | _widget_1709090879284 | number
+ |  | 销售单价(不含税)/元 | _widget_1709090879285 | number
+ |  | 税额/元 | _widget_1709090879286 | number
+ |  | 售价毛利/元 | _widget_1709090879287 | number
+ |  | 产品权限 | _widget_1709090879288 | array
+ |  | 产品图片 | _widget_1615187277456 | array
+ |  | 提交人 | creator | json
+ |  | 提交时间 | createTime | string
+ |  | 更新时间 | updateTime | string
+ |  | 扩展字段 | ext | string
+ | 产品管理->产品分类 | 产品属性 | _widget_1679301489573 | string
+ |  | 产品类型 | _widget_1550805773548 | string
+ |  | 提交人 | creator | json
+ |  | 提交时间 | createTime | string
+ |  | 更新时间 | updateTime | string
+ | 市场及线索管理->市场活动记录 | 活动名称 | _widget_1615787945007 | string
+ |  | 活动开始时间 | _widget_1615787945043 | string
+ |  | 活动结束时间 | _widget_1615787945080 | string
+ |  | 活动类型 | _widget_1615787945095 | string
+ |  | 责任人 | _widget_1646752108621 | json
+ |  | 责任部门 | _widget_1646752108604 | json
+ |  | 预计投入成本 | _widget_1615787945190 | number
+ |  | 预计产出线索数 | _widget_1615787945210 | number
+ |  | 活动计划 | _widget_1646794516948 | string
+ |  | 实际投入成本 | _widget_1615787945346 | number
+ |  | 活动总结 | _widget_1646794517263 | string
+ |  | 提交人 | creator | json
+ |  | 提交时间 | createTime | string
+ |  | 更新时间 | updateTime | string
+ | 市场及线索管理->线索 | 客户名称 | _widget_0201001000001 | string
+ |  | 手机号 | _widget_0201001000003 | string
+ |  | 联系人 | _widget_0201001000002 | string
+ |  | 部门 | _widget_1631071302405 | string
+ |  | 职务 | _widget_1631071302424 | string
+ |  | 线索池 | _widget_0201001000006 | json
+ |  | 线索来源 | _widget_1631071302443 | string
+ |  | 活动类型 | _widget_1646808420281 | string
+ |  | 线索详情 | _widget_1631071302527 | string
+ |  | 负责人 | _widget_0201001000004 | json
+ |  | 归属部门 | _widget_0201001000012 | json
+ |  | 协作人 | _widget_0201001000005 | array
+ |  | 线索状态 | _widget_0201001000007 | string
+ |  | 领取时间 | _widget_0201001000008 | string
+ |  | 最后跟进时间 | _widget_0201001000009 | string
+ |  | 线索转换时间 | _widget_0201001000010 | string
+ |  | 线索退回原因 | _widget_0201001000011 | string
+ |  | 转换为客户 | _widget_0201001000013 | json | account_id
+ |  | 预计回收时间 | _widget_0201001000014 | string | plan_recycle_time
+ |  | 提交人 | creator | json
+ |  | 提交时间 | createTime | string
+ |  | 更新时间 | updateTime | string
+ | 客户管理->客户 | 客户名称 | _widget_0201002000002 | string
+ |  | 客户简称 | _widget_1750662011960 | string
+ |  | 客户编码 | _widget_0201002000001 | string
+ |  | 国别 | _widget_1750660469667 | string
+ |  | 客户状态 | _widget_1630862543415 | string
+ |  | 客户来源 | _widget_1631071964761 | string
+ |  | 客户级别 | _widget_1630862543434 | string
+ |  | 所属公海 | _widget_0201002000005 | json
+ |  | 客户查重 | _widget_1663742427957 | string
+ |  | 预计回收时间 | _widget_0201002000011 | string | plan_recycle_time
+ |  | 所属行业 | _widget_1630862543637 | string
+ |  | 客户邮箱 | _widget_1646826421878 | string
+ |  | 客户地址 | _widget_1631071964919 | json
+ |  | 客户详情 | _widget_1631071964934 | string
+ |  | 销售负责人 | _widget_0201002000003 | json
+ |  | 销售归属部门 | _widget_0201002000006 | json
+ |  | 协作人 | _widget_0201002000004 | array
+ |  | 客户查重：客户表内该客户数量 | _widget_1663742427909 | number
+ |  | 领取时间 | _widget_0201002000007 | string
+ |  | 客户退回原因 | _widget_0201002000009 | string
+ |  | 最后跟进时间 | _widget_0201002000008 | string
+ |  | 结算期限 | _widget_1709110880998 | string
+ |  | 信用额度/元 | _widget_1709110881001 | number
+ |  | 发票抬头 | _widget_1709110881002 | string
+ |  | 发票税号 | _widget_1709110881003 | string
+ |  | 税种 | _widget_1709110881004 | string
+ |  | 增值税税率 % | _widget_1709110881007 | number
+ |  | 开户电话 | _widget_1709110881008 | string
+ |  | 开户银行 | _widget_1709110881009 | string
+ |  | 银行账户 | _widget_1709110881016 | string
+ |  | 提交人 | creator | json
+ |  | 提交时间 | createTime | string
+ |  | 更新时间 | updateTime | string
+ | 客户管理->联系人 | 联系人姓名 | _widget_0201003000002 | string | name
+ |  | 联系人手机号 | _widget_0201003000003 | string | phone
+ |  | 国别 | _widget_1750662212042 | string
+ |  | 选择客户 | _widget_0201003000001 | json | account_id
+ |  | 客户编码 | _widget_1663817678154 | string
+ |  | 客户名称 | _widget_1750662071899 | string
+ |  | 客户简称 | _widget_1750662071900 | string
+ |  | 部门 | _widget_1631072817187 | string
+ |  | 职务 | _widget_1631072817206 | string
+ |  | 其他联系方式 | _widget_1631072817244 | string
+ |  | 邮箱 | _widget_1631072817225 | string
+ |  | 关键决策人 | _widget_1631072817282 | string
+ |  | 联系人详情 | _widget_1631072817316 | string
+ |  | 负责人 | _widget_0201003000004 | json | charger
+ |  | 归属部门 | _widget_0201003000006 | json | department
+ |  | 协作人 | _widget_0201003000005 | array | collaborator
+ |  | 提交人 | creator | json
+ |  | 提交时间 | createTime | string
+ |  | 更新时间 | updateTime | string
+ | 客户管理->跟进记录 | 跟进记录 | _widget_0201004000005 | string | content
+ |  | 跟进主体 | _widget_0201004000001 | json | follow_subject
+ |  | 客户名称 | _widget_1709276989308 | string
+ |  | 客户编码 | _widget_1652238197809 | string
+ |  | 跟进商机 | _widget_0201004000002 | json | follow_opportunity
+ |  | 商机编码 | _widget_1652238197921 | string
+ |  | 联系人 | _widget_0201004000003 | json | contacts_id
+ |  | 跟进方式 | _widget_0201004000004 | string | follow_way
+ |  | 跟进内容 | _widget_1652775746705 | string
+ |  | 跟进时间 | _widget_0201004000007 | string | follow_time
+ |  | 跟进人 | _widget_0201004000006 | json | executor
+ |  | 归属部门 | _widget_0201004000008 | json | department
+ |  | 提交人 | creator | json
+ |  | 提交时间 | createTime | string
+ |  | 更新时间 | updateTime | string
+ | 客户管理->跟进计划 | 计划内容 | _widget_0201006000004 | string | content
+ |  | 跟进客户 | _widget_0201006000001 | json | account_id
+ |  | 计划时间 | _widget_0201006000003 | string | execute_time
+ |  | 计划执行人 | _widget_0201006000002 | json | plan_executor
+ |  | 归属部门 | _widget_0201006000006 | json | department
+ |  | 计划状态 | _widget_0201006000005 | string | plan_status
+ |  | 提交人 | creator | json
+ |  | 提交时间 | createTime | string
+ |  | 更新时间 | updateTime | string
+ | 商机管理->商机 | 选择客户 | _widget_0201005000003 | json
+ |  | 客户名称 | _widget_1676545991202 | string
+ |  | 客户编码 | _widget_1631064792937 | string
+ |  | 选择联系人 | _widget_0201005000004 | json
+ |  | 联系人姓名 | _widget_1709102454954 | string
+ |  | 联系人手机号 | _widget_1709102454955 | string
+ |  | 客户地址 | _widget_1709102454961 | json
+ |  | 商机名称 | _widget_0201005000002 | string
+ |  | 销售阶段 | _widget_0201005000005 | json
+ |  | 输单原因 | _widget_0201005000008 | string
+ |  | 赢率 | _widget_0201005000006 | number
+ |  | 阶段类型 | _widget_0201005000007 | string
+ |  | 商机编码 | _widget_0201005000001 | string
+ |  | 销售负责人 | _widget_0201005000009 | json
+ |  | 销售归属部门 | _widget_0201005000015 | json
+ |  | 协作人 | _widget_0201005000010 | array
+ |  | 报备时间 | _widget_1709102454987 | string
+ |  | 预计成交日期 | _widget_0201005000014 | string
+ |  | 商机明细 | _widget_1631002659171 | array
+ |  | 商机明细.选择产品 | _widget_1631002659171._widget_1631002659188 | json
+ |  | 商机明细.产品名称 | _widget_1631002659171._widget_1631002659271 | string
+ |  | 商机明细.产品编码 | _widget_1631002659171._widget_1709102454966 | string
+ |  | 商机明细.品牌 | _widget_1631002659171._widget_1631002659272 | string
+ |  | 商机明细.规格型号 | _widget_1631002659171._widget_1631002659273 | string
+ |  | 商机明细.单位 | _widget_1631002659171._widget_1631002659275 | string
+ |  | 商机明细.数量 | _widget_1631002659171._widget_1631002659711 | number
+ |  | 商机明细.销售单价(含税)/元 | _widget_1631002659171._widget_1631002659274 | number
+ |  | 商机明细.增值税税率 % | _widget_1631002659171._widget_1631002659744 | number
+ |  | 商机明细.销售单价(不含税)/元 | _widget_1631002659171._widget_1709102454967 | number
+ |  | 商机明细.产品原价合计(含税)/元 | _widget_1631002659171._widget_1709102454968 | number
+ |  | 商机明细.实际售价(含税)/元 | _widget_1631002659171._widget_1709102454969 | number
+ |  | 商机明细.产品售价合计(含税)/元 | _widget_1631002659171._widget_1709102454970 | number
+ |  | 商机明细.实际售价(不含税)/元 | _widget_1631002659171._widget_1709102454971 | number
+ |  | 商机明细.产品售价合计(不含税)/元 | _widget_1631002659171._widget_1709102454972 | number
+ |  | 商机明细.成本单价/元 | _widget_1631002659171._widget_1653934010040 | number
+ |  | 商机明细.产品成本合计/元 | _widget_1631002659171._widget_1653934010121 | number
+ |  | 商机原价总额(含税)/元 | _widget_1709102454975 | number
+ |  | 预计优惠金额/元 | _widget_1709102454976 | number
+ |  | 整单折扣率% | _widget_1709102454977 | number
+ |  | 预测商机金额(含税)/元 | _widget_0201005000013 | number
+ |  | 金额大写 | _widget_1709102454978 | string
+ |  | 销售订单金额(不含税)/元 | _widget_1709102454979 | number
+ |  | 产品成本总额/元 | _widget_1709102454980 | number
+ |  | 报价毛利率 % | _widget_1709102454981 | number
+ |  | 最后跟进时间 | _widget_0201005000011 | string
+ |  | 阶段变更时间 | _widget_0201005000012 | string
+ |  | 报价状态 | _widget_1713861897280 | string
+ |  | 提交人 | creator | json
+ |  | 提交时间 | createTime | string
+ |  | 更新时间 | updateTime | string
+ | 订单管理->报价单 | 选择商机 | _widget_1631004165106 | json
+ |  | 商机名称 | _widget_1631005820116 | string
+ |  | 商机编码 | _widget_1636180812627 | string
+ |  | 选择客户 | _widget_1630583148223 | json
+ |  | 客户名称 | _widget_1615858669714 | string
+ |  | 客户编码 | _widget_1615858669716 | string
+ |  | 选择联系人 | _widget_1709106980623 | json
+ |  | 联系人姓名 | _widget_1709106980624 | string
+ |  | 联系人手机号 | _widget_1709106980625 | string
+ |  | 销售负责人 | _widget_1631004899715 | json
+ |  | 销售归属部门 | _widget_1663812198783 | json
+ |  | 报价日期 | _widget_1615187419450 | string
+ |  | 第几次报价 | _widget_1615191306812 | number
+ |  | 报价单编号 | _widget_1709105850520 | string
+ |  | 产品明细 | _widget_1615187420300 | array
+ |  | 产品明细.选择产品 | _widget_1615187420300._widget_1615858670527 | json
+ |  | 产品明细.产品名称 | _widget_1615187420300._widget_1615858670970 | string
+ |  | 产品明细.产品编号 | _widget_1615187420300._widget_1709105850521 | string
+ |  | 产品明细.品牌 | _widget_1615187420300._widget_1615858670971 | string
+ |  | 产品明细.规格型号 | _widget_1615187420300._widget_1615858670972 | string
+ |  | 产品明细.单位 | _widget_1615187420300._widget_1615858670974 | string
+ |  | 产品明细.销售数量 | _widget_1615187420300._widget_1615187421349 | number
+ |  | 产品明细.销售单价(含税)/元 | _widget_1615187420300._widget_1615858670973 | number
+ |  | 产品明细.增值税税率 % | _widget_1615187420300._widget_1615187421408 | number
+ |  | 产品明细.销售单价(不含税)/元 | _widget_1615187420300._widget_1709106980601 | number
+ |  | 产品明细.产品原价合计(含税)/元 | _widget_1615187420300._widget_1709106980602 | number
+ |  | 产品明细.实际售价(含税)/元 | _widget_1615187420300._widget_1709106980603 | number
+ |  | 产品明细.产品售价合计(含税)/元 | _widget_1615187420300._widget_1709106980604 | number
+ |  | 产品明细.实际售价(不含税)/元 | _widget_1615187420300._widget_1709106980605 | number
+ |  | 产品明细.产品售价合计(不含税)/元 | _widget_1615187420300._widget_1709106980606 | number
+ |  | 产品明细.成本单价/元 | _widget_1615187420300._widget_1653921156890 | number
+ |  | 产品明细.产品成本合计/元 | _widget_1615187420300._widget_1653921157924 | number
+ |  | 销售原价总额(含税)/元 | _widget_1615187419548 | number
+ |  | 优惠金额/元 | _widget_1615187419925 | number
+ |  | 整单折扣率 % | _widget_1615187419608 | number
+ |  | 销售订单金额(含税)/元 | _widget_1615187419587 | number
+ |  | 金额大写 | _widget_1615187419687 | string
+ |  | 销售订单金额(不含税)/元 | _widget_1709106980607 | number
+ |  | 产品成本总额/元 | _widget_1653921157570 | number
+ |  | 报价毛利率 % | _widget_1653921158128 | number
+ |  | 审批结果 | _widget_1615189841737 | string
+ |  | 审批人 | _widget_1709108249162 | json
+ |  | 审批人归属部门 | _widget_1709108249164 | json
+ |  | 审批时间 | _widget_1709108249165 | string
+ |  | 不通过原因 | _widget_1709108249166 | string
+ |  | 提交人 | creator | json
+ |  | 提交时间 | createTime | string
+ |  | 更新时间 | updateTime | string
+ | 订单管理->销售订单 | 选择商机 | _widget_1709100140874 | json
+ |  | 商机名称 | _widget_1709100140876 | string
+ |  | 商机编码 | _widget_1709100140877 | string
+ |  | 选择客户 | _widget_1630633680947 | json
+ |  | 客户名称 | _widget_1615860206492 | string
+ |  | 客户编码 | _widget_1615860206494 | string
+ |  | 选择联系人 | _widget_1709108821159 | json
+ |  | 联系人姓名 | _widget_1709108821162 | string
+ |  | 联系人手机号 | _widget_1709108821163 | string
+ |  | 销售订单名称 | _widget_1663812600499 | string
+ |  | 订单签订日期 | _widget_1663812600585 | string
+ |  | 订单交付日期 | _widget_1663812600609 | string
+ |  | 销售负责人 | _widget_1636033440200 | json
+ |  | 销售归属部门 | _widget_1646840292625 | json
+ |  | 销售订单编号 | _widget_1709108821164 | string
+ |  | 销售产品明细 | _widget_1615190135282 | array
+ |  | 销售产品明细.选择产品 | _widget_1615190135282._widget_1709109273465 | json
+ |  | 销售产品明细.产品名称 | _widget_1615190135282._widget_1615883329983 | string
+ |  | 销售产品明细.产品编码 | _widget_1615190135282._widget_1709109273447 | string
+ |  | 销售产品明细.品牌 | _widget_1615190135282._widget_1615192111566 | string
+ |  | 销售产品明细.规格型号 | _widget_1615190135282._widget_1615192111598 | string
+ |  | 销售产品明细.单位 | _widget_1615190135282._widget_1615192111618 | string
+ |  | 销售产品明细.销售数量 | _widget_1615190135282._widget_1615192111720 | number
+ |  | 销售产品明细.销售单价(含税)/元 | _widget_1615190135282._widget_1615192112017 | number
+ |  | 销售产品明细.增值税税率 % | _widget_1615190135282._widget_1709109273448 | number
+ |  | 销售产品明细.销售单价(不含税) | _widget_1615190135282._widget_1709109273449 | number
+ |  | 销售产品明细.产品原价合计(含税)/元 | _widget_1615190135282._widget_1709109273450 | number
+ |  | 销售产品明细.实际售价(含税)/元 | _widget_1615190135282._widget_1709109273451 | number
+ |  | 销售产品明细.实际售价合计(含税)/元 | _widget_1615190135282._widget_1709109273452 | number
+ |  | 销售产品明细.实际售价(不含税)/元 | _widget_1615190135282._widget_1709109273453 | number
+ |  | 销售产品明细.实际售价合计(不含税)/元 | _widget_1615190135282._widget_1709109273454 | number
+ |  | 销售产品明细.成本单价/元 | _widget_1615190135282._widget_1709109273455 | number
+ |  | 销售产品明细.产品成本合计/元 | _widget_1615190135282._widget_1709109273457 | number
+ |  | 销售原价总额(含税)/元 | _widget_1663812600305 | number
+ |  | 优惠金额/元 | _widget_1663812600310 | number
+ |  | 整单折扣率 | _widget_1663812600307 | number
+ |  | 销售订单金额(含税)/元 | _widget_1615883630901 | number
+ |  | 销售订单金额大写 | _widget_1615883630962 | string
+ |  | 销售订单金额(不含税)/元 | _widget_1709109273460 | number
+ |  | 产品成本总额/元 | _widget_1709109273461 | number
+ |  | 订单毛利率 % | _widget_1709109273462 | number
+ |  | 合同附件上传 | _widget_1676564112806 | array
+ |  | 送货地址 | _widget_1663812601469 | json
+ |  | 送货计划 | _widget_1709109273475 | array
+ |  | 送货计划.送货批次 | _widget_1709109273475._widget_1709109273477 | string
+ |  | 送货计划.计划送货日期 | _widget_1709109273475._widget_1709109273478 | string
+ |  | 送货计划.计划送货内容备注 | _widget_1709109273475._widget_1709109273479 | string
+ |  | 结算期限 | _widget_1709109273483 | string
+ |  | 收款计划 | _widget_1709111340401 | array
+ |  | 收款计划.收款项 | _widget_1709111340401._widget_1709111340403 | string
+ |  | 收款计划.收款比例 % | _widget_1709111340401._widget_1709111340406 | number
+ |  | 收款计划.收款金额/元 | _widget_1709111340401._widget_1709111340407 | number
+ |  | 收款计划.收款方式 | _widget_1709111340401._widget_1709111340408 | string
+ |  | 收款计划.计划收款日期 | _widget_1709111340401._widget_1709111340411 | string
+ |  | 收款计划.备注 | _widget_1709111340401._widget_1709111340412 | string
+ |  | 审批结果 | _widget_1676564112803 | string
+ |  | 审批人 | _widget_1709111340413 | json
+ |  | 审批人归属部门 | _widget_1709111340414 | json
+ |  | 审批时间 | _widget_1709111340415 | string
+ |  | 不通过原因 | _widget_1709111340416 | string
+ |  | 发票抬头 | _widget_1709111340425 | string
+ |  | 发票税号 | _widget_1709111340426 | string
+ |  | 税种 | _widget_1709111340427 | string
+ |  | 增值税税率 % | _widget_1709111340428 | number
+ |  | 银行账户 | _widget_1709111340430 | string
+ |  | 开户银行 | _widget_1709111340431 | string
+ |  | 提交人 | creator | json
+ |  | 提交时间 | createTime | string
+ |  | 更新时间 | updateTime | string
+ | 财务管理->回款计划 | 选择销售订单 | _widget_1705973533093 | json
+ |  | 销售订单名称 | _widget_1705564858466 | string
+ |  | 销售订单编号 | _widget_1705564858467 | string
+ |  | 客户名称 | _widget_1705564858464 | string
+ |  | 客户编码 | _widget_1705564858465 | string
+ |  | 联系人姓名 | _widget_1705567622979 | string
+ |  | 联系人手机号 | _widget_1705567622980 | string
+ |  | 销售负责人 | _widget_1705564858469 | json
+ |  | 销售归属部门 | _widget_1705564858470 | json
+ |  | 销售订单金额/元 | _widget_1705564858468 | number
+ |  | 已回款金额/元 | _widget_1705979346530 | number
+ |  | 待回款金额/元 | _widget_1706855468634 | number
+ |  | 回款计划编号 | _widget_1705566138020 | string
+ |  | 回款项 | _widget_1705566138019 | string
+ |  | 计划回款金额/元 | _widget_1705564858472 | number
+ |  | 计划回款方式 | _widget_1705564858476 | string
+ |  | 计划回款日期 | _widget_1705564858474 | string
+ |  | 备注 | _widget_1705565476854 | string
+ |  | 提交人 | creator | json
+ |  | 提交时间 | createTime | string
+ |  | 更新时间 | updateTime | string
+ | 财务管理->开票申请 | 选择销售订单 | _widget_1705566271761 | json
+ |  | 销售订单名称 | _widget_1705566271764 | string
+ |  | 销售订单编号 | _widget_1705566271765 | string
+ |  | 销售订单金额/元 | _widget_1705566271766 | number
+ |  | 客户名称 | _widget_1705566271760 | string
+ |  | 客户编码 | _widget_1705566271759 | string
+ |  | 销售负责人 | _widget_1705566271767 | json
+ |  | 销售归属部门 | _widget_1705566271768 | json
+ |  | 开票申请单编号 | _widget_1705566271785 | string
+ |  | 已开票金额/元 | _widget_1705634475966 | number
+ |  | 待开票金额/元 | _widget_1706855582222 | number
+ |  | 开票类型 | _widget_1705566271772 | string
+ |  | 开票金额/元 | _widget_1705566271781 | number
+ |  | 发票号码 | _widget_1705567164807 | string
+ |  | 备注 | _widget_1705567164808 | string
+ |  | 发票附件 | _widget_1705567164809 | array
+ |  | 开票日期 | _widget_1705566271774 | string
+ |  | 联系人姓名 | _widget_1705568006156 | string
+ |  | 联系人手机号 | _widget_1705568006157 | string
+ |  | 寄送地址 | _widget_1705568006159 | json
+ |  | 发票回款状态 | _widget_1705636882922 | string
+ |  | 累计回款金额/元 | _widget_1706855937483 | number
+ |  | 财务开票确认 | _widget_1706520641752 | string
+ |  | 确认时间 | _widget_1706520641754 | string
+ |  | 提交人 | creator | json
+ |  | 提交时间 | createTime | string
+ |  | 更新时间 | updateTime | string
+ | 财务管理->回款单 | 选择销售订单 | _widget_1706855042292 | json
+ |  | 销售订单名称 | _widget_1705566271764 | string
+ |  | 销售订单编号 | _widget_1705566271765 | string
+ |  | 销售订单金额/元 | _widget_1705566271766 | number
+ |  | 客户名称 | _widget_1705566271760 | string
+ |  | 客户编码 | _widget_1705566271759 | string
+ |  | 联系人姓名 | _widget_1705567944452 | string
+ |  | 联系人手机号 | _widget_1705567944453 | string
+ |  | 销售负责人 | _widget_1705566271767 | json
+ |  | 销售归属部门 | _widget_1705566271768 | json
+ |  | 选择发票申请单 | _widget_1705566271761 | json
+ |  | 开票申请单编号 | _widget_1705633502131 | string
+ |  | 发票号码 | _widget_1705633502130 | string
+ |  | 开票金额/元 | _widget_1705566271781 | number
+ |  | 开票类型 | _widget_1705633502132 | string
+ |  | 发票附件 | _widget_1705633502133 | array
+ |  | 已回款金额/元 | _widget_1705634980473 | number
+ |  | 待回款金额/元 | _widget_1706855767951 | number
+ |  | 选择回款账户 | _widget_1706687727782 | json
+ |  | 账户名称 | _widget_1706687727784 | string
+ |  | 账户编码 | _widget_1706687727783 | string
+ |  | 本次回款金额/元 | _widget_1705633502134 | number
+ |  | 累计回款金额/元 | _widget_1706855986059 | number
+ |  | 回款方式 | _widget_1705566271772 | string
+ |  | 回款日期 | _widget_1705566271774 | string
+ |  | 回款单编号 | _widget_1705566271785 | string
+ |  | 财务回款确认 | _widget_1706520870354 | string
+ |  | 确认时间 | _widget_1706520870356 | string
+ |  | 发票回款状态 | _widget_1705566271790 | string
+ |  | 提交人 | creator | json
+ |  | 提交时间 | createTime | string
+ |  | 更新时间 | updateTime | string
+ | 财务管理->付款单 | 选择付款账户 | _widget_1706688485389 | json
+ |  | 账户类型 | _widget_1706688485391 | string
+ |  | 账户名称 | _widget_1706688485393 | string
+ |  | 账户编码 | _widget_1706688485390 | string
+ |  | 付款类型 | _widget_1706752371310 | string
+ |  | 付款事项 | _widget_1706688485384 | string
+ |  | 付款金额/元 | _widget_1706688485387 | number
+ |  | 附件 | _widget_1706753304992 | array
+ |  | 付款时间 | _widget_1706688485386 | string
+ |  | 付款单编码 | _widget_1706688485385 | string
+ |  | 付款人 | _widget_1706772015606 | json
+ |  | 付款人归属部门 | _widget_1706772015607 | json
+ |  | 财务付款确认 | _widget_1706688485396 | string
+ |  | 付款时间 | _widget_1706688485398 | string
+ |  | 提交人 | creator | json
+ |  | 提交时间 | createTime | string
+ |  | 更新时间 | updateTime | string
+ | 财务管理->资金账户 | 账户编码 | _widget_1706686272674 | string
+ |  | 账户类型 | _widget_1706686021577 | string
+ |  | 账户名称 | _widget_1706686021580 | string
+ |  | 账户状态 | _widget_1706687840197 | string
+ |  | 初始金额/元 | _widget_1706755481073 | number
+ |  | 初始日期 | _widget_1706686021582 | string
+ |  | 备注 | _widget_1706686021583 | string
+ |  | 提交人 | creator | json
+ |  | 提交时间 | createTime | string
+ |  | 更新时间 | updateTime | string
+ | 薪酬管理->销售目标制定 | 填报人 | _widget_1646814164830 | json
+ |  | 填报时间 | _widget_1705387335559 | string
+ |  | 目标月份 | _widget_1705386221269 | string
+ |  | 目标明细 | _widget_1646894960395 | array
+ |  | 目标明细.销售负责人 | _widget_1646894960395._widget_1705386221270 | json
+ |  | 目标明细.当月回款目标/元 | _widget_1646894960395._widget_1646894960396 | number
+ |  | 提交人 | creator | json
+ |  | 提交时间 | createTime | string
+ |  | 更新时间 | updateTime | string
+ | 薪酬管理->绩效系数规则 | 目标完成率 | _widget_1646898292659 | number
+ |  | 回款业绩提成点 | _widget_1646897785558 | number
+ |  | 提交人 | creator | json
+ |  | 提交时间 | createTime | string
+ |  | 更新时间 | updateTime | string
+ | 薪酬管理->销售薪酬计算-每月同步 | 月份 | _widget_1709259128000 | string
+ |  | 销售负责人 | _widget_1709259128001 | json
+ |  | 销售归属部门 | _widget_1709259128002 | json
+ |  | 当月回款目标/元 | _widget_1709259128003 | number
+ |  | 回款金额/元 | _widget_1709259128004 | number
+ |  | 目标完成率 | _widget_1709259128005 | number
+ |  | 提成比例 | _widget_1709259128006 | number
+ |  | 提成金额/元 | _widget_1709259128007 | number
+ |  | 提交人 | creator | json
+ |  | 提交时间 | createTime | string
+ |  | 更新时间 | updateTime | string
+基础信息 | 产品信息 | UUID | _widget_1757476473666 | string
+ |  | 产品编码 | _widget_1750657513918 | string
+ |  | 产品名称 | _widget_1750657513926 | string
+ |  | 产品类型 | _widget_1752587002915 | string
+ |  | 获取方式 | _widget_1754014181495 | string
+ |  | 选择分类 | _widget_1755163636007 | json
+ |  | 三级分类 | _widget_1750657513923 | string
+ |  | 三级分类编码 | _widget_1750665746710 | string
+ |  | 品牌 | _widget_1750657513925 | string
+ |  | 型号 | _widget_1750657513927 | string
+ |  | 单位 | _widget_1750657513931 | string
+ |  | 规格/图号 | _widget_1750657513928 | string
+ |  | 材质 | _widget_1750657513929 | string
+ |  | 备注 | _widget_1752650335678 | string
+ |  | 附件/图片打开地址 | _widget_1757476473668 | string
+ |  | 产品附件 | _widget_1750657513935 | array
+ |  | 产品图片 | _widget_1750657513934 | array
+ |  | 新增确认 | _widget_1765952981632 | string
+ |  | 提交人 | creator | json
+ |  | 提交时间 | createTime | string
+ |  | 更新时间 | updateTime | string
+ | 单位库 | 单位 | _widget_1750658380726 | string
+ |  | 提交人 | creator | json
+ |  | 提交时间 | createTime | string
+ |  | 更新时间 | updateTime | string
+ | 公司基础信息 | 公司名称 | _widget_1750301171580 | string
+ |  | 公司代码 | _widget_1750301171581 | string
+ |  | 是否启用 | _widget_1750301171582 | string
+ |  | 提交人 | creator | json
+ |  | 提交时间 | createTime | string
+ |  | 更新时间 | updateTime | string
+ | 产品物料分类管理->分类管理 | 分类代号 | _widget_1750251111628 | string
+ |  | 分类名称 | _widget_1750251111629 | string
+ |  | 标准号1 | _widget_1755163859090 | string
+ |  | 标准号2 | _widget_1755163859091 | string
+ |  | 标准号3 | _widget_1755163859092 | string
+ |  | 提交人 | creator | json
+ |  | 提交时间 | createTime | string
+ |  | 更新时间 | updateTime | string
+项目管理 | 客户询价单 | 询价单号 | _widget_1751872482286 | string
+ |  | 序号 | _widget_1751872776617 | number
+ |  | 询价日期 | _widget_1751872482287 | string
+ |  | 销售员 | _widget_1751872482288 | json
+ |  | 关联项目 | _widget_1751872482289 | string
+ |  | 项目编码 | _widget_1751872482290 | string
+ |  | 项目名称 | _widget_1751872482291 | string
+ |  | 联系人姓名 | _widget_1751872482292 | string
+ |  | 联系人手机号 | _widget_1751872482293 | string
+ |  | 国别 | _widget_1751872482294 | string
+ |  | 客户编码 | _widget_1751872482295 | string
+ |  | 客户名称 | _widget_1751872482296 | string
+ |  | 客户简称 | _widget_1751872482297 | string
+ |  | 相关资料 | _widget_1751872776543 | array
+ |  | 项目简介 | _widget_1751872776544 | string
+ |  | 报价描述 | _widget_1760508586184 | string
+ |  | 选择需要审批人员 | _widget_1763451446886 | array
+ |  | 产品明细 | _widget_1751872776545 | array
+ |  | 产品明细.选择产品 | _widget_1751872776545._widget_1751872776548 | json
+ |  | 产品明细.产品编码 | _widget_1751872776545._widget_1751872776549 | string
+ |  | 产品明细.产品名称 | _widget_1751872776545._widget_1751872776550 | string
+ |  | 产品明细.三级分类 | _widget_1751872776545._widget_1751872776557 | string
+ |  | 产品明细.三级分类编码 | _widget_1751872776545._widget_1751872776559 | string
+ |  | 产品明细.品牌 | _widget_1751872776545._widget_1751872776560 | string
+ |  | 产品明细.型号 | _widget_1751872776545._widget_1751872776561 | string
+ |  | 产品明细.规格 | _widget_1751872776545._widget_1751872776562 | string
+ |  | 产品明细.材质等级 | _widget_1751872776545._widget_1751872776563 | string
+ |  | 产品明细.销售数量 | _widget_1751872776545._widget_1751872776566 | number
+ |  | 产品明细.单位 | _widget_1751872776545._widget_1751872776564 | string
+ |  | 产品明细.销售单价（含税）/元 | _widget_1751872776545._widget_1751872776573 | number
+ |  | 产品明细.增值税税率 % | _widget_1751872776545._widget_1751872776579 | number
+ |  | 产品明细.产品原价合计(含税)/元 | _widget_1751872776545._widget_1751872776654 | number
+ |  | 产品明细.实际售价(含税)/元 | _widget_1751872776545._widget_1751872776655 | number
+ |  | 产品明细.产品售价合计(含税)/元 | _widget_1751872776545._widget_1751872776659 | number
+ |  | 产品明细.成本单价（含税）/元 | _widget_1751872776545._widget_1751872776572 | number
+ |  | 产品明细.产品成本合计/元 | _widget_1751872776545._widget_1751872776662 | number
+ |  | 销售原价总额(含税)/元 | _widget_1751872776658 | number
+ |  | 折扣率 | _widget_1752137125894 | number
+ |  | 优惠金额/元 | _widget_1751872776656 | number
+ |  | 订单总数量 | _widget_1753945157253 | number
+ |  | 销售订单金额(含税)/元 | _widget_1751872776660 | number
+ |  | 金额大写 | _widget_1751872776661 | string
+ |  | 产品成本总额/元 | _widget_1751872776669 | number
+ |  | 其他费用 | _widget_1752119800794 | number
+ |  | 其他费用备注 | _widget_1752568514774 | string
+ |  | 报价毛利率 % | _widget_1751872776670 | number
+ |  | 报价单附件附件 | _widget_1752568514781 | array
+ |  | 是否成单 | _widget_1751872776595 | string
+ |  | 订单状态 | _widget_1753946270291 | string
+ |  | 提交人 | creator | json
+ |  | 提交时间 | createTime | string
+ |  | 更新时间 | updateTime | string
+ | 销售出库 | 销售出库单编号 | _widget_1753943084477 | string
+ |  | 出库时间 | _widget_1753943084478 | string
+ |  | 操作人 | _widget_1753943084479 | json
+ |  | 选择订单 | _widget_1753943084480 | json
+ |  | 询价单号 | _widget_1753943084481 | string
+ |  | 项目编码 | _widget_1753943084482 | string
+ |  | 项目名称 | _widget_1753943084483 | string
+ |  | 客户编码 | _widget_1753943084484 | string
+ |  | 客户名称 | _widget_1753943084485 | string
+ |  | 客户简称 | _widget_1753943084486 | string
+ |  | 订单总数量 | _widget_1753945219905 | number
+ |  | 出库仓库 | _widget_1753943621495 | string
+ |  | 备注 | _widget_1765760948950 | string
+ |  | 抄送人 | _widget_1765760948952 | array
+ |  | 仓库负责人 | _widget_1765776676845 | array
+ |  | 附件 | _widget_1765849581027 | array
+ |  | 产品明细 | _widget_1753943084487 | array
+ |  | 产品明细.产品编码 | _widget_1753943084487._widget_1753943084489 | string
+ |  | 产品明细.产品名称 | _widget_1753943084487._widget_1753943084490 | string
+ |  | 产品明细.三级分类 | _widget_1753943084487._widget_1753943084491 | string
+ |  | 产品明细.三级分类编码 | _widget_1753943084487._widget_1753943084493 | string
+ |  | 产品明细.品牌 | _widget_1753943084487._widget_1753943084494 | string
+ |  | 产品明细.型号 | _widget_1753943084487._widget_1753943084495 | string
+ |  | 产品明细.规格/图号 | _widget_1753943084487._widget_1753943084496 | string
+ |  | 产品明细.材质 | _widget_1753943084487._widget_1753943084497 | string
+ |  | 产品明细.销售数量 | _widget_1753943084487._widget_1753943084498 | number
+ |  | 产品明细.待出库数量辅助 | _widget_1753943084487._widget_1753943084506 | number
+ |  | 产品明细.待出库数量 | _widget_1753943084487._widget_1753944893964 | number
+ |  | 产品明细.当前库存数量 | _widget_1753943084487._widget_1753943621491 | number
+ |  | 产品明细.本次出库数量 | _widget_1753943084487._widget_1753943084507 | number
+ |  | 产品明细.单位 | _widget_1753943084487._widget_1753943084499 | string
+ |  | 产品明细.销售单价（含税）/元 | _widget_1753943084487._widget_1753943084501 | number
+ |  | 产品明细.增值税税率 % | _widget_1753943084487._widget_1753943084502 | number
+ |  | 产品明细.实际售价(含税)/元 | _widget_1753943084487._widget_1753943084503 | number
+ |  | 产品明细.产品售价合计(含税)/元 | _widget_1753943084487._widget_1753943084504 | number
+ |  | 产品明细.成本单价（含税）/元 | _widget_1753943084487._widget_1753943084505 | number
+ |  | 出库产品总数 | _widget_1753943621487 | number
+ |  | 产品出库确认 | _widget_1753944054151 | string
+ |  | 拍照 | _widget_1753944054153 | array
+ |  | 待出库辅助 | _widget_1753945625410 | number
+ |  | 订单状态 | _widget_1753945625419 | string
+ |  | 提交人 | creator | json
+ |  | 提交时间 | createTime | string
+ |  | 更新时间 | updateTime | string
+ | 项目启动->项目策划 | UUID | _widget_1757485729784 | string
+ |  | 策划分类 | _widget_1750745210790 | string
+ |  | 选择项目 | _widget_1752303048926 | json
+ |  | 选择客户 | _widget_1750814829381 | json
+ |  | 客户编码 | _widget_1750814385026 | string
+ |  | 客户名称 | _widget_1750745210793 | string
+ |  | 客户简称 | _widget_1763102742253 | string
+ |  | 国别 | _widget_1750814385027 | string
+ |  | 联系人姓名 | _widget_1750814385028 | string
+ |  | 联系人手机号 | _widget_1750814385029 | string
+ |  | 项目号 | _widget_1750745501453 | string
+ |  | 项目编码 | _widget_1752303048927 | string
+ |  | 项目名称 | _widget_1752303048928 | string
+ |  | 项目开始时间 | _widget_1752303048929 | string
+ |  | 项目结束时间 | _widget_1752303048930 | string
+ |  | 项目负责人 | _widget_1752303048931 | array
+ |  | 负责部门 | _widget_1764052515573 | array
+ |  | 项目名 | _widget_1750745210794 | string
+ |  | 项目开始时间 | _widget_1750745210796 | string
+ |  | 项目结束时间 | _widget_1750745210797 | string
+ |  | 产品实现方式 | _widget_1750745210799 | string
+ |  | 项目负责人 | _widget_1756879214671 | array
+ |  | 技术和产品 | _widget_1750745210801 | string
+ |  | 优势 | _widget_1750745210802 | string
+ |  | 项目团队组建 | _widget_1756879214674 | array
+ |  | 特别关注事项及风险管控 | _widget_1750745501455 | string
+ |  | 附件/图片打开地址 | _widget_1757485729785 | string
+ |  | 附件 | _widget_1750815089276 | array
+ |  | 策划结论 | _widget_1762307029643 | string
+ |  | 分析描述 | _widget_1762307029642 | string
+ |  | 提交人 | creator | json
+ |  | 提交时间 | createTime | string
+ |  | 更新时间 | updateTime | string
+ | 项目启动->项目立项 | UUID | _widget_1757486511615 | string
+ |  | 项目编码 | _widget_1750296500410 | string
+ |  | 公司名称 | _widget_1750301473425 | string
+ |  | 关联项目 | _widget_1750316397815 | string
+ |  | 项目名称 | _widget_1750296500411 | string
+ |  | 项目编码（关联） | _widget_1750316397816 | string
+ |  | 立项年份（关联） | _widget_1750316397818 | string
+ |  | 序号（关联） | _widget_1750316986884 | number
+ |  | 公司代码 | _widget_1750301473427 | string
+ |  | 提交日期 | _widget_1750296586308 | string
+ |  | 立项年份 | _widget_1750301473424 | string
+ |  | 序号 | _widget_1750301473429 | number
+ |  | 序号（辅助） | _widget_1750302229503 | string
+ |  | 立项序号 | _widget_1750302229501 | string
+ |  | 选择客户 | _widget_1750814738830 | json
+ |  | 国别 | _widget_1750814738833 | string
+ |  | 客户编码 | _widget_1750814738834 | string
+ |  | 客户名称 | _widget_1750814738835 | string
+ |  | 客户简称 | _widget_1750814738836 | string
+ |  | 选择联系人 | _widget_1762307449639 | json
+ |  | 联系人姓名 | _widget_1750814738831 | string
+ |  | 联系人手机号 | _widget_1750814738832 | string
+ |  | 项目状态 | _widget_1750667909610 | string
+ |  | 项目来源 | _widget_1750667909614 | string
+ |  | 币种 | _widget_1753924069246 | string
+ |  | 税率 | _widget_1753924069248 | number
+ |  | 项目预计总金额 | _widget_1750667909616 | number
+ |  | 项目开始时间 | _widget_1750667909617 | string
+ |  | 项目计划工期（天） | _widget_1750667909622 | number
+ |  | 项目结束时间 | _widget_1750667909618 | string
+ |  | 项目预算（元） | _widget_1750667909626 | number
+ |  | 项目相关资料 | _widget_1750667909627 | array
+ |  | 附件/图片打开地址 | _widget_1757486689876 | string
+ |  | 项目简介 | _widget_1750667909628 | string
+ |  | 项目负责人 | _widget_1750667909640 | array
+ |  | 负责部门 | _widget_1752290412656 | array
+ |  | 项目成员 | _widget_1750667909642 | array
+ |  | 审批结果 | _widget_1753063007311 | string
+ |  | 提交人 | creator | json
+ |  | 提交时间 | createTime | string
+ |  | 更新时间 | updateTime | string
+ | 项目启动->项目计划 | 计划编号 | _widget_1756352717877 | string
+ |  | UUID | _widget_1757487480621 | string
+ |  | 计划类型 | _widget_1750815499260 | string
+ |  | 选择项目 | _widget_1711520160763 | json
+ |  | 项目编号 | _widget_1711524862196 | string
+ |  | 项目名称 | _widget_1667813159461 | string
+ |  | 项目状态 | _widget_1711459505072 | string
+ |  | 项目来源 | _widget_1711459505078 | string
+ |  | 项目预计总金额（元） | _widget_1711461283045 | number
+ |  | 项目开始时间 | _widget_1670310397327 | string
+ |  | 项目结束时间 | _widget_1670310397328 | string
+ |  | 项目计划工期（天） | _widget_1711461283044 | number
+ |  | 项目预算（元） | _widget_1711461283046 | number
+ |  | 项目相关资料 | _widget_1710397508476 | array
+ |  | 附件/图片打开地址 | _widget_1757486984392 | string
+ |  | 项目负责人 | _widget_1750746789449 | array
+ |  | 激活数据 | _widget_1756431346259 | string
+ |  | 项目简介 | _widget_1667813159464 | string
+ |  | 计划编制日期 | _widget_1711461283064 | string
+ |  | 审批人 | _widget_1749523686586 | json
+ |  | 项目计划 | _widget_1711519168046 | array
+ |  | 项目计划.项目编码 | _widget_1711519168046._widget_1756259932385 | string
+ |  | 项目计划.项目名称 | _widget_1711519168046._widget_1756259932386 | string
+ |  | 项目计划.选择部门 | _widget_1711519168046._widget_1756259932348 | json
+ |  | 项目计划.任务一级分类 | _widget_1711519168046._widget_1756259932350 | string
+ |  | 项目计划.任务二级分类 | _widget_1711519168046._widget_1756259932352 | string
+ |  | 项目计划.任务名称 | _widget_1711519168046._widget_1711519482159 | string
+ |  | 项目计划.任务属性 | _widget_1711519168046._widget_1735090224367 | string
+ |  | 项目计划.主负责人 | _widget_1711519168046._widget_1711519759472 | json
+ |  | 项目计划.负责人 | _widget_1711519168046._widget_1749523602741 | array
+ |  | 项目计划.负责部门 | _widget_1711519168046._widget_1752112447709 | array
+ |  | 项目计划.所属项目阶段 | _widget_1711519168046._widget_1756259932356 | string
+ |  | 项目计划.开始时间 | _widget_1711519168046._widget_1756259932358 | string
+ |  | 项目计划.截止时间 | _widget_1711519168046._widget_1711519482163 | string
+ |  | 项目计划.预计工时（小时） | _widget_1711519168046._widget_1711520160755 | number
+ |  | 项目计划.优先级 | _widget_1711519168046._widget_1735098602735 | string
+ |  | 项目计划.添加附件 | _widget_1711519168046._widget_1756259932359 | array
+ |  | 项目计划.任务描述 | _widget_1711519168046._widget_1711519482165 | string
+ |  | 项目计划.WBS 编号 | _widget_1711519168046._widget_1752286829118 | number
+ |  | 项目计划.WBS 编号(文本) | _widget_1711519168046._widget_1716442765497 | string
+ |  | 项目计划.激活字段 | _widget_1711519168046._widget_1756431346285 | string
+ |  | 项目计划.uuid | _widget_1711519168046._widget_1756352717890 | string
+ |  | 任务附件/图片打开地址 | _widget_1757487480634 | string
+ |  | 部门上级审批 | _widget_1711461283068 | string
+ |  | 部门上级审批意见 | _widget_1711461283072 | string
+ |  | 总经理审批 | _widget_1711461283066 | string
+ |  | 总经理审批意见 | _widget_1711461283073 | string
+ |  | 提交人 | creator | json
+ |  | 提交时间 | createTime | string
+ |  | 更新时间 | updateTime | string
+ | 项目启动->内部任务项目立项 | 项目编号 | _widget_1668689605608 | string
+ |  | 项目名称 | _widget_1667813159461 | string
+ |  | 预计开始时间 | _widget_1670310397327 | string
+ |  | 预计结束时间 | _widget_1670310397328 | string
+ |  | 项目负责人 | _widget_1670316390205 | json
+ |  | 成员 | _widget_1668689605610 | array
+ |  | 部门 | _widget_1749713560809 | array
+ |  | 项目预计费用（元） | _widget_1710750453163 | number
+ |  | 项目描述 | _widget_1667813159464 | string
+ |  | 项目进度（%） | _widget_1710748412539 | number
+ |  | 项目状态 | _widget_1669352060660 | string
+ |  | 附件 | _widget_1710397508476 | array
+ |  | 提交人 | creator | json
+ |  | 提交时间 | createTime | string
+ |  | 更新时间 | updateTime | string
+ | 项目执行->任务管理 | 项目类型 | _widget_1763091867833 | string
+ |  | WBS 编号 | _widget_1710491067381 | number
+ |  | WBS编号(文本) | _widget_1752054078161 | string
+ |  | 部门 | _widget_1749085291624 | json
+ |  | 一级任务分类 | _widget_1749085291625 | string
+ |  | 二级任务分类 | _widget_1749085291627 | string
+ |  | 任务编号 | _widget_1710402153871 | string
+ |  | 任务名称 | _widget_1668082756215 | string
+ |  | 关联项目 | _widget_1763516189923 | string
+ |  | 所属项目 | _widget_1669429084882 | json
+ |  | 项目编号 | _widget_1669429084883 | string
+ |  | 项目名称 | _widget_1710399012344 | string
+ |  | 任务属性 | _widget_1710399012342 | string
+ |  | 所属里程碑任务 | _widget_1750143841995 | string
+ |  | 所属里程碑任务 | _widget_1710402153870 | string
+ |  | 里程碑任务编号 | _widget_1710402695115 | string
+ |  | 子任务编号 | _widget_1763971450318 | string
+ |  | 主负责人 | _widget_1668085072209 | json
+ |  | 负责人 | _widget_1749021035267 | array
+ |  | 负责部门 | _widget_1749021035268 | array
+ |  | 任务状态 | _widget_1668690637187 | string
+ |  | 所属项目阶段 | _widget_1710401489891 | string
+ |  | 开始时间 | _widget_1667894235099 | string
+ |  | 截止时间 | _widget_1667894235119 | string
+ |  | 预计工时（小时） | _widget_1710399012345 | number
+ |  | 优先级 | _widget_1668689007999 | string
+ |  | 子任务进度% | _widget_1710492811727 | number
+ |  | 添加附件 | _widget_1668085072214 | array
+ |  | 任务描述 | _widget_1668085072208 | string
+ |  | F-里程碑任务WBS | _widget_1710731764980 | number
+ |  | F-子任务WBS | _widget_1710731764981 | number
+ |  | 子任务拆分uuid | _widget_1763973803958 | string
+ |  | 提交人 | creator | json
+ |  | 提交时间 | createTime | string
+ |  | 更新时间 | updateTime | string
+ | 项目执行->创建里程碑任务 | 项目类型 | _widget_1752290127769 | string
+ |  | 所属销售项目 | _widget_1752290127779 | json
+ |  | 所属内部项目 | _widget_1669429084882 | json
+ |  | 项目编号 | _widget_1669429084883 | string
+ |  | 项目名称 | _widget_1710399012344 | string
+ |  | 任务编号 | _widget_1668691715303 | string
+ |  | 当前部门 | _widget_1749027901794 | json
+ |  | 当前部门 | _widget_1750311765905 | array
+ |  | 任务一级分类 | _widget_1749027901795 | string
+ |  | 任务二级分类 | _widget_1749027901797 | string
+ |  | WBS 编号 | _widget_1710492290532 | number
+ |  | WBS编号(文本) | _widget_1752054578287 | string
+ |  | 任务名称 | _widget_1668082756215 | string
+ |  | 任务属性 | _widget_1710399012342 | string
+ |  | 所属里程碑任务 | _widget_1710400367814 | string
+ |  | 里程碑任务编号 | _widget_1710400367816 | string
+ |  | 主负责人 | _widget_1668085072209 | json
+ |  | 负责人 | _widget_1749021178645 | array
+ |  | 负责部门 | _widget_1749021178646 | array
+ |  | 任务状态 | _widget_1668690637187 | string
+ |  | 获取WBS编号 | _widget_1756344285599 | string
+ |  | 所属项目阶段 | _widget_1710401489891 | string
+ |  | 开始时间 | _widget_1667894235099 | string
+ |  | 里程碑任务结束时间 | _widget_1756879555018 | string
+ |  | 截止时间 | _widget_1667894235119 | string
+ |  | 预计工时（小时） | _widget_1710399012345 | number
+ |  | 优先级 | _widget_1668689007999 | string
+ |  | 添加附件 | _widget_1668085072214 | array
+ |  | 计划编号 | _widget_1756352648486 | string
+ |  | 任务描述 | _widget_1668085072208 | string
+ |  | 里程碑任务判断 | _widget_1710726546362 | string
+ |  | 子任务判断 | _widget_1710726546363 | string
+ |  | 里程碑任务WBS | _widget_1710730292886 | number
+ |  | 子任务WBS | _widget_1710730292887 | number
+ |  | 辅助状态 | _widget_1752290571834 | string
+ |  | uuid | _widget_1756352648496 | string
+ |  | 提交人 | creator | json
+ |  | 提交时间 | createTime | string
+ |  | 更新时间 | updateTime | string
+ | 项目执行->创建非里程碑任务 | 任务编号 | _widget_1668691715303 | string
+ |  | 当前部门 | _widget_1749027901794 | json
+ |  | 当前部门 | _widget_1750311765905 | array
+ |  | 任务一级分类 | _widget_1749027901795 | string
+ |  | 任务二级分类 | _widget_1749027901797 | string
+ |  | 任务名称 | _widget_1668082756215 | string
+ |  | 任务属性 | _widget_1710399012342 | string
+ |  | 主负责人 | _widget_1668085072209 | json
+ |  | 负责人 | _widget_1749021178645 | array
+ |  | 负责部门 | _widget_1749021178646 | array
+ |  | 任务状态 | _widget_1668690637187 | string
+ |  | 开始时间 | _widget_1667894235099 | string
+ |  | 截止时间 | _widget_1667894235119 | string
+ |  | 预计工时（小时） | _widget_1710399012345 | number
+ |  | 优先级 | _widget_1668689007999 | string
+ |  | 添加附件 | _widget_1668085072214 | array
+...TRUNCATED...
+### SHEET: 表单ID
+表单名称（name） | 表单id（entry_id） | 对应应用名称（app_id）
+8，区域代理协议模板Agency Agreement | 6a2a61235b6ed7fd5fd963b6 | 683fea34b48f2816984878aa
+数据流转 | 6a334b49c18379b8fe85fa62 | 683fea34b48f2816984878aa
+固定资产请购表 | 6a3a27b7cbe5151808c0b912 | 683fea34b48f2816984878aa
+立项申请审批表 | 6a3a3a967cf75a92cad8b663 | 683fea34b48f2816984878aa
+9，项目授权书模板 | 6a3b78fcc50f304c3c0158d6 | 683fea34b48f2816984878aa
+动平衡规程 | 6a437f6a4855df752704141a | 683fea34b48f2816984878aa
+水压规程 | 6a4385a5a27c8e7dfd2d7e1c | 683fea34b48f2816984878aa
+储运规程 | 6a44d39b2ef8598aa737882f | 683fea34b48f2816984878aa
+无损检测规程 | 6a461937b46648c17f6cf76b | 683fea34b48f2816984878aa
+热处理 | 6a46202f16797094824233fe | 683fea34b48f2816984878aa
+表面处理与喷涂 | 6a46268d8d9b78e7e5ed0e0d | 683fea34b48f2816984878aa
+发货作业单 | 6a4714592477eb1fe52a2d70 | 683fea34b48f2816984878aa
+未命名表单 | 6a608942f4c91401621302ce | 683fea34b48f2816984878aa
+出差日志表单 | 6923b907e6d8e5ab5329bbb5 | 683fea34b48f2816984878aa
+创建非里程碑任务 | 69255d38879328e9360f2956 | 683fea34b48f2816984878aa
+出差日志表单_拷贝 | 692960e23f3732ec84b075cd | 683fea34b48f2816984878aa
+测试 | 6930e8ab50b9b5a139c2e994 | 683fea34b48f2816984878aa
+关联子表 | 6930e8b86b6ba04ac998c9e7 | 683fea34b48f2816984878aa
+BOM更改 | 69410d3ae520ddb072592e5b | 683fea34b48f2816984878aa
+关联子表 | 69410d70058053680e72bca5 | 683fea34b48f2816984878aa
+修改底层 | 69424cf38f14b86013edd099 | 683fea34b48f2816984878aa
+关联子表 | 69424d312a492c2ac878249a | 683fea34b48f2816984878aa
+路径预设基础表 | 694a48337d3134ee0cd32210 | 683fea34b48f2816984878aa
+客户礼品记录 | 695cbf63c2db77dfab36d8a8 | 683fea34b48f2816984878aa
+BOM状态重置 | 695e39846f7ca9e7a90f126d | 683fea34b48f2816984878aa
+业务问题意见箱 | 696716b6f63bda344c10133c | 683fea34b48f2816984878aa
+【V-FLO人】电子月刊投稿专区 | 69a7ff0632c52c9274e903c9 | 683fea34b48f2816984878aa
+K32-阀门类通用技术护照 | 69ba599eaa026b3fc71930c2 | 683fea34b48f2816984878aa
+K32-机械设备通用模板 | 69ba5a8bfce530a6613a55e5 | 683fea34b48f2816984878aa
+报工工序重置 | 69c63a075916c863cbe5278b | 683fea34b48f2816984878aa
+阀门类通用技术护照_演示使用 | 69d6198c7ae154082fd5cc61 | 683fea34b48f2816984878aa
+Tag property register | 69d72b2a2f10fcd319c5a770 | 683fea34b48f2816984878aa
+(ISM UoM Class Units)表格视图 | 69d749460f867d1c3edf47da | 683fea34b48f2816984878aa
+(ISM Enumerations)表格视图 | 69d74aa50f867d1c3ee0768f | 683fea34b48f2816984878aa
+(ISM Functional Classes)表格视图 | 69d74c8a90f2a021e803eca6 | 683fea34b48f2816984878aa
+(ISM Functional Class Attributes)表格视图 | 69d74cfbe1966aaad69a5930 | 683fea34b48f2816984878aa
+(ISM总表) | 69df5433d249a71475097901 | 683fea34b48f2816984878aa
+阀门执行器技术协议模板 | 69e89f47ef71a3078918e04e | 683fea34b48f2816984878aa
+接线箱采购技术协议模板 | 69e8a75834717b6067b7c088 | 683fea34b48f2816984878aa
+B02-供应商清单/Sub-supplier list | 69e8aafb84655d37e6eb2453 | 683fea34b48f2816984878aa
+E03-安全阀数据表 | 69e8b03953deff7a3e7e6122 | 683fea34b48f2816984878aa
+仪表类采购技术协议 | 69e9cd9de4ca97f71b8a6af1 | 683fea34b48f2816984878aa
+控制柜采购技术协议 | 69e9dcc0b14d7cea32f20a29 | 683fea34b48f2816984878aa
+E03-压力表数据表 | 69e9f8121e7d8345395b441f | 683fea34b48f2816984878aa
+E03-压力变送器数据表 | 69ea0479b2701aa57b48b15f | 683fea34b48f2816984878aa
+A01-文件清单/VDR-AGCC模板 | 69ead39ed7d8d142904b6df7 | 683fea34b48f2816984878aa
+A01-文件清单/VDR-SIUBR模板 | 69eb135b038196d0ff897a48 | 683fea34b48f2816984878aa
+电缆采购技术协议 | 69eb33c4beb90e2d761ac551 | 683fea34b48f2816984878aa
+EAC 证书采购技术协议 | 69ef22af058c9fc31b2d0837 | 683fea34b48f2816984878aa
+F07-润滑油清单 | 69ef256186ea58ecf20845b1 | 683fea34b48f2816984878aa
+工艺管道采购技术协议 | 69ef299cf72f70ce2681f0ff | 683fea34b48f2816984878aa
+油漆采购技术协议 | 69ef2e9c75670e1b8b7ed1c0 | 683fea34b48f2816984878aa
+流量计采购技术协议 | 69f065d21127ad83ab02849c | 683fea34b48f2816984878aa
+手葫芦采购技术协议 | 69f0766f5cc98e73f99098c2 | 683fea34b48f2816984878aa
+格兰头采购技术协议 | 69f07f5380461a79f003e8ef | 683fea34b48f2816984878aa
+F01-仪表清单-AGCC模板 | 69f095b50fb3cfe08ed6c4fe | 683fea34b48f2816984878aa
+F01-仪表清单-SIBUR模板 | 69f0a81dd056cd67055c6bb5 | 683fea34b48f2816984878aa
+F03-电负载清单 | 69f0ae1a313db388cdbf803f | 683fea34b48f2816984878aa
+仪表管道采购技术协议 | 69f1acd36c40568e8e82163b | 683fea34b48f2816984878aa
+F10-消耗清单 | 69f2f64e6f381060dc905404 | 683fea34b48f2816984878aa
+阀门类通用技术护照_演示使用_拷贝 | 69f300a1d40f41799cf1d626 | 683fea34b48f2816984878aa
+F15-安全阀清单 | 69fb0dee739535d17b999c42 | 683fea34b48f2816984878aa
+F02-线缆清单-PDH模板 | 69fc31ebdf770f2407a79f8e | 683fea34b48f2816984878aa
+F02-线缆清单-AGCC模板 | 69fc44912038ba61637f1ee6 | 683fea34b48f2816984878aa
+F11-紧固件清单 | 69fd8a8082480ea7d682882b | 683fea34b48f2816984878aa
+F12-BOM清单 | 69fd936d53893965bf7ff4d8 | 683fea34b48f2816984878aa
+ELECTRICAL LOAD LIST | 69feee4b01a6a2cd060ad09b | 683fea34b48f2816984878aa
+F05-IO清单-西布尔模板 | 6a01a5d798061e2a76dda9de | 683fea34b48f2816984878aa
+F05-IO清单-AGCC模板 | 6a02d513a7b9d4d82483b4ef | 683fea34b48f2816984878aa
+I/O List | 6a0ec8999c352ba3e0b00dc6 | 683fea34b48f2816984878aa
+泵操作柱技术协议 | 6a16965b629dbf8ef51893f2 | 683fea34b48f2816984878aa
+转换接头技术协议 | 6a16a0027991f13e1fc98eca | 683fea34b48f2816984878aa
+Lubricant list | 6a17e8603ed05a1e01d79c95 | 683fea34b48f2816984878aa
+Instrument equipment List | 6a17eda94df8783b019f960b | 683fea34b48f2816984878aa
+Two years spare part list | 6a18033e6fbebfb8d87243b0 | 683fea34b48f2816984878aa
+Valve list | 6a18f28664b52d6a7218ae02 | 683fea34b48f2816984878aa
+Commissioning spare part list | 6a192a530b3c8eac28457059 | 683fea34b48f2816984878aa
+接线箱采购技术协议 | 6a195045574dfca327f7cfa3 | 683fea34b48f2816984878aa
+机械密封技术协议 | 6a20c53c07bf15789dc95650 | 683fea34b48f2816984878aa
+联轴器技术协议 | 6a20d0074355a9bb3325620f | 683fea34b48f2816984878aa
+泵压力表技术协议 | 6a20d792290fbe0ec318b52f | 683fea34b48f2816984878aa
+泵壳振探头技术协议 | 6a20da8354bb67953f401757 | 683fea34b48f2816984878aa
+泵轴振技术协议 | 6a20ddb805f4e5992bcc160c | 683fea34b48f2816984878aa
+泵温度变送器技术协议 | 6a20e1702eb90b5318ff5b6e | 683fea34b48f2816984878aa
+泵温度表技术协议 | 6a20e44b12c8a6ca9b157b22 | 683fea34b48f2816984878aa
+包装规程 | 6a20e5a582e8768c6ef2c5dd | 683fea34b48f2816984878aa
+电机温度变送器采购单 | 6a20e721f57070e3005e5463 | 683fea34b48f2816984878aa
+电机壳振探头技术协议 | 6a20ebb884d71df010ebe448 | 683fea34b48f2816984878aa
+反转监测仪表技术协议 | 6a20ee0c722960513e06e5c3 | 683fea34b48f2816984878aa
+接线箱技术协议 | 6a20f213845f186204bc49b7 | 683fea34b48f2816984878aa
+底座加工技术协议 | 6a20f43d05f4e5992bdcaeef | 683fea34b48f2816984878aa
+ARC阀技术协议 | 6a2107b19008278c168c6606 | 683fea34b48f2816984878aa
+冲洗系统技术协议 | 6a210dfbc394efb34f7bbf19 | 683fea34b48f2816984878aa
+压力变送器技术协议 | 6a21119d28b78c57fc442b91 | 683fea34b48f2816984878aa
+锻造技术协议 | 6a2114999ae16a2676eef6a1 | 683fea34b48f2816984878aa
+导轴承加工技术协议 | 6a211720bd83be4005cb61bb | 683fea34b48f2816984878aa
+液位变送器技术协议 | 6a2118ee99bd9c3ac40112c5 | 683fea34b48f2816984878aa
+动平衡规程 | 6a211a35f00f109f84d0f2ef | 683fea34b48f2816984878aa
+安全阀技术协议 | 6a211cd830d998877e37621e | 683fea34b48f2816984878aa
+水压规程 | 6a211dd17b7936db80a0d5b2 | 683fea34b48f2816984878aa
+蓄能器技术协议 | 6a211ffc43285eddda41ce00 | 683fea34b48f2816984878aa
+热处理规程 | 6a2120b79368ff2e33b8d564 | 683fea34b48f2816984878aa
+型材毛坯技术协议 | 6a212271dea186af641fa499 | 683fea34b48f2816984878aa
+密封环锻件技术协议 | 6a2123ee567859528796cc71 | 683fea34b48f2816984878aa
+辅助系统技术协议 | 6a2125c48e72884e614f64dc | 683fea34b48f2816984878aa
+性能规程 | 6a21338d2a7c8be1df960550 | 683fea34b48f2816984878aa
+一般资产申请表 | 6a265eb843e5ee557c41bab1 | 683fea34b48f2816984878aa
+使馆回复模板-Fax Reply | 6a2770daba66d6904190de7e | 683fea34b48f2816984878aa
+4，技术澄清函模板 Clarification Regarding XXXX | 6a27cdc3f7ac3d200ea5cc25 | 683fea34b48f2816984878aa
+合同北京威福陆 | 6a27d0d4724d5d4ff6c5ae0b | 683fea34b48f2816984878aa
+5，公司信息表模板-SIBUR平台投标 | 6a2a253ac44b841efba9a76b | 683fea34b48f2816984878aa
+6，俄文版授权函模板 | 6a2a2bed95bd266b6343f82d | 683fea34b48f2816984878aa
+7，签证邀请函模板 | 6a2a4d4a0d46eba60dd4f92b | 683fea34b48f2816984878aa
+内部任务项目立项 | 6368cf27de256c000a6cc773 | 683fea34b48f2816984878aa
+创建里程碑任务 | 636b2c51c27bf3000a2eb438 | 683fea34b48f2816984878aa
+任务管理 | 65f2a8677a89ace938810a28 | 683fea34b48f2816984878aa
+任务验收 | 65f2ba91d45bda3b5104d610 | 683fea34b48f2816984878aa
+任务进度汇报 | 66028478e479aa6b66a9bf53 | 683fea34b48f2816984878aa
+标准库 | 683fecdb43b88ffd27ad1737 | 683fea34b48f2816984878aa
+一级分类 | 684006b13b1ae17aacacfe01 | 683fea34b48f2816984878aa
+二级分类 | 684006e7f42efba4f6eefd51 | 683fea34b48f2816984878aa
+内部资料 | 68413c6fa6ca7e874d36dab7 | 683fea34b48f2816984878aa
+BOM表 | 684b917203466e4c54248529 | 683fea34b48f2816984878aa
+分类管理 | 68513786b154cc203cd11f4e | 683fea34b48f2816984878aa
+询价申请单 | 6852b640f7bebca81d8f86e1 | 683fea34b48f2816984878aa
+二级分类管理 | 6852b6684e3cf794b19df287 | 683fea34b48f2816984878aa
+项目立项 | 685367b2948c8f1c474ba1c5 | 683fea34b48f2816984878aa
+公司基础信息 | 685379f2b2c046e57a5fae40 | 683fea34b48f2816984878aa
+产品信息 | 6858e9e97ae286878cd3347f | 683fea34b48f2816984878aa
+单位库 | 6858ed4aa4a441cbae420f30 | 683fea34b48f2816984878aa
+物料信息 | 6858ee165533a1666749ff19 | 683fea34b48f2816984878aa
+一级分类管理 | 685904cd5af28d2110c45863 | 683fea34b48f2816984878aa
+分类管理 | 685904cfd1a38c981d1cc2bc | 683fea34b48f2816984878aa
+项目策划 | 685a40638d92425d4bdea2b2 | 683fea34b48f2816984878aa
+项目计划 | 685a45377d71a3edeecb4591 | 683fea34b48f2816984878aa
+项目成果上传 | 685b5d87393fbd72687fe73b | 683fea34b48f2816984878aa
+项目结项申请 | 685b5d908f47c55ff0614517 | 683fea34b48f2816984878aa
+项目合同 | 685ba4d74551a2c3313519d1 | 683fea34b48f2816984878aa
+合同附件上传 | 685baa28559f05306fb96615 | 683fea34b48f2816984878aa
+仓库信息 | 686341b53734e8283ff6afb7 | 683fea34b48f2816984878aa
+仓位信息 | 686341bf8c5a9bcadf1769b3 | 683fea34b48f2816984878aa
+辅助表：库存期初期末（产品-日期） | 686341c35723ee64e8d33cbd | 683fea34b48f2816984878aa
+其他入库单 | 686341ccf2fdd82cd1148bbd | 683fea34b48f2816984878aa
+其他出库单 | 686341d20ed2919263cec8bd | 683fea34b48f2816984878aa
+库存调拨 | 686341d870ee0134a94849e7 | 683fea34b48f2816984878aa
+库存盘点 | 686341de008adb7e8abca9b5 | 683fea34b48f2816984878aa
+未命名表单 | 68639e2699919ca9ba4027de | 683fea34b48f2816984878aa
+生产班组 | 68663e0541455b93205ef8ed | 683fea34b48f2816984878aa
+工序 | 68663e9bbdbea69841f1c4c4 | 683fea34b48f2816984878aa
+工艺路线明细表 | 686640a1d5992474ecfd5acc | 683fea34b48f2816984878aa
+工艺路线 | 686640fc468f47336210a501 | 683fea34b48f2816984878aa
+客户项目反馈 | 68673f22ef9a5c1db1460ede | 683fea34b48f2816984878aa
+供应商列表 | 686740b3b01f71bfba52f8e0 | 683fea34b48f2816984878aa
+询价任务池 | 686746ce4d7d11c9056f9762 | 683fea34b48f2816984878aa
+采购需求池 | 686773e6f4d69b56beebbe40 | 683fea34b48f2816984878aa
+供应商价格表 | 68677ccb5f3f2bf7fc1304e8 | 683fea34b48f2816984878aa
+采购订单 | 68677e08a9023b8d1da41b3d | 683fea34b48f2816984878aa
+客户询价单 | 686b72f75d9f61878ce4d3ed | 683fea34b48f2816984878aa
+1级bom运算 | 686c73f1e5b9650cb154ab18 | 683fea34b48f2816984878aa
+物料需求清单 | 686c88c27b40343a38ab97db | 683fea34b48f2816984878aa
+5级bom运算 | 686c88c7e30d7af02507ed1c | 683fea34b48f2816984878aa
+4级bom运算 | 686c88ca34d62d070b92b9c3 | 683fea34b48f2816984878aa
+3级bom运算 | 686c88cc64cc6019e2f9b84a | 683fea34b48f2816984878aa
+2级bom运算 | 686c88cf4cec0f9b7da3d86d | 683fea34b48f2816984878aa
+生产计划 | 686c890a10876b91062d7e0c | 683fea34b48f2816984878aa
+询报价单明细表 | 686cb34f2352086da19104bf | 683fea34b48f2816984878aa
+测试表 | 686f214d1fd867db02bc8dba | 683fea34b48f2816984878aa
+供应商评审 | 6870b53e7537c9f860fcfbc9 | 683fea34b48f2816984878aa
+未命名表单 | 6871d4744af587b3332e2df5 | 683fea34b48f2816984878aa
+来料检验单 | 687d9a0e2d10e3d3968943f7 | 683fea34b48f2816984878aa
+不合格处置单 | 687d9f85d700c06438d977d4 | 683fea34b48f2816984878aa
+生产任务 | 687daf1fbcb3b447a8d15618 | 683fea34b48f2816984878aa
+采购入库 | 687db80bd3277bfa5d6bf7db | 683fea34b48f2816984878aa
+生产工单 | 687de24e36363a26ebcf8fe2 | 683fea34b48f2816984878aa
+生产领料 | 687dfb0b152d97becf3a7f23 | 683fea34b48f2816984878aa
+生产报工 | 68808e42769693e9613a8e51 | 683fea34b48f2816984878aa
+14.QRI-14 喷漆报告 | 6883354e0bcfd78ad8d94d2d | 683fea34b48f2816984878aa
+OH2装配检验记录 | 68833e04d4489e2dca63e20a | 683fea34b48f2816984878aa
+27.QRI-27 零件尺寸检验记录-报告 | 68833e5121d9021ad9c71b59 | 683fea34b48f2816984878aa
+BB1装配检验记录 | 688348b539c0e886ea9905de | 683fea34b48f2816984878aa
+BB2装配检验记录 | 68834936e773caaded5d1fb5 | 683fea34b48f2816984878aa
+BB5装配检验记录 | 68834986b4fb1cc4a1dcdd79 | 683fea34b48f2816984878aa
+OH3装配检验记录 | 688349f1af8e64cb3733c101 | 683fea34b48f2816984878aa
+VS6装配检验记录 | 68834a7ddac3818bbdef5c99 | 683fea34b48f2816984878aa
+15.QRI-15 装配检验记录_拷贝_拷贝 | 68834ca57aeb434a12f96429 | 683fea34b48f2816984878aa
+产品物料明细表 | 688732c50ac875b0c2ba8764 | 683fea34b48f2816984878aa
+采购退货 | 6888763344d8e6aeb5c2e350 | 683fea34b48f2816984878aa
+销售出库 | 688b0c13bfbf95d8a10d06da | 683fea34b48f2816984878aa
+生产计划明细表 | 688c5e1bc227570490a13479 | 683fea34b48f2816984878aa
+字母大小写转换 | 688c8117269e7e002d7c97aa | 683fea34b48f2816984878aa
+生产工序工单 | 689022b97ca8ef8515759926 | 683fea34b48f2816984878aa
+文件上传测试 | 68930634d9fdd1bc0c279c42 | 683fea34b48f2816984878aa
+生产退料 | 68932abfc113239d2838ea4d | 683fea34b48f2816984878aa
+未命名表单_拷贝 | 689447f1ed1bce387f73ff0c | 683fea34b48f2816984878aa
+来料检验单_拷贝 | 6895549275ac33118ee63b6c | 683fea34b48f2816984878aa
+生产入库 | 68998c6c6cafbc515d6f3ef1 | 683fea34b48f2816984878aa
+生产报工检验单 | 68999781efd4bba3214931aa | 683fea34b48f2816984878aa
+报工不合格处置单 | 6899a0b99f82fbc2c60b8bde | 683fea34b48f2816984878aa
+物料清单确认 | 689c06e94568162e3f4bc945 | 683fea34b48f2816984878aa
+物料清单确认明细表 | 689c394025bc1a90775fda72 | 683fea34b48f2816984878aa
+操作演示视频 | 689c52a10252366bbc51e5a4 | 683fea34b48f2816984878aa
+采购入库流水 | 689d9b26681052b0bc35fcc1 | 683fea34b48f2816984878aa
+知识库 | 68ad15ab88c411d76390e0a2 | 683fea34b48f2816984878aa
+公共库存设定 | 68b2a7295027f2d58b44fd30 | 683fea34b48f2816984878aa
+异常工单处理 | 68ba4a2ab79ceb9b1aa074b6 | 683fea34b48f2816984878aa
+计划 | 68bf9049870140eaf8f27181 | 683fea34b48f2816984878aa
+计划_拷贝 | 68bfccad645ab1fa9dbcdbc2 | 683fea34b48f2816984878aa
+工单暂停流程表 | 68c921242db452baecdd8cb2 | 683fea34b48f2816984878aa
+超领料申请 | 68ca74bcaed3ed510d1ec7f9 | 683fea34b48f2816984878aa
+未命名表单 | 690576aed20978360850c7a8 | 683fea34b48f2816984878aa
+未命名表单 | 6909a641fdbe9634566784d4 | 683fea34b48f2816984878aa
+子任务拆分 | 691fcc63ea2d3d295b9b45ea | 683fea34b48f2816984878aa
+任务拆分明细 | 691fd04ca3155a990553c970 | 683fea34b48f2816984878aa
+产品信息 | 60458a6440c90e0008c75561 | 6850c3b35eb163fd2c829f24 | CRM
+产品分类 | 65dea48adbb2766a9b752402 | 6850c3b35eb163fd2c829f25
+市场活动记录 | 60458b7f91731e0007d6db23 | 6850c3b35eb163fd2c829f26
+线索 | 020100100000000000000001 | 6850c3b35eb163fd2c829f27
+客户 | 020100200000000000000001 | 6850c3b35eb163fd2c829f28
+联系人 | 020100300000000000000001 | 6850c3b35eb163fd2c829f29
+跟进记录 | 020100400000000000000001 | 6850c3b35eb163fd2c829f30
+跟进计划 | 020100600000000000000001 | 6850c3b35eb163fd2c829f31
+商机 | 020100500000000000000001 | 6850c3b35eb163fd2c829f32
+报价单 | 60458a1dc5f30c000902e2b9 | 6850c3b35eb163fd2c829f33
+销售订单 | 60458aa5103b80000744de9c | 6850c3b35eb163fd2c829f34
+回款计划 | 65dfdeef2afab317a192b583 | 6850c3b35eb163fd2c829f35
+开票申请 | 65dfdef42adb7ccda25d5e46 | 6850c3b35eb163fd2c829f36
+回款单 | 65dfdef970c41fc8abf89944 | 6850c3b35eb163fd2c829f37
+付款单 | 65dea4ec7dc04967dd39e52a | 6850c3b35eb163fd2c829f38
+资金账户 | 65dea4e57dc04967dd39e042 | 6850c3b35eb163fd2c829f39
+销售目标制定 | 65e12c9c7b15a9a958394e48 | 6850c3b35eb163fd2c829f40
+绩效系数规则 | 65dea69dc8432884921fbfb6 | 6850c3b35eb163fd2c829f41
+销售薪酬计算-每月同步 | 65e13978b3db20c8e873e2ce | 6850c3b35eb163fd2c829f42

@@ -1,0 +1,3796 @@
+### SHEET: 完整接口总表
+分类（AI生成） | 接口名 | 请求方式 | 请求地址 | 请求频率 | 接口简介 | 请求参数 | 请求示例 (JSON) | 响应示例 (JSON) | 文档链接 | 调试台链接
+应用接口 | 用户应用查询 | POST | https://api.jiandaoyun.com/api/v5/app/list | 30 次/秒 | 仅获取 API Key 当中应用授权范围内的应用信息 | | 参数 | 类型 | 必需 | 说明 |
+|---|---|---|---|
+| limit | Number | 否 | 单次取数的数据条数，1~100，默认 100。 |
+| skip | Number | 否 | 需要跳过的数据条数，默认 0 。 | |  | {
+    "apps": [
+        {
+            "name": "应用名称1",
+            "app_id": "5d5a5bbb850a6d0604ab119"
+        },
+        {
+            "name": "应用名称2",
+            "app_id": "5d5a5c14850a6d0604ab11a4"
+        }
+    ]
+} | https://hc.jiandaoyun.com/open/18538 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+应用接口 | 用户表单查询 | POST | https://api.jiandaoyun.com/api/v5/app/entry/list | 30 次/秒 | 获取当前应用下所有表单信息 | | 参数 | 类型 | 必需 | 说明 |
+|---|---|---|---|
+| app_id | String | 是 | 应用ID。 |
+| limit | Number | 否 | 单次取数的数据条数，1~100，默认 100。 |
+| skip | Number | 否 | 需要跳过的数据条数，默认 0 。 | | {
+          "app_id": "5e0dca0cc9a2790006c11e02"
+ } | {
+    "forms": [
+        {
+            "name": "表单名称1",
+            "app_id": "5e0dca0cc9a2790006c11e02",
+            "entry_id": "56fcab0f02c4675e3fe9694a"
+        },
+        {
+            "name": "表单名称2",
+            "app_id": "5e0dca0cc9a2790006c11e02",
+            "entry_id": "5ed750af3c07c70f9c6eef78"
+        }
+    ]
+} | https://hc.jiandaoyun.com/open/18539 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+表单接口 | 表单字段查询 | POST | https://api.jiandaoyun.com/api/v5/app/entry/widget/list | 30 次/秒 | 获取指定表单的字段信息，包括 V1/V2/V5 三个版本 | | 参数 | 类型 | 必需 | 说明 |
+|---|---|---|---|
+| app_id | String | 是 | 应用ID |
+| entry_id | String | 是 | 表单ID | | {
+    "app_id": "59264073a2a60c0c08e20bfb",
+    "entry_id": "59264073a2a60c0c08e20bfd"
+} | {
+    "widgets": [
+        {
+            "name": "_widget_1529400746031",
+            "widgetName": "_widget_1529400746031",
+            "label": "单行文本",
+            "type": "text"
+        },
+        {
+            "name": "_widget_1529400746045",
+            "widgetName": "_widget_1529400746045",
+            "label": "多行文本",
+            "type": "textarea"
+        },
+        {
+            "name": "_widget_1529400746056",
+            "widgetName": "_widget_1529400746056",
+            "label": "数字",
+            "type": "number"
+        },
+        {
+            "name": "_widget_1529400746068",
+            "widgetName": "_widget_1529400746068",
+            "label": "日期",
+            "type": "datetime"
+        },
+        {
+            "name": "_widget_1529400746079",
+            "widgetName": "_widget_1529400746079",
+            "label": "日期时间",
+            "type": "datetime"
+        },
+        {
+            "name": "_widget_1529400746090",
+            "widgetName": "_widget_1529400746090",
+            "label": "单选按钮组",
+            "type": "radiogroup"
+        },
+        {
+            "name": "_widget_1529400746105",
+            "widgetName": "_widget_1529400746105",
+            "label": "复选框组",
+            "type": "checkboxgroup"
+        },
+        {
+            "name": "_widget_1529400746119",
+            "widgetName": "_widget_1529400746119",
+            "label": "下拉框",
+            "type": "combo"
+        },
+        {
+            "name": "_widget_1529400746136",
+            "widgetName": "_widget_1529400746136",
+            "label": "下拉复选框",
+            "type": "combocheck"
+        },
+        {
+            "name": "_widget_1529400746157",
+            "widgetName": "_widget_1529400746157",
+            "label": "地址",
+            "type": "address"
+        },
+        {
+            "name": "_widget_1529400746173",
+            "widgetName": "_widget_1529400746173",
+            "label": "定位",
+            "type": "location"
+        },
+        {
+            "name": "_widget_1529400746191",
+            "widgetName": "_widget_1529400746191",
+            "label": "图片",
+            "type": "image"
+        },
+        {
+            "name": "_widget_1529400746209",
+            "widgetName": "_widget_1529400746209",
+            "label": "附件",
+            "type": "upload"
+        },
+        {
+            "name": "_widget_1529400746221",
+            "widgetName": "_widget_1529400746221",
+            "label": "子表单",
+            "type": "subform",
+            "items": [
+                // 同主表
+            ]
+        },
+        {
+            "name": "_widget_1529400746242",
+            "widgetName": "_widget_1529400746242",
+            "label": "选择数据",
+            "type": "linkdata"
+        },
+        {
+            "name": "_widget_1529400746242",
+            "widgetName": "_widget_1529400746242",
+            "label": "关联数据",
+            "type": "lookup"
+        },
+        {
+            "name": "_widget_1529400746254",
+            "widgetName": "_widget_1529400746254",
+            "label": "手写签名",
+            "type": "signature"
+        },
+        {
+            "name": "_widget_1529400746696",
+            "widgetName": "_widget_1529400746696",
+            "label": "成员单选",
+            "type": "user"
+        },
+        {
+            "name": "_widget_1529400746713",
+            "widgetName": "_widget_1529400746713",
+            "label": "成员多选",
+            "type": "usergroup"
+        },
+        {
+            "name": "_widget_1529400746729",
+            "widgetName": "_widget_1529400746729",
+            "label": "部门单选",
+            "type": "dept"
+        },
+        {
+            "name": "_widget_1529400746746",
+            "widgetName": "_widget_1529400746746",
+            "label": "部门多选",
+            "type": "deptgroup"
+        }
+    ],
+    "sysWidgets": [
+        { "name": "flowState" },
+        { "name": "wx_open_id" },
+        { "name": "wx_nickname" },
+        { "name": "wx_gender" },
+        { "name": "creator" },
+        { "name": "updater" },
+        { "name": "deleter" },
+        { "name": "ext" },
+        { "name": "createTime" },
+        { "name": "updateTime" },
+        { "name": "deleteTime" }
+    ],
+    "dataModifyTime": "2021-09-08T03:40:26.586Z"
+} | https://hc.jiandaoyun.com/open/14216 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+数据接口 | 查询多条数据 | POST | https://api.jiandaoyun.com/api/v5/app/entry/data/list | 30 次/秒 | 通过查询多条数据接口，可以一次查询表单中的多条数据 | | 参数 | 类型 | 必需 | 说明 |
+|---|---|---|---|
+| app_id | String | 是 | 应用ID |
+| entry_id | String | 是 | 表单ID |
+| data_id | String | 否 | 分页符，上一次查询数据结果的最后一条数据的 ID，没有则留空 |
+| fields | Array | 否 | 需要查询的数据字段，暂不支持子表单字段。 |
+| filter | JSON | 否 | 数据筛选器 |
+| limit | Number | 否 | 查询的数据条数，1~100，默认10 | | {
+    "app_id": "59264073a2a60c0c08e20bfb",
+    "entry_id": "59264073a2a60c0c08e20bfd",
+    "data_id": "59e9a2fe283ffa7c11b1ddbf",
+    "limit": 100,
+    "fields": ["_widget_1508400000001", "_widget_1508400000002", "_widget_1508400000003"],
+    "filter": {
+        "rel": "and",
+        "cond": [
+            {
+                "field": "flowState",
+                "type": "flowstate",
+                "method": "eq",
+                "value": [0]
+            }
+        ]
+    }
+} | {
+    "data": [
+        {
+            "_id": "59e9a2fe283ffa7c11b1ddbe",
+            "appId": "59264073a2a60c0c08e20bfb",
+            "entryId": "59264073a2a60c0c08e20bfd",
+            "creator": {
+                "name": "小简",
+                "username": "xiaojian",
+                "status": 1,
+                "type": 0,
+                "departments": [1, 3],
+                "integrate_id": "xiaojian"
+            },
+            "createTime": "2017-10-20T22:41:51.430Z",
+            "updateTime": "2017-10-20T11:12:15.293Z",
+            "_widget_1741589364098": {
+                "id": "67ce8c18705dfcd1eef5c070"
+            },
+            "_widget_1432728651402": "A班",
+            "_widget_1615777739673": [
+                {
+                    "_id": "604ed0298e2ade077c7245f1",
+                    "_widget_1615777739744": "子表单数据1"
+                },
+                {
+                    "_id": "604ed0298e2ade077c7245f2",
+                    "_widget_1615777739744": "子表单数据2"
+                }
+            ]
+        },
+        {
+            "_id": "59e9a2fe283ffa7c11b1ddbf",
+            "appId": "59264073a2a60c0c08e20bfb",
+            "entryId": "59264073a2a60c0c08e20bfd",
+            "creator": {
+                "name": "小简",
+                "username": "xiaojian",
+                "status": 1,
+                "type": 0,
+                "departments": [1, 3],
+                "integrate_id": "xiaojian"
+            },
+            "createTime": "2017-10-20T22:41:51.430Z",
+            "updateTime": "2017-10-20T11:12:15.293Z",
+            "_widget_1725969783950": "67221b4fac0a62ac8f43a1c2",
+            "_widget_1741589364098": {
+                "id": "67ce8c18705dfcd1eef5c070"
+            },
+            "_widget_1432728651402": "B班",
+            "_widget_1615777739673": [
+                {
+                    "_id": "604ed0298e2ade077c7245f3",
+                    "_widget_1615777739744": "子表单数据1"
+                },
+                {
+                    "_id": "604ed0298e2ade077c7245f4",
+                    "_widget_1615777739744": "子表单数据2"
+                }
+            ]
+        }
+    ]
+} | https://hc.jiandaoyun.com/open/14220 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+数据接口 | 查询单条数据 | POST | https://api.jiandaoyun.com/api/v5/app/entry/data/get | 30 次/秒 | 通过查询单条数据接口，可以查询表单中的指定数据 | | 参数 | 类型 | 必需 | 说明 |
+|---|---|---|---|
+| app_id | String | 是 | 应用ID |
+| entry_id | String | 是 | 表单ID |
+| data_id | String | 是 | 数据 ID | | {
+   "app_id": "59264073a2a60c0c08e20bfb",
+   "entry_id": "59264073a2a60c0c08e20bfd",
+   "data_id": "59e9a2fe283ffa7c11b1ddbf"
+} | {
+    "data": {
+        "_id": "59e9a2fe283ffa7c11b1ddbf",
+        "appId": "59264073a2a60c0c08e20bfb",
+        "entryId": "59264073a2a60c0c08e20bfd",
+        "creator": {
+            "name": "小简",
+            "username": "xiaojian",
+            "status": 1,
+            "type": 0,
+            "departments": [1, 3],
+            "integrate_id": "xiaojian"
+        },
+        "updater": {
+            "name": "小简",
+            "username": "xiaojian",
+            "status": 1,
+            "type": 0,
+            "departments": [1, 3],
+            "integrate_id": "xiaojian"
+        },
+        "createTime": "2017-10-20T22:41:51.430Z",
+        "updateTime": "2017-10-20T11:12:15.293Z",
+        "_widget_1725969783950": "67221b4fac0a62ac8f43a1c2",
+        "_widget_1432728651402": "简道云",
+        "_widget_1432728651403": 100,
+        "_widget_1432728651404": "简道云是一个强大易用的应用搭建工具，可以快速把你的想法变成应用",
+        "_widget_1432728651405": "选项一",
+        "_widget_1432728651406": ["选项一", "选项二", "选项三"],
+        "_widget_1432728651407": "2018-01-01T10:10:10.000Z",
+        "_widget_1432728651408": { "id": "5b28effa49b561455dfda91e" },
+        "_widget_1432728651409": [{
+            "name": "image.jpg",
+            "size": 262144,
+            "mime": "image/jpeg",
+            "url": "https://files.jiandaoyun.com/lepxaifzcapghupffcaswikmhnyp"
+        }],
+        "_widget_1432728651410": [{
+            "name": "产品说明文档.pdf",
+            "size": 524288,
+            "mime": "application/pdf",
+            "url": "https://files.jiandaoyun.com/bogrebbkdbkfsbuldnjujoenclle"
+        }],
+        "_widget_1432728651411": {
+            "name": "image.png",
+            "size": 262144,
+            "mime": "image/png",
+            "url": "https://files.jiandaoyun.com/sxbikbrchwlylrgqwyfkjbjmuncp"
+        },
+        "_widget_1432728651412": {
+            "province": "江苏省",
+            "city": "无锡市",
+            "district": "梁溪区",
+            "detail": "清扬路138号茂业天地"
+        },
+        "_widget_1432728651413": {
+            "province": "江苏省",
+            "city": "无锡市",
+            "district": "梁溪区",
+            "detail": "清扬路138号茂业天地",
+            "lnglatXY": [120.31237, 31.49099]
+        },
+        "_widget_1652345009097": {
+            "verified": false,
+            "phone": "15852540044"
+        },
+        "_widget_1432728651414": {
+            "name": "小简",
+            "username": "xiaojian",
+            "status": 1,
+            "type": 0,
+            "departments": [1, 3],
+            "integrate_id": "xiaojian"
+        },
+        "_widget_1432728651415": [{
+            "name": "小简",
+            "username": "xiaojian",
+            "status": 1,
+            "type": 0,
+            "departments": [1, 3],
+            "integrate_id": "xiaojian"
+        }],
+        "_widget_1432728651416": {
+            "name": "经理部",
+            "dept_no": 1,
+            "type": 0,
+            "parent_no": 2,
+            "status": 1,
+            "integrate_id": 1
+        },
+        "_widget_1432728651417": [{
+            "name": "经理部",
+            "dept_no": 1,
+            "type": 0,
+            "parent_no": 2,
+            "status": 1,
+            "integrate_id": 1
+        }],
+        "_widget_1432728651408": [{"_id_sub": "subform..."}],
+        "_widget_1432728651528": {
+            "html": "<p>Hello, world!<img src=\"https://files.xxxxxx.com/xxx\" /></p>",
+            "attachments": [{
+                "name": "image1.png",
+                "size": 262144,
+                "mime": "image/png",
+                "url": "https://files.xxxxx.com/xxx"
+            }]
+        },
+        "wx_open_id": "wx98fb14481b3ab5a3",
+        "wx_nickname": "jiandaoyun",
+        "wx_gender": "男"
+    }
+} | https://hc.jiandaoyun.com/open/14221 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+数据接口 | 新建单条数据 | POST | https://api.jiandaoyun.com/api/v5/app/entry/data/create | 20 次/秒 | 通过新建单条数据接口，可以向指定的表单中添加单条数据 | | 参数 | 类型 | 必需 | 说明 | 默认 |
+|---|---|---|---|---|
+| app_id | String | 是 | 应用ID |  |
+| entry_id | String | 是 | 表单ID |  |
+| data | JSON | 是 | 数据内容 |  |
+| data_creator | String | 否 | 数据提交人（取成员编号 username，可从通讯录接口获取）。不能使用互联组织中外部对接人的 username | 企业创建者 |
+| is_start_workflow | Bool | 否 | 是否发起流程（仅流程表单有效） | false |
+| is_start_trigger | Bool | 否 | 是否触发智能助手 | false |
+| transaction_id | String | 否 | 事务ID；用于绑定一批上传的文件，若数据中包含附件或图片控件，则必须与"获取文件上传凭证和上传地址接口"中的 transaction_id 参数相同。 |  | | {
+    "app_id": "59264073a2a60c0c08e20bfb",
+    "entry_id": "59264073a2a60c0c08e20bfd",
+    "transaction_id": "87cd7d71-c6df-4281-9927-469094395677",
+    "data_creator": "Yonne",
+    "data": {
+        "_widget_1432728651402": { "value": "简道云" },
+        "_widget_1725969783950": { "value": "67221b4fac0a62ac8f43a1c3" },
+        "_widget_1432728651403": { "value": 100 },
+        "_widget_1432728651404": { "value": "简道云是一个强大易用的应用搭建工具，\n可以快速把你的想法变成应用" },
+        "_widget_1432728651405": { "value": "选项一" },
+        "_widget_1432728651406": { "value": ["选项一","选项二","选项三"] },
+        "_widget_1432728651407": { "value": "2018-01-01T10:10:10.000Z" },
+        "_widget_1432728651412": {
+            "value": {
+                "province": "江苏省",
+                "city": "无锡市",
+                "district": "梁溪区",
+                "detail": "清扬路138号茂业天地"
+            }
+        },
+        "_widget_1432728651413": {
+            "value": {
+                "province": "江苏省",
+                "city": "无锡市",
+                "district": "梁溪区",
+                "detail": "清扬路138号茂业天地",
+                "lnglatXY": [120.31237, 31.49099]
+            }
+        },
+        "_widget_1528854613291": {
+            "value": [
+                {
+                    "_widget_1528854614409": { "value": "子表单数据1" },
+                    "_widget_1528854615499": { "value": 1001 }
+                },
+                {
+                    "_widget_1528854614410": { "value": "子表单数据2" },
+                    "_widget_1528854615419": { "value": 1002 }
+                }
+            ]
+        },
+        "_widget_1652345009097": { "value": { "phone": "15852540044" } },
+        "_widget_1652345009126": { "value": "jian" },
+        "_widget_1652345009143": { "value": ["jian", "dao"] },
+        "_widget_1652345009157": { "value": 12 },
+        "_widget_1652345009174": { "value": [12, 13] },
+        "_widget_1432728651408": { "value": ["6b559cf1-b16c-43bd-a211-8fa8fdeae2ef","6b559cf1-b16c-43bd-a211-646ab85da8cb"] },
+        "_widget_1432728652567": { "value": ["6b559cf1-b16c-43bd-a211-74389cd8ae76","6b559cf1-b16c-43bd-a211-564e56a65bd6"] },
+        "_widget_1432728651528": { "value": "<p>Hello, world!<img data-key=\"6b559cf1-b16c-43bd-a211-74389cd8ae76\" width=\"100\" height=\"100\" /></p>" }
+    }
+} | {
+    "data": {
+        "_id": "59e9a2fe283ffa7c11b1ddbf",
+        "appId": "59264073a2a60c0c08e20bfb",
+        "entryId": "59264073a2a60c0c08e20bfd",
+        "creator": {
+            "name": "小简",
+            "username": "xiaojian",
+            "status": 1,
+            "type": 0,
+            "departments": [1, 3],
+            "integrate_id": "xiaojian"
+        },
+        "updater": {
+            "name": "小简",
+            "username": "xiaojian",
+            "status": 1,
+            "type": 0,
+            "departments": [1, 3],
+            "integrate_id": "xiaojian"
+        },
+        "createTime": "2017-10-20T22:41:51.430Z",
+        "updateTime": "2017-10-20T11:12:15.293Z",
+        "_widget_1432728651402": "简道云",
+        "_widget_1725969783950": "67221b4fac0a62ac8f43a1c3",
+        "_widget_1432728651403": 100,
+        "_widget_1432728651404": "简道云是一个强大易用的应用搭建工具，可以快速把你的想法变成应用",
+        "_widget_1432728651405": "选项一",
+        "_widget_1432728651406": ["选项一、选项二、选项三"],
+        "_widget_1432728651407": "2018-01-01T10:10:10.000Z",
+        "_widget_1432728651409": [{
+            "name": "image.jpg",
+            "size": 262144,
+            "mime": "image/jpeg",
+            "url": "https://files.jiandaoyun.com/lepxaifzcapghupffcaswikmhnyp"
+        }],
+        "_widget_1432728651410": [{
+            "name": "产品说明文档.pdf",
+            "size": 524288,
+            "mime": "application/pdf",
+            "url": "https://files.jiandaoyun.com/bogrebbkdbkfsbuldnjujoenclle"
+        }],
+        "_widget_1432728651411": {
+            "name": "image.png",
+            "size": 262144,
+            "mime": "image/png",
+            "url": "https://files.jiandaoyun.com/sxbikbrchwlylrgqwyfkjbjmuncp"
+        },
+        "_widget_1432728651412": {
+            "province": "江苏省",
+            "city": "无锡市",
+            "district": "梁溪区",
+            "detail": "清扬路138号茂业天地"
+        },
+        "_widget_1432728651413": {
+            "province": "江苏省",
+            "city": "无锡市",
+            "district": "梁溪区",
+            "detail": "清扬路138号茂业天地",
+            "lnglatXY": [120.31237, 31.49099]
+        },
+        "_widget_1652345009097": {
+            "verified": false,
+            "phone": "15852540044"
+        },
+        "_widget_1432728651414": {
+            "name": "小简",
+            "username": "xiaojian",
+            "status": 1,
+            "type": 0,
+            "departments": [1, 3],
+            "integrate_id": "xiaojian"
+        },
+        "_widget_1432728651415": [{
+            "name": "小简",
+            "username": "xiaojian",
+            "status": 1,
+            "type": 0,
+            "departments": [1, 3],
+            "integrate_id": "xiaojian"
+        }],
+        "_widget_1432728651416": {
+            "name": "经理部",
+            "dept_no": 1,
+            "type": 0,
+            "parent_no": 2,
+            "status": 1,
+            "integrate_id": 1
+        },
+        "_widget_1432728651417": [{
+            "name": "经理部",
+            "dept_no": 1,
+            "type": 0,
+            "parent_no": 2,
+            "status": 1,
+            "integrate_id": 1
+        }],
+        "_widget_1432728651408": [{"_id_sub": "subform..."}],
+        "_widget_1432728651528": {
+            "html": "<p>Hello, world!<img src=\"https://files.xxxxxx.com/xxx\" /></p>",
+            "attachments": [{
+                "name": "image1.png",
+                "size": 262144,
+                "mime": "image/png",
+                "url": "https://files.xxxxx.com/xxx"
+            }]
+        },
+        "wx_open_id": "wx98fb14481b3ab5a3",
+        "wx_nickname": "jiandaoyun",
+        "wx_gender": "男"
+    }
+} | https://hc.jiandaoyun.com/open/14222 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+数据接口 | 新建多条数据 | POST | https://api.jiandaoyun.com/api/v5/app/entry/data/batch_create | 10 次/秒 | 通过新建多条数据接口，可以向指定的表单中添加多条数据（最多 100 条） | | 参数 | 类型 | 必需 | 说明 | 默认 |
+|---|---|---|---|---|
+| app_id | String | 是 | 应用ID | —— |
+| entry_id | String | 是 | 表单ID |  |
+| data_list | Array | 是 | 数据内容数组 |  |
+| data_creator | String | 否 | 数据提交人（取成员编号 username，可从通讯录接口获取）。不能使用互联组织中外部对接人的 username | 企业创建者 |
+| transaction_id | String | 否 | 事务ID；用于表示一次事务，用于防止因重试而导致重复创建同一批数据，也用于绑定一批文件，建议使用 UUID 以免重复。 |  |
+| is_start_workflow | Bool | 否 | 是否发起流程（仅流程表单有效） | false | | {
+  "app_id": "59264073a2a60c0c08e20bfb",
+  "entry_id": "59264073a2a60c0c08e20bfd",
+  "transaction_id": "87cd7d71-c6df-4281-9927-469094395677",
+  "data_list": [
+    {
+        "_widget_1432728651402": { "value": "简道云1" },
+        "_widget_1432728651403": { "value": 100 },
+        "_widget_1725969783950": { "value": "67221b4fac0a62ac8f43a1c4" },
+        "_widget_1528854613291": {
+            "value": [
+                {
+                    "_widget_1528854614409": { "value": "子表单数据11" },
+                    "_widget_1528854615499": { "value": 1001 }
+                },
+                {
+                    "_widget_1528854614410": { "value": "子表单数据12" },
+                    "_widget_1528854615419": { "value": 1002 }
+                }
+            ]
+        }
+    },
+    {
+        "_widget_1432728651402": { "value": "简道云2" },
+        "_widget_1432728651403": { "value": 200 },
+        "_widget_1528854613291": {
+            "value": [
+                {
+                    "_widget_1528854614409": { "value": "子表单数据21" },
+                    "_widget_1528854615499": { "value": 2001 }
+                }
+            ]
+        }
+    },
+    {
+        "_widget_1432728651402": { "value": "简道云3" },
+        "_widget_1432728651403": { "value": 300 },
+        "_widget_1528854613291": {
+            "value": [
+                {
+                    "_widget_1528854614410": { "value": "子表单数据31" },
+                    "_widget_1528854615419": { "value": 3001 }
+                }
+            ]
+        }
+    }
+  ],
+  "is_start_workflow": true
+} | {
+    "status": "success",
+    "success_count": 3,
+    "success_ids": [
+        "200001181fe09728936510eb",
+        "200001181fe09728936510ec",
+        "200001181fe09728936510ed"
+    ]
+} | https://hc.jiandaoyun.com/open/14223 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+数据接口 | 修改单条数据 | POST | https://api.jiandaoyun.com/api/v5/app/entry/data/update | 20 次/秒 | 通过修改单条数据接口，可以对指定的单条数据进行修改 | | 参数 | 类型 | 必需 | 说明 | 默认 |
+|---|---|---|---|---|
+| app_id | String | 是 | 应用ID |  |
+| entry_id | String | 是 | 表单ID |  |
+| data_id | String | 是 | 数据 ID |  |
+| data | JSON | 是 | 数据内容，其他同新建单条数据接口，子表单需要注明子表单数据 ID |  |
+| is_start_trigger | Bool | 否 | 是否触发智能助手 | false |
+| transaction_id | String | 否 | 事务 ID；用于绑定一批上传的文件，若数据中包含附件或图片控件，则必须与"获取文件上传凭证和上传地址接口"中的 transaction_id 参数相同。 |  | | {
+   "app_id": "604eb6eea71d720006e1336e",
+   "entry_id": "604ecfca8e2ade077c72453a",
+   "transaction_id": "87cd7d71-c6df-4281-9927-469094395677",
+   "data_id": "6052e8072315c0075001d65e",
+   "data": {
+        "_widget_1615777739654": { "value": "张三" },
+        "_widget_1725969783950": { "value": "67221b4fac0a62ac8f43a1c3" },
+        "_widget_1615777739673": {
+            "value": [
+                {
+                    "_widget_1615777739744": { "value": "张三" }
+                },
+                {
+                    "_id": { "value": "606290aba392ca00076da000" },
+                    "_widget_1615777739744": { "value": "李四" }
+                },
+                {
+                    "_id": { "value": "606290aba392ca00076da0a9" },
+                    "_widget_1615777739744": { "value": "王五" }
+                }
+            ]
+        }
+    },
+    "is_start_trigger": true
+} | {
+    "data": {
+        "creator": {
+            "name": "小简",
+            "username": "xiaojian",
+            "status": 1,
+            "type": 0,
+            "departments": [1, 3],
+            "integrate_id": "xiaojian"
+        },
+        "updater": {
+            "name": "小简",
+            "username": "xiaojian",
+            "status": 1,
+            "type": 0,
+            "departments": [1, 3],
+            "integrate_id": "xiaojian"
+        },
+        "deleter": null,
+        "createTime": "2021-03-18T05:41:27.760Z",
+        "updateTime": "2021-03-30T02:46:21.563Z",
+        "deleteTime": null,
+        "_widget_1615777739654": "张三",
+        "_widget_1725969783950": "67221b4fac0a62ac8f43a1c3",
+        "_widget_1616052516346": "",
+        "_widget_1615777739673": [
+            { "_id": "606290fd0094210006e97551", "_widget_1615777739744": "张三" },
+            { "_id": "606290fd0094210006e97552", "_widget_1615777739744": "李四" },
+            { "_id": "606290aba392ca00076da0a9", "_widget_1615777739744": "王五" }
+        ],
+        "_id": "6052e8072315c0075001d65e",
+        "appId": "604eb6eea71d720006e1336e",
+        "entryId": "604ecfca8e2ade077c72453a",
+        "wx_open_id": "wx98fb14481b3ab5a3",
+        "wx_nickname": "jiandaoyun",
+        "wx_gender": "男"
+    }
+} | https://hc.jiandaoyun.com/open/14224 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+数据接口 | 修改多条数据 | POST | https://api.jiandaoyun.com/api/v5/app/entry/data/batch_update | 10 次/秒 | 通过修改多条数据接口，可以批量修改多条数据（最多 100 条，暂不支持子表单） | | 参数 | 类型 | 必需 | 说明 |
+|---|---|---|---|
+| app_id | String | 是 | 应用ID |
+| entry_id | String | 是 | 表单ID |
+| data_ids | Array | 是 | 要更新的数据 ID 数组 |
+| data | JSON | 是 | 数据内容，暂不支持子表单 |
+| transaction_id | String | 否 | 事务 ID；用于绑定一批上传的文件，若数据中包含附件或图片控件，则必须与"获取文件上传凭证和上传地址接口"中的 transaction_id 参数相同 | | {
+  "app_id": "59264073a2a60c0c08e20bfb",
+  "entry_id": "59264073a2a60c0c08e20bfd",
+  "transaction_id": "87cd7d71-c6df-4281-9927-469094395677",
+  "data_ids": [
+    "200001181fe09728936510eb",
+    "200001181fe09728936510ec",
+    "200001181fe09728936510ed"
+  ],
+  "data": {
+    "_widget_1432728651402": { "value": "简道云1" },
+    "_widget_1432728651403": { "value": 100 },
+    "_widget_1725969783950": { "value": "67221b4fac0a62ac8f43a1c4" }
+  }
+} | {
+    "status": "success",
+    "success_count": 3
+} | https://hc.jiandaoyun.com/open/14225 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+数据接口 | 删除单条数据 | POST | https://api.jiandaoyun.com/api/v5/app/entry/data/delete | 20 次/秒 | 通过删除单条数据接口，可以对指定的数据进行删除。 | | 参数 | 类型 | 必需 | 说明 | 默认 |
+|---|---|---|---|---|
+| app_id | String | 是 | 应用ID |  |
+| entry_id | String | 是 | 表单ID |  |
+| data_id | String | 是 | 数据 ID |  |
+| is_start_trigger | Bool | 否 | 是否触发智能助手 | false | | {
+    "app_id": "59264073a2a60c0c08e20bfb",
+    "entry_id": "59264073a2a60c0c08e20bfd",
+    "data_id": "6052e8072315c0075001d65e"
+} | {
+    "status": "success"
+} | https://hc.jiandaoyun.com/open/14226 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+数据接口 | 删除多条数据 | POST | https://api.jiandaoyun.com/api/v5/app/entry/data/batch_delete | 10 次/秒 | 通过删除多条数据接口，可以批量删除数据。一次最多支持删除 100 条数据。 | | 参数 | 必须 | 类型 | 说明 |
+|---|---|---|---|
+| app_id | 是 | String | 应用ID |
+| entry_id | 是 | String | 表单ID |
+| data_ids | 是 | String[] | 要删除的数据ID数组 | | {
+    "app_id": "59264073a2a60c0c08e20bfb",
+    "entry_id": "59264073a2a60c0c08e20bfd",
+    "data_ids": [
+        "200001181fe09728936510eb",
+        "200001181fe09728936510ec",
+        "200001181fe09728936510ed"
+    ]
+} | {  
+    "status": "success",
+    "success_count": 3
+} | https://hc.jiandaoyun.com/open/14527 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+文件接口 | 文件 | POST | https://api.jiandaoyun.com/api/v5/app/entry/file/get_upload_token | 20 次/秒 | 获取文件上传凭证和上传地址接口。每次请求会获取 100 个文件上传凭证和上传地址。 | | 参数 | 类型 | 必需 | 说明 |
+|---|---|---|---|
+| app_id | String | 是 | 应用ID |
+| entry_id | String | 是 | 表单ID |
+| transaction_id | String | 是 | 事务ID | | {
+ "app_id": "59264073a2a60c0c08e20bfb",
+  "entry_id": "59264073a2a60c0c08e20bfd",
+  "transaction_id": "87cd7d71-c6df-4281-9927-469094395677"   //事务ID
+} | {
+    "token_and_url_list": [
+        {
+            "url": "https://upload.qiniup.com",
+            "token": "bM7UwVPyBBdPaleBZt21SWKzMy2qPUpn-05jZlas:ELIqACNut-t52UMPD-DZNrX8hTU=:eyJmc2l6ZU1pbiI6MSwiZnNpemVMaW1pdCI6MjA5NzE1MjAwLCJjYWxsYmFja0JvZHlUeXBlIjoiYXBwbGljYXRpb24vanNvbiIsImNhbGxiYWNrQm9keSI6IntcImFwcElkXCI6XCI2MWFjNzcxNTE0MjU3NDM2ODhlZWMwYzRcIixcImVudHJ5SWRcIjpcIjYxYWM3NzNhMTQyNTc0MzY4OGVlYzBjN1wiLFwia2V5XCI6XCIkKGtleSlcIixcImhhc2hcIjpcIiQoZXRhZylcIixcIm5hbWVcIjpcIiQoZm5hbWUpXCIsXCJzaXplXCI6XCIkKGZzaXplKVwiLFwibWltZVwiOlwiJChtaW1lVHlwZSlcIixcImJ1Y2tldFwiOlwiamR5LWZpbGVcIixcInVwbG9hZGVyXCI6XCI2MTFhMmQzNjRmMzQ3MDAwMDY3NWM5ZGRcIixcInNlc3Npb25JZFwiOlwic3NkXCJ9IiwiY2FsbGJhY2tIb3N0IjoiNTA3NS0xMTQtMjI0LTE3LTIxNi5uZ3Jvay5pbyIsImNhbGxiYWNrVXJsIjoiaHR0cDovLzUwNzUtMTE0LTIyNC0xNy0yMTYubmdyb2suaW8vZmlsZS91cGxvYWQvYXBpX2NhbGxiYWNrIiwiZm9yY2VTYXZlS2V5Ijp0cnVlLCJzYXZlS2V5IjoiYTJjOTkwY2ItMTlhZS00NDgwLTkyYzYtZDI3N2I5ZGQ2MmFhIiwic2NvcGUiOiJkbi1qZHktdXBsb2FkIiwiZGVhZGxpbmUiOjE2Mzk0ODU2NjV9"
+        },
+        {
+            "url": "https://upload.qiniup.com",
+            "token": "bM7UwVPyBBdPaleBZt21SWKzMylqPUpn-05jZlas:inKpUPPCKIWJ6CnZzHrRPnjXwio=:eyJmc226ZU1pbiI6MSwiZnNpemVMaW1pdCI6MjA5NzE1MjAwLCJjYWxsYmFja0JvZHlUeXBlIjoiYXBwbGljYXRpb24vanNvbiIsImNhbGxiYWNrQm9keSI6IntcImFwcElkXCI6XCI2MWFjNzcxNTE0MjU3NDM2ODhlZWMwYzRcIixcImVudHJ5SWRcIjpcIjYxYWM3NzNhMTQyNTc0MzY4OGVlYzBjN1wiLFwia2V5XCI6XCIkKGtleSlcIixcImhhc2hcIjpcIiQoZXRhZylcIixcIm5hbWVcIjpcIiQoZm5hbWUpXCIsXCJzaXplXCI6XCIkKGZzaXplKVwiLFwibWltZVwiOlwiJChtaW1lVHlwZSlcIixcImJ1Y2tldFwiOlwiamR5LWZpbGVcIixcInVwbG9hZGVyXCI6XCI2MTFhMmQzNjRmMzQ3MDAwMDY3NWM5ZGRcIixcInNlc3Npb25JZFwiOlwic3NkXCJ9IiwiY2FsbGJhY2tIb3N0IjoiNTA3NS0xMTQtMjI0LTE3LTIxNi5uZ3Jvay5pbyIsImNhbGxiYWNrVXJsIjoiaHR0cDovLzUwNzUtMTE0LTIyNC0xNy0yMTYubmdyb2suaW8vZmlsZS91cGxvYWQvYXBpX2NhbGxiYWNrIiwiZm9yY2VTYXZlS2V5Ijp0cnVlLCJzYXZlS2V5IjoiN2Y4Yzk3NDAtNmI2YS00OTQ0LWE0MzgtNjQ1Y2IzN2ViNmQ0Iiwic2NvcGUiOiJkbi1qZHktdXBsb2FkIiwiZGVhZGxpbmUiOjE2Mzk0ODU2NjV9"
+        }
+    ]
+} | https://hc.jiandaoyun.com/open/13287 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+流程接口 | 查询流程实例审批意见 | POST | https://api.jiandaoyun.com/api/v1/app/{app_id}/entry/{entry_id}/data/{data_id}/approval_comments | 30 次/秒 | 该接口用来获取单条表单流程数据的审批意见。 | **URL 参数:**
+| 参数 | 类型 | 说明 |
+|---|---|---|
+| appId | String | 应用 ID |
+| entryId | String | 表单 ID |
+| dataId | String | 流程表单数据 ID |
+
+**Body 参数:**
+| 参数 | 类型 | 说明 |
+|---|---|---|
+| skip | Number | 偏移量,即跳过多少条审批意见。由于每次最多返回 100 条审批意见,因此如果要查询第 100 条之后的结果,需要将该参数设定为 100,如果需要查询第 200 条之后的结果,需要将该参数设定为 200,以此类推。 | | POST - /api/v1/app/{app_id}/entry/{entry_id}/data/{data_id}/approval_comments
+{
+    "approveCommentList": [
+        {
+            "operator": {
+                "_id": "5ed78abead7b951a243cc828",
+                "username": "jdy-y69rlimdfquz",
+                "status": 1，
+                "name": "AngelMsger"
+            },
+            "flowAction": "forward",
+            "comment": "一条审批意见",
+            "flowNodeName": "必须手写签名",
+            "signature_url": "https://files.jiandaoyun.com/FtMNaGofTPeLMFW5_5SCs8w2mX8h?e=1595347199&token=bM7UwVPyBBdPaleBZt21SWKzMylqPUpn-05jZlas:iac5fKQqYDZkF1YyvJUm4YRDPzg="
+        }
+    ]
+} |  | https://hc.jiandaoyun.com/open/16050 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+流程接口 | 查询流程实例信息 | POST | https://api.jiandaoyun.com/api/v6/workflow/instance/get | 30 次/秒 | 该接口用来查询流程实例信息。 | | 参数 | 必须 | 类型 | 说明 |
+|---|---|---|---|
+| instance_id | 是 | String | 实例 id，同 data_id |
+| tasks_type | 否 | number | 返回待办种类，0 表示不返回；1 表示全部返回 | | {
+    "instance_id": "63ff32d918fbc20007a4a082",
+    "tasks_type":1
+} | {
+    "app_id": "628d8c0d73544c0006a54bfd",
+    "form_id": "63f31ae8144f4a09ec197163",
+    "form_title": "物品信息借用",
+    "instance_id": "63ff32d918fbc20007a4a082",
+    "url": "https://www.jiandaoyun.com/workflow/process_instance/63ff32d918fbc20007a4a082",
+    "update_time": "2022-10-26T13:18:57.605Z",
+    "create_time": "2022-10-26T13:11:45.087Z",
+    "finish_time": null,
+    "status": 0,
+    "creator": {
+        "username": "xiaojian",
+        "name": "小简",
+        "departments": [
+            1
+        ],
+        "type": 0,
+        "status": 1
+    },
+    "tasks": [
+        {
+            "app_id": "628d8c0d73544c0006a54bfd",
+            "form_id": "63f31ae8144f4a09ec197163",
+            "form_title": "物品信息借用",
+            "title": "流程发起节点",
+            "instance_id": "63ff32d918fbc20007a4a082",
+            "task_id": "63f31ae8144f4a09ec197162",
+            "flow_id": 0,
+            "flow_name": "流程发起节点",
+            "url": "https://www.jiandaoyun.com/workflow/process_instance/63ff32d918fbc20007a4a082/task/63f31ae8144f4a09ec197162",
+            "assignee": {
+                "username": "xiaoyun",
+                "name": "小云",
+                "departments": [
+                    1
+                ],
+                "type": 0,
+                "status": 1
+            },
+            "creator": {
+                "username": "xiaojian",
+                "name": "小简",
+                "departments": [
+                    1
+                ],
+                "type": 0,
+                "status": 1
+            },
+            "create_time": "2022-10-26T13:11:45.087Z",
+            "create_action": "forward",
+            "finish_time": "2022-10-26T13:11:45.087Z",
+            "finish_action": "forward",
+            "status": 1
+         },
+        {
+            "app_id": "628d8c0d73544c0006a54bfd",
+            "form_id": "63f31ae8144f4a09ec197163",
+            "form_title": "物品信息借用",
+            "title": "审批",
+            "instance_id": "63ff32d918fbc20007a4a082",
+            "task_id": "63f31ae8144f4a09ec197163",
+            "flow_id": 2,
+            "flow_name": "审批",
+            "url": "https://www.jiandaoyun.com/workflow/process_instance/63ff32d918fbc20007a4a082/task/63f31ae8144f4a09ec197163",
+            "assignee": {
+                "username": "xiaoyun",
+                "name": "小云",
+                "departments": [
+                    1
+                ],
+                "type": 0,
+                "status": 1
+            },
+            "creator": {
+                "username": "xiaojian",
+                "name": "小简",
+                "departments": [
+                    1
+                ],
+                "type": 0,
+                "status": 1
+            },
+            "create_time": "2022-10-26T13:18:57.605Z",
+            "create_action": "forward",
+            "finish_time": null,
+            "finish_action": null,
+            "status": 0
+        }
+    ]
+} | https://hc.jiandaoyun.com/open/16051 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+流程接口 | 结束流程实例 | POST | https://api.jiandaoyun.com/api/v1/workflow/instance/close | 20 次/秒 | 该接口用于管理员结束当前流程实例。 | | 参数 | 必须 | 类型 | 说明 |
+|---|---|---|---|
+| instance_id | 是 | String | 实例 id，同 data_id。结束对应的流程实例。 | | {
+    "instance_id": "6358a65878b1fb0007aba61b"
+} | {
+    "status": "success"
+} | https://hc.jiandaoyun.com/open/16052 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+流程接口 | 查询我的待办 | POST | https://api.jiandaoyun.com/api/v6/workflow/task/list | 20 次/秒 | 该接口可以获取用户当前的流程待办信息。 | | 参数 | 必须 | 类型 | 说明 |
+|---|---|---|---|
+| username | 是 | String | 用户名，即成员编号 |
+| limit | 否 | Number | 分页参数，页大小 默认 10 最大 100 |
+| task_id | 否 | Number | 分页符，上一次查询待办列表时最后一条数据的 task_id，没有则留空。 | | {
+    "username": "xiaoyun",
+    "task_id": "63f31ae8144f4a09ec197163",
+    "limit": 10
+} | {
+    "has_more": false,
+    "tasks": [
+        {
+            "app_id": "628d8c0d73544c0006a54bfd",
+            "task_id": "63f31ae8144f4a09ec197163",
+            "form_id": "63ff33531c2f7e5fe8789b4b",
+            "instance_id": "628d8c0d73544c0006a54bfc",
+            "form_title": "待办测试表单标题",
+            "title": "待办标题",
+            "flow_id": 1,
+            "flow_name": "节点1",
+            "url": "",
+            "assignee": {
+                "username": "xiaoyun",
+                "name": "小云",
+                "departments": [
+                    1,
+                    3
+                ],
+                "type": 0,
+                "status": 1,
+                "integrate_id": "xiaoyun"
+            },
+            "creator": {
+                "username": "xiaojian",
+                "name": "小简",
+                "departments": [
+                    1,
+                    3
+                ],
+                "type": 0,
+                "status": 1,
+                "integrate_id": "xiaojian"
+            },
+            "create_time": "2022-10-26T13:18:57.605Z",
+            "create_action": "forward",
+            "finish_time": null,
+            "finish_action": null,
+            "status": 0
+        }
+    ]
+} | https://hc.jiandaoyun.com/open/16053 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+流程接口 | 流程待办提交 | POST | https://api.jiandaoyun.com/api/v1/workflow/task/approve | 20 次/秒 | 该接口用来提交流程待办。 | | 参数 | 必须 | 类型 | 说明 |
+|---|---|---|---|
+| username | 是 | String | 用户名，即成员编号 |
+| instance_id | 是 | String | 实例 id，同 data_id |
+| task_id | 是 | String | 任务 id（需要和 username 一一对应） |
+| comment | 否 | String | 审批意见 | | {
+    "username": "xiaoyun",
+    "instance_id":  "6358a65878b1fb0007aba61b",
+    "task_id": "6358a65878b1fb0007aba63c"
+} | {
+    "status": "success"
+} | https://hc.jiandaoyun.com/open/16054 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+流程接口 | 流程待办回退 | POST | https://api.jiandaoyun.com/api/v2/workflow/task/rollback | 20 次/秒 | 该接口用来回退流程待办。 | | 参数 | 必须 | 类型 | 说明 |
+|---|---|---|---|
+| username | 是 | String | 用户名，即成员编号 |
+| instance_id | 是 | String | 实例 id，同 data_id |
+| task_id | 是 | String | 任务 id（需要和 username 一一对应） |
+| flow_id | 否 | Number | 回退目标节点：节点配置为回退到指定节点时需要设置 flow_id,根据设置的节点进行回退；节点配置为回退到上一节点时无需设置 flow_id,即使设置了flow_id 也不根据设置的节点回退。 |
+| comment | 否 | String | 审批意见 |
+| back_type | 否 | Number | 回退人选择,节点回退操作配置「回退人选择」时,执行回退需要带该参数：1：正常流转；2：直达目标节点 | | {
+    "username": "xiaojian",
+    "instance_id": "635919d1a2cca9000734511c",
+    "task_id": "635919d1a2cca9000734513b",
+    "comment": ""回退",
+    "back_type": 1
+} | {
+    "status": "success"
+} | https://hc.jiandaoyun.com/open/16055 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+流程接口 | 流程待办转交 | POST | https://api.jiandaoyun.com/api/v1/workflow/task/transfer | 20 次/秒 | 该接口用来转交流程待办。 | | 参数 | 必须 | 类型 | 说明 |
+|---|---|---|---|
+| username | 是 | String | 用户名，即成员编号（注：此处用户名指的是当前节点的负责人，而非流程表单的创建者） |
+| instance_id | 是 | String | 实例 id，同 data_id |
+| task_id | 是 | String | 任务 id（需要和 username 一一对应） |
+| transfer_username | 是 | String | 转交用户 |
+| comment | 否 | String | 审批意见 | | {
+    "username":"xiaoyun",
+    "instance_id": "6358af7c1f4eab0007704076",
+    "task_id":"6358af8446f8db00072d6121",
+    "transfer_username":"xiaojian"
+} | {
+    "status": "success"
+} | https://hc.jiandaoyun.com/open/16056 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+流程接口 | 激活流程实例 | POST | https://api.jiandaoyun.com/api/v1/workflow/instance/activate | 20 次/秒 | 流程激活接口用于激活当前流程实例。 | | 参数 | 必须 | 类型 | 说明 |
+|---|---|---|---|
+| instance_id | 是 | string | 激活对应的流程实例 |
+| flow_id | 是 | number | 激活的节点 id | | {
+    "instance_id": "64c7274cd172150007f2533d",
+    "flow_id": 1
+} | {
+    "status": "success"
+} | https://hc.jiandaoyun.com/open/17366 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+流程接口 | 流程待办撤回 | POST | https://api.jiandaoyun.com/api/v2/workflow/task/revoke | 20 次/秒 | 流程待办撤回接口用于将流程待办撤回。 | | 参数 | 必须 | 类型 | 说明 |
+|---|---|---|---|
+| instance_id | 是 | string | 对应的流程实例 |
+| task_id | 否 | string | 需要撤回的待办实例 id (是指之前进行提交操作过的待办 id，不是当前的待办实例 id，选填：不传默认进行发起节点的撤回操作) |
+| username | 是 | string | 处理待办对应的用户名 |
+| comment | 否 | string | 撤回理由。当流程节点为「仅允许发起节点撤回」，且流程流转到不与发起节点相连的节点时，发起人在发起节点撤回流程时必填撤回理由。 | | {
+    "instance_id": "64c72910561073000755af52",
+    "task_id": "64c72910561073000755af7c",
+    "username": "jdy-90ahnts5a6rh",
+    "comment": "因XXX需要撤回至发起节点"
+} | {
+    "status": "success"
+} | https://hc.jiandaoyun.com/open/17367 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+流程接口 | 流程待办加签 | POST | https://api.jiandaoyun.com/api/v2/workflow/task/add_sign | 20 次/秒 | 流程待办加签是指，对当前流程的待办加签。 | | 参数 | 必须 | 类型 | 说明 |
+|---|---|---|---|
+| instance_id | 是 | string | 对应的流程实例 |
+| task_id | 是 | string | 待办实例 id |
+| username | 是 | string | 待办对应的用户名 |
+| comment | 否 | String | （选填）审批意见 |
+| add_sign_type | 是 | number | 加签类型（0 前加签 / 1 后加签 / 2 并加签） |
+| add_sign_usernames | 是 | string[] | 被加签人的用户名 | | {
+  "instance_id": "64c72a03561073000755afd8",
+  "task_id": "64c72a03561073000755b001",
+  "username": "jdy-90ahnts5a6rh",
+  "comment": "Approval",
+  "add_sign_type": 1,
+  "add_sign_usernames": [
+    "R-vmTE0o3N",
+    "R-vmTE0o3P"
+  ]
+} | {
+    "status": "success"
+} | https://hc.jiandaoyun.com/open/17368 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+流程接口 | 查询流程日志 | POST | https://api.jiandaoyun.com/api/v1/workflow/instance/logs | 30 次/秒 | 该接口用来查询流程日志信息，目前仅支持返回包含审批意见的流程日志。 | | 参数 | 必须 | 类型 | 说明 |
+|---|---|---|---|
+| instance_id | 是 | string | 实例 id，同 data_id |
+| types | 是 | string[] | 返回的日志类型,可选项；审批意见："comment" |
+| limit | 否 | number | 分页参数,页大小默认 100 ，最大 100 |
+| skip | 否 | number | 分页参数,跳过前面数据条数,默认为 0 | | {
+    "instance_id": "659cba93489a49c06f7d4281",
+    "types": [
+        "comment"
+    ],
+    "skip": 0,
+    "limit": 10
+} | {
+    "logs": [
+        {
+            "flow_id": 1,
+            "flow_name": "必须手写签名",
+            "create_time": "2024-01-09T03:16:35.447Z",
+            "create_action": "forward",
+            "finish_time": "2024-01-09T03:17:03.239Z",
+            "finish_action": "forward",
+            "operator": {
+                "username": "xiaojian",
+                "name": "小简",
+                "departments": [
+                    1
+                ],
+                "type": 0,
+                "status": 1
+            },
+            "comment": "一条审批意见",
+            "signature": {
+                "url": "https://files.jiandaoyun.com/FtMNaGofTPeLMFW5_5SCs8w2mX8h?e=1595347199&token=bM7UwVPyBBdPaleBZt21SWKzMylqPUpn-05jZlas:iac5fKQqYDZkF1YyvJUm4YRDPzg="
+            },
+            "attachments": [
+                {
+                    "name": "WechatIMG21.jpeg",
+                    "size": 74935,
+                    "mime": "image/jpeg",
+                    "url": "https://files.jiandaoyun.com/FtMNaGofTPeLMFW5_5SCs8w2mX8h?e=1595347199&token=bM7UwVPyBBdPaleBZt21SWKzMylqPUpn-05jZlas:iac5fKQqYDZkF1YyvJUm4YRDPzg="
+                },
+                {
+                    "name": "6b2cc009-141d-44c4-b5fc-5d01667ee0f8.jpg",
+                    "size": 33174,
+                    "mime": "image/jpeg",
+                    "url": "https://files.jiandaoyun.com/FtMNaGofTPeLMFW5_5SCs8w2mX8h?e=1595347199&token=bM7UwVPyBBdPaleBZt21SWKzMylqPUpn-05jZlas:iac5fKQqYDZkF1YyvJUm4YRDPzg="
+                },
+                {
+                    "name": "24x24.png",
+                    "size": 34281,
+                    "mime": "image/png",
+                    "url": "https://files.jiandaoyun.com/FtMNaGofTPeLMFW5_5SCs8w2mX8h?e=1595347199&token=bM7UwVPyBBdPaleBZt21SWKzMylqPUpn-05jZlas:iac5fKQqYDZkF1YyvJUm4YRDPzg="
+                }
+            ]
+        }
+    ]
+} | https://hc.jiandaoyun.com/open/18793 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+流程接口 | 流程待办否决 | POST | https://api.jiandaoyun.com/api/v1/workflow/task/reject | 20 次/秒 | 流程待办否决接口用于将流程待办否决。 | | 参数 | 必须 | 类型 | 说明 |
+|---|---|---|---|
+| instance_id | 是 | string | 对应的流程实例 |
+| task_id | 是 | string | 待办实例id |
+| username | 是 | string | 待办对应的用户名 |
+| comment | 否 | String | 审批意见（选填） | | {
+    "instance_id": "64c72a03561073000755afd8",
+    "task_id": "64c72a03561073000755b001",
+    "username": "jdy-90ahnts5a6rh",
+    "comment": "不同意"
+} | {
+    "status": "success"
+} | https://hc.jiandaoyun.com/open/21608 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+流程接口 | 查询抄送列表 | POST | https://api.jiandaoyun.com/api/v1/workflow/cc/list | 5 次/秒 | 该插件用于查询抄送列表，目前仅支持查询 90 天内的抄送数据。 | | 参数 | 必须 | 类型 | 说明 |
+|---|---|---|---|
+| username | 是 | string | 用户名，即成员编号 |
+| skip | 否 | number | 分页参数，跳过前面数据条数。默认 0 |
+| limit | 否 | number | 分页参数,页大小默认 10， 最大 100 |
+| read_status | 否 | string | 已读状态，已读："read"；未读："unread"；全部："all"（默认） | | {
+    "username":"xiaoyun",
+    "skip": 0,
+    "limit": 1,
+    "read_status": "all"
+} | {
+    "cc_list": [
+        {
+            "app_id": "67c1584ea70e38aa41a9b466",
+            "form_id": "67c1649dfee1fc583c98be20",
+            "task_id": "67c164a8fee1fc583c98be7f",
+            "instance_id": "67c164a8fee1fc583c98be59",
+            "form_title": "抄送全部已读",
+            "title": "节点1",
+            "flow_id": 1,
+            "flow_name": "节点1",
+            "url": "https://www.jiandaoyun.com/workflow/process_instance/67c164a8fee1fc583c98be59/task/67c164a8fee1fc583c98be7f",
+            "assignee": {
+                "username": "xiaoyun",
+                "name": "小云",
+                "departments": [
+                    1,
+                    3
+                ],
+                "type": 0,
+                "status": 1,
+                "integrate_id": "xiaoyun"
+            },
+            "creator": {
+                "username": "xiaojian",
+                "name": "小简",
+                "departments": [
+                    1,
+                    3
+                ],
+                "type": 0,
+                "status": 1,
+                "integrate_id": "xiaojian"
+            },
+            "create_time": "2025-02-28T07:24:24.321Z",
+            "status": 1,
+            "start_time": "2025-02-28T07:24:24.323Z",
+            "finish_time": "2025-02-28T07:24:27.608Z",
+            "start_action": "forward"
+        }
+    ],
+    "has_more": true
+} | https://hc.jiandaoyun.com/open/22875 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-成员接口 | 获取成员信息 | POST | https://api.jiandaoyun.com/api/v5/corp/user/get | 30 次/秒 | 根据 username 获取指定成员的名称和部门编号。支持公共模式和集成模式。 | | 参数 | 必需 | 类型 | 说明 |
+|---|---|---|---|
+| username | 是 | String | 成员编号 | | {
+    "username": "jiandaoyun"
+} | {
+  "user": {
+    "username": "jiandaoyun",
+    "name": "小云",
+    "departments": [1,3],
+    "type": 0,
+    "status": 1,
+    "integrate_id": "jiandaoyun"
+  }
+} | https://hc.jiandaoyun.com/open/18509 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-成员接口 | 添加成员 | POST | https://api.jiandaoyun.com/api/v5/corp/user/create | 20 次/秒 | 在指定部门下添加一位成员，该成员用户自动激活（可直接通过单点登录进行访问，并且会占用1个用户数），但是没有手机、邮箱和密码等个人注册信息。仅支持公共模式。 | | 参数 | 是否必需 | 类型 | 说明 |
+|---|---|---|---|
+| name | 是 | String | 昵称 |
+| departments | 否 | Number[] | 用户所属部门列表 |
+| username | 否 | String | 成员编号（成员编号仅支持字母、数字和下划线） | | {
+    "username": "jiandaoyun",
+    "name": "小云",
+    "departments": [1, 3]
+} | {
+  "user": {
+    "username": "jiandaoyun",
+    "name": "小云",
+    "departments": [1,3],
+    "type": 0,
+    "status": 1
+  }
+} | https://hc.jiandaoyun.com/open/18510 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-成员接口 | 修改成员 | POST | https://api.jiandaoyun.com/api/v5/corp/user/update | 20 次/秒 | 修改指定成员的信息，比如部门、昵称。仅支持公共模式。 | | 参数 | 是否必需 | 类型 | 说明 |
+|---|---|---|---|
+| username | 是 | String | 成员编号 |
+| name | 否 | String | 昵称 |
+| departments | 否 | Number[] | 用户所属部门列表 | | {
+    "username": "jiandaoyun",
+     "name": "小云",
+    "departments": [4]
+} | {
+  "user": {
+    "username": "jiandaoyun",
+    "name": "小云",
+    "departments": [1,3],
+    "type": 0,
+    "status": 1
+  }
+} | https://hc.jiandaoyun.com/open/18511 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-成员接口 | 删除成员 | POST | https://api.jiandaoyun.com/api/v5/corp/user/delete | 20 次/秒 | 从通讯录中删除指定成员编号的用户。仅支持公共模式。 | | 参数 | 必需 | 类型 | 说明 |
+|---|---|---|---|
+| username | 是 | String | 成员编号 | | {
+    "username": "jiandaoyun"
+} | {
+    "status": "success"
+} | https://hc.jiandaoyun.com/open/18512 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-成员接口 | 批量删除成员 | POST | https://api.jiandaoyun.com/api/v5/corp/user/batch_delete | 10 次/秒 | 对成员进行批量删除。（仅支持公共模式） | | 参数 | 是否必需 | 类型 | 说明 |
+|---|---|---|---|
+| usernames | 是 | Array | 成员编号列表 | | {
+    "usernames": ["tester", "developer"]
+} | {
+    "status": "success"
+} | https://hc.jiandaoyun.com/open/18513 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-成员接口 | 增量导入成员 | POST | https://api.jiandaoyun.com/api/v5/corp/user/import | 10 次/秒 | 本接口以企业内的 username（成员编号）为主键，更新创建企业成员。（仅支持公共模式） | | 参数 | 是否必需 | 类型 | 说明 |
+|---|---|---|---|
+| users | 是 | Json[] | 成员列表 |
+| users[].username | 是 | String | 成员编号 |
+| users[].name | 是 | String | 昵称 |
+| users[].departments | 是 | Number[] | 所在部门编号列表 | | {
+    "users": [{
+        "username": "coding_master",
+        "name": "小简",
+        "departments": [1, 3]
+    }]
+} | {
+    "status": "success"
+} | https://hc.jiandaoyun.com/open/18514 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-部门接口 | （递归）获取部门成员 | POST | https://api.jiandaoyun.com/api/v5/corp/department/user/list | 10 次/秒 | 能够（递归）获取指定部门编号下的所有成员。支持公共模式和集成模式。 | | 参数 | 类型 | 是否必需 | 说明 |
+|---|---|---|---|
+| dept_no | Number | 是 | 部门编号 |
+| has_child | Boolean | 否 | 是否递归获取所有成员。默认为 false，即只获取当前部门下的成员，而不获取其子部门的成员。 | | {
+   "dept_no":1,
+  "has_child": true
+} | {
+  "users": [
+    {
+      "username": "aubrey",
+      "name": "aubrey",
+      "departments": [1],
+      "type": 0,
+      "status": 1
+    }
+  ]
+} | https://hc.jiandaoyun.com/open/18515 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-部门接口 | （递归）获取部门列表 | POST | https://api.jiandaoyun.com/api/v6/corp/department/list | 10 次/秒 | 能够（递归）获取指定部门 id 的所有子部门。支持公共模式和集成模式。 | | 参数 | 是否必需 | 类型 | 说明 |
+|---|---|---|---|
+| dept_no | 是 | Number | 部门编号 |
+| has_child | 否 | Boolean | 是否递归获取所有子部门。默认为 false，即只获取一级子部门。 | | {
+  "dept_no": 1,
+  "has_child": true
+} | {
+  "departments": [
+    {
+      "dept_no": 3,
+      "name": "销售部",
+      "parent_no": 1,
+      "type": 0,
+      "status": 1
+    },
+    {
+      "dept_no": 33,
+      "name": "华东区销售小组",
+      "parent_no": 3,
+      "type": 0,
+      "status": 1,
+      "seq": 2
+    }
+  ]
+} | https://hc.jiandaoyun.com/open/18516 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-部门接口 | 创建部门 | POST | https://api.jiandaoyun.com/api/v6/corp/department/create | 20 次/秒 | 创建一个新部门。仅支持公共模式。 | | 参数 | 是否必需 | 类型 | 说明 |
+|---|---|---|---|
+| name | 是 | String | 部门名称（最多不超过 50 个字符） |
+| parent_no | 否 | Number | 父部门编号，不传默认为根部门 |
+| dept_no | 否 | Number | 部门编号，不传自动生成（上限 9007199254740991） | | {
+    "name": "研发部门",
+    "parent_no": 1,
+    "dept_no": 2
+} | {
+  "department": {
+    "dept_no": 2,
+    "name": "研发部门",
+    "parent_no": 1,
+    "type": 0,
+    "status": 1,
+    "seq": 1
+  }
+} | https://hc.jiandaoyun.com/open/18517 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-部门接口 | 修改部门 | POST | https://api.jiandaoyun.com/api/v6/corp/department/update | 20 次/秒 | 修改指定部门的部门信息。仅支持公共模式。 | | 参数 | 是否必需 | 类型 | 说明 |
+|---|---|---|---|
+| name | 否 | String | 部门名称 |
+| parent_no | 否 | Integer | 上级部门编号 |
+| dept_no | 是 | Number | 部门编号 |
+| seq | 否 | number | 部门排序 |
+
+注：请求参数中的 name 、 parent_no 和 seq 至少填写一个。 | {
+    "dept_no": 3,
+    "name": "测试部门",
+    "parent_no": 1,
+    "seq": 1
+} | {
+  "department": {
+    "dept_no": 3,
+    "name": "测试部门",
+    "parent_no": 2,
+    "type": 0,
+    "status": 1,
+    "seq": 1
+  }
+} | https://hc.jiandaoyun.com/open/18518 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-部门接口 | 删除部门 | POST | https://api.jiandaoyun.com/api/v5/corp/department/delete | 20 次/秒 | 将指定部门从通组织架构接中移除。仅支持公共模式。 | | 参数 | 类型 | 是否必需 | 说明 |
+|---|---|---|---|
+| dept_no | Number | 是 | 部门编号 | | {
+    "dept_no": 1
+} | {
+    "status": "success"
+} | https://hc.jiandaoyun.com/open/18519 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-部门接口 | 获取集成模式部门编号 | POST | https://api.jiandaoyun.com/api/v6/corp/department/dept_no/get | 30 次/秒 | 本接口可以通过第三方平台的通讯录部门的 ID 获取其对应的简道云通讯录部门编号。仅支持集成模式。 | | 参数 | 是否必需 | 类型 | 说明 |
+|---|---|---|---|
+| integrate_id | 是 | String | 第三方平台通讯录的部门 ID，如钉钉/企业微信/飞书的通讯录部门 ID。 | | {
+     "integrate_id": "1005"
+} | {
+  "department": {
+    "dept_no": 1005,
+    "name": "产品部门",
+    "parent_no": 2,
+    "type": 0,
+    "status": 1,
+    "integrate_id": "1005",
+    "seq": 1
+  }
+} | https://hc.jiandaoyun.com/open/18520 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-部门接口 | 全量导入部门 | POST | https://api.jiandaoyun.com/api/v5/corp/department/import | 10 次/秒 | 本接口以 dept_no（部门编号）为主键，全量覆盖企业内的通讯录部门树。仅支持公共模式。 | | 参数 | 是否必需 | 类型 | 说明 |
+|---|---|---|---|
+| departments | 是 | Array | 部门列表 |
+| departments[].dept_no | 是 | Number | 部门编号（上限 9007199254740991） |
+| departments[].name | 是 | String | 部门名称 |
+| departments[].parent_no | 否 | Number | 父部门编号，不传默认为根部门下 | | {
+    "departments": [{
+        "dept_no": 11,
+        "name": "研发部门",
+        "parent_no": 1
+    }, {
+     "dept_no": 12,
+     "name": "测试部门",
+     "parent_no": 1
+    }]
+} | {
+    "status": "success"
+} | https://hc.jiandaoyun.com/open/18521 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-部门接口 | 获取部门主管列表 | POST | https://api.jiandaoyun.com/api/v6/corp/department/manager/get | 20 次/秒 | 获取指定部门下的主管成员列表 | | 参数 | 类型 | 是否必需 | 说明 |
+|---|---|---|---|
+| dept_no | number | 是 | 部门编号 | | {
+  "dept_no": 1
+} | {
+  "dept_managers": [
+    {
+      "username": "zhangsan",
+      "name": "张三",
+      "departments": [1, 2],
+      "type": 0,
+      "status": 1
+    }
+  ]
+} | https://hc.jiandaoyun.com/open/25948 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-部门接口 | 设置部门主管 | POST | https://api.jiandaoyun.com/api/v6/corp/department/manager/update | 20 次/秒 | 设置指定部门的主管成员，以全量覆盖方式更新。 | | 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| dept_no | number | 是 | 部门编号 |
+| managers | string[] | 是 | 主管成员用户名列表，传入空数组 [] 可清空所有主管 | | {
+  "dept_no": 1,
+  "managers": ["zhangsan", "lisi"]
+} | {
+  "dept_managers": [
+    {
+      "username": "zhangsan",
+      "name": "张三",
+      "departments": [1, 2],
+      "type": 0,
+      "status": 1
+    },
+    {
+      "username": "lisi",
+      "name": "李四",
+      "departments": [1],
+      "type": 0,
+      "status": 1
+    }
+  ]
+} | https://hc.jiandaoyun.com/open/25949 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-角色接口 | 列出角色 | POST | https://api.jiandaoyun.com/api/v5/corp/role/list | 30 次/秒 | 将角色列出来。支持公共模式和集成模式。 | | 参数 | 类型 | 是否必需 | 说明 |
+|---|---|---|---|
+| skip | Number | 否 | 偏移量 |
+| limit | Number | 否 | limit，不传递时默认值为 1 |
+| has_internal | Boolean | 否 | 是否包含自建角色默认为 true |
+| has_sync | Boolean | 否 | 是否包含集成角色默认为 true | | {
+    "skip": 0,
+    "limit": 3,
+    "has_internal": true,
+    "has_sync": true
+} | {
+    "roles": [
+        {
+            "role_no": 3,
+            "group_no": 2547,
+            "name": "设计中心",
+            "type": 0,
+            "status": 1
+        },
+        {
+            "role_no": 2551,
+            "group_no": 2550,
+            "name": "销售总监",
+            "type": 0,
+           "status": 1
+        },
+        {
+            "role_no": 2552,
+            "group_no": 2550,
+            "name": "销售主管",
+            "type": 0,
+           "status": 1
+        }
+    ]
+} | https://hc.jiandaoyun.com/open/18522 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-角色接口 | 创建一个自建角色 | POST | https://api.jiandaoyun.com/api/v5/corp/role/create | 20 次/秒 | 只能创建内部自建角色。支持公共模式和集成模式。 | | 参数 | 类型 | 是否必需 | 说明 |
+|---|---|---|---|
+| name | String | 是 | 角色名称 |
+| group_no | Number | 是 | 角色组编号 | | {
+    "group_no": 2547,
+    "name": "研发中心"
+} | {
+  "role": {
+    "role_no": 2558,
+    "group_no": 2547,
+    "name": "研发中心",
+    "type": 0,
+    "status": 1
+  }
+} | https://hc.jiandaoyun.com/open/18523 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-角色接口 | 更新一个自建角色 | POST | https://api.jiandaoyun.com/api/v5/corp/role/update | 20 次/秒 | 对自建角色进行更新。支持公共模式和集成模式， 但集成模式下只支持对自建角色的操作，不支持对第三方同步过来的角色操作。 | | 参数 | 类型 | 是否必需 | 说明 |
+|---|---|---|---|
+| role_no | Number | 是 | 角色编号 |
+| group_no | Number | 是 | 角色组编号 |
+| name | String | 否 | 角色名称 | | {
+    "role_no": 2558,
+    "group_no": 2547,
+    "name": "研发部门"
+} | {
+  "role": {
+    "role_no": 2558,
+    "group_no": 2547,
+    "name": "研发部门",
+    "type": 0,
+    "status": 1
+  }
+} | https://hc.jiandaoyun.com/open/18524 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-角色接口 | 删除一个自建角色 | POST | https://api.jiandaoyun.com/api/v5/corp/role/delete | 20 次/秒 | 对某个自建角色进行删除。支持公共模式和集成模式， 但集成模式下只支持对自建角色的操作，不支持对第三方同步过来的角色操作。 | | 参数 | 类型 | 是否必需 | 说明 |
+|---|---|---|---|
+| role_no | Number | 是 | 角色编号 | | {
+    "role_no": 2558
+} | {
+    "status": "success"
+} | https://hc.jiandaoyun.com/open/18525 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-角色接口 | 列出角色下的成员 | POST | https://api.jiandaoyun.com/api/v5/corp/role/user/list | 30 次/秒 | 列出角色下的所有成员信息。支持公共模式和集成模式。 | | 参数 | 位置 | 是否必需 | 说明 |
+|---|---|---|---|
+| skip | Number | 否 | 分页偏移 |
+| limit | Number | 否 | 分页大小，最大值为 10000。 |
+| role_no | Number | 是 | 角色编号 |
+| has_manage_range | Boolean | 否 | 是否包含分管部门信息，默认值为 false。 | | {
+    "skip": 0,
+    "limit": 3,
+    "role_no": 72,
+    "has_manage_range": true
+} | {
+    "users": [
+  {
+    "username": "jdy-xulalikdbj82",
+    "name": "frank",
+    "departments": [212],
+    "type": 0,
+    "status": 1,
+    "deptarments_range": [378,1157],
+    "has_child": true
+  },
+  {
+    "username": "R-E9rRNbwL",
+    "name": "成员删除1",
+    "departments": [338,226],
+    "type": 0,
+    "status": 1,
+    "deptarments_range": [1157],
+    "has_child": false
+  },
+  {
+    "username": "UPDATE",
+    "name": "testadmin",
+    "departments": [1],
+    "type": 0,
+    "status": 1
+  }
+   ]
+} | https://hc.jiandaoyun.com/open/18526 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-角色接口 | 为自建角色批量添加成员 | POST | https://api.jiandaoyun.com/api/v5/corp/role/add_members | 10 次/秒 | 为自建的角色批量添加成员。支持公共模式和集成模式， 但集成模式下只支持对自建角色的操作，不支持对第三方同步过来的角色操作。 | | 参数 | 类型 | 是否必须 | 说明 |
+|---|---|---|---|
+| role_no | Number | 是 | 角色编号，示例：3 |
+| usernames | String[] | 是 | 员工工号 | | {
+    "role_no": 3,
+    "usernames": [
+         "fr0005",
+         "fr008"
+    ]
+} | {
+    "status": "success"
+} | https://hc.jiandaoyun.com/open/18527 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-角色接口 | 为自建角色批量移除成员 | POST | https://api.jiandaoyun.com/api/v5/corp/role/remove_members | 10 次/秒 | 将成员从角色中批量移除。支持公共模式和集成模式， 但集成模式下只支持对自建角色的操作。 | | 参数 | 类型 | 是否必须 | 说明 |
+|---|---|---|---|
+| role_no | Number | 是 | 角色编号，示例：3 |
+| usernames | String[] | 是 | 员工工号 | | {
+    "role_no": 3,
+    "usernames": [
+        "fr0005",
+        "fr008"
+    ]
+} | {
+    "status": "success"
+} | https://hc.jiandaoyun.com/open/18528 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-角色组接口 | 列出自建角色组 | POST | https://api.jiandaoyun.com/api/v5/corp/role_group/list | 30 次/秒 | 将角色组全部拉取出来。支持公共模式和集成模式。 | | 参数 | 类型 | 是否必需 | 说明 |
+|---|---|---|---|
+| skip | Integer | 否 | 偏移量 |
+| limit | Integer | 否 | limit |
+| has_internal | Boolean | 否 | 是否包含自建角色组默认为 true |
+| has_sync | Boolean | 否 | 是否包含集成角色组默认为 true | | {
+    "skip": 0,
+    "limit": 3,
+    "has_internal": true,
+    "has_sync": true
+} | {
+    "role_groups": [
+        {
+            "group_no": 2547,
+            "name": "默认",
+            "type": 0,
+            "status": 1
+        },
+        {
+            "group_no": 2550,
+            "name": "CRM角色组",
+            "type": 0,
+            "status": 1
+        },
+        {
+            "group_no": 2556,
+            "name": "营销中心",
+            "type": 0,
+            "status": 1
+        }
+    ]
+} | https://hc.jiandaoyun.com/open/18529 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-角色组接口 | 创建自建角色组 | POST | https://api.jiandaoyun.com/api/v5/corp/role_group/create | 20 次/秒 | 通过接口新建角色组。支持公共模式和集成模式。 | | 参数 | 类型 | 是否必需 | 说明 |
+|---|---|---|---|
+| name | String | 是 | 角色组名称 | | {
+    "name": "研发中心"
+} | {
+  "role_group": {
+    "group_no": 2559,
+    "name": "研发中心",
+    "type": 0,
+    "status": 1
+  }
+} | https://hc.jiandaoyun.com/open/18530 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-角色组接口 | 更新自建角色组 | POST | https://api.jiandaoyun.com/api/v5/corp/role_group/update | 20 次/秒 | 更新创建好的角色组信息。支持公共模式和集成模式，但集成模式下只支持对自建角色操作，不支持对第三方同步的角色操作。 | | 参数 | 类型 | 是否必须 | 说明 |
+|---|---|---|---|
+| role_group_no | Integer | 是 | 角色组编号 |
+| name | String | 是 | 角色组名称 | | {
+    "role_group_no": 2559,
+    "name": "研发部门"
+} | {
+  "role_group": {
+    "group_no": 2559,
+    "name": "研发部门",
+    "type": 0,
+    "status": 1
+  }
+} | https://hc.jiandaoyun.com/open/18531 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-角色组接口 | 删除自建角色组 | POST | https://api.jiandaoyun.com/api/v5/corp/role_group/delete | 20 次/秒 | 删除创建好的角色组信息。支持公共模式和集成模式，但集成模式下只支持对自建角色操作，不支持对第三方同步的角色操作。 | | 参数 | 类型 | 是否必须 | 说明 |
+|---|---|---|---|
+| role_group_no | Number | 是 | 角色组编号 | | {
+    "role_group_no": 2561
+} | {
+    "status": "success"
+} | https://hc.jiandaoyun.com/open/18532 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-企业互联接口 | 列出我连接的企业 | POST | https://api.jiandaoyun.com/api/v5/corp/guest/department/list | 30 次/秒 | 能够获取所有外部部门的列表。支持公共模式和集成模式。 | | 参数 | 类型 | 是否必须 | 说明 |
+|---|---|---|---|
+| dept_no | integer | 否 | 部门编号，不填则返回所有外部部门 | | {
+    "dept_no": 1012
+} | {
+    "dept_list": [
+        {
+         "name": "帆软软件有限公司",
+         "dept_no": 1012,
+         "type": 2,
+          "status": 1
+        }
+    ]
+} | https://hc.jiandaoyun.com/open/18533 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-企业互联接口 | 列出我连接的企业的对接人 | POST | https://api.jiandaoyun.com/api/v5/corp/guest/user/list | 30 次/秒 | 能够获取外部对接人的列表部列出来。支持公共模式和集成模式。 | | 参数 | 类型 | 是否必需 | 说明 |
+|---|---|---|---|
+| dept_no | Integer | 否 | 部门编号，不填则返回全部 | | {
+    "dept_no":19
+} | {
+  "member_list": [
+    {
+      "name": "Purl",
+      "username": "R-ww9a61c11fc226842f-#admin",
+      "departments": [
+        19
+      ],
+      "type": 2,
+      "status": 1
+    }
+  ]
+} | https://hc.jiandaoyun.com/open/18534 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-企业互联接口 | 获取我连接的企业对接人的详细信息 | POST | https://api.jiandaoyun.com/api/v5/corp/guest/user/get | 30 次/秒 | 获取某个对接人的详细信息。 | | 参数 | 类型 | 是否必需 | 说明 |
+|---|---|---|---|
+| username | String | 是 | 成员编号 | | {
+    "username": "R-611e10175402f70006bcdc2c-jdy-e4703i1mde61"
+} | {
+  "member": {
+    "name": "peach",
+    "username": "R-611e10175402f70006bcdc2c-jdy-e4703i1mde61",
+    "departments": [
+      62
+    ],
+    "type": 2,
+    "status": 1
+  }
+} | https://hc.jiandaoyun.com/open/18535 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+资源用量接口 | 获取应用资源用量统计 | POST | https://api.jiandaoyun.com/api/v1/corp_usage/app_metrics | 1 次/秒 | 获取当前企业在指定日期的应用维度资源用量统计。 | | 参数 | 类型 | 必需 | 说明 |
+| --- | --- | --- | --- |
+| date | String | 否 | 统计日期，格式 yyyy-MM-dd。不传或传空字符串表示查询当前日期的前一日（T-1）的统计信息 |
+| app_ids | String[] | 否 | 应用 ID 列表，最多 10 个。空数组或不传表示分页查询全部应用 |
+| skip | Number | 否 | 分页偏移，默认 0 |
+| limit | Number | 否 | 分页大小，默认 20，最大 100 | | {
+  "date": "2026-05-08",
+  "app_ids": [
+    "65f000000000000000000001"
+  ],
+  "skip": 0,
+  "limit": 20
+} | {
+  "date": "2026-05-08",
+  "has_next": false,
+  "items": [
+    {
+      "app_id": "65f000000000000000000001",
+      "app_name": "CRM",
+      "creator": {
+        "member_id": "65f000000000000000000011",
+        "name": "张三"
+      },
+      "created_at": "2026-01-01T00:00:00+08:00",
+      "last_edit_at": "2026-05-06T12:00:00+08:00",
+      "last_visit_at": "2026-05-06T18:00:00+08:00",
+      "metrics": {
+        "app": 1,
+        "form_coop": 20,
+        "form_workflow": 3,
+        "dash": 2,
+        "etl": 1,
+        "aggregate": 1,
+        "public_link": 5,
+        "data_trigger": 2,
+        "automation": 1,
+        "bpa": 0,
+        "data": 2,
+        "daily_attachment_upload": 0,
+        "daily_automation_exec": 0
+      }
+    }
+  ]
+} | https://hc.jiandaoyun.com/open/25791 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+资源用量接口 | 获取平台资源用量统计 | POST | https://api.jiandaoyun.com/api/v1/corp_usage/overview | 1 次/秒 | 获取当前企业在指定日期的平台资源用量概览。注：接口只返回企业维度的汇总指标，不返回应用或成员明细。 | | 参数 | 类型 | 必需 | 说明 |
+| --- | --- | --- | --- |
+| date | String | 否 | 统计日期，格式 yyyy-MM-dd。不传或传空字符串表示查询当前日期的前一日（T-1）的统计信息<br>注：1）date 默认为东八区时间，即中国时间。2）指定 date 时，不能晚于当前日期的前一日（T-1），最多支持查询最近 180 天。3）使用该接口时，若从未使用过「管理后台 > 管理工具 > 使用统计」功能，将无法获取相关数据，指标字段返回值为 0。4）当 date 合法但传入时间早于第一次使用「管理后台 > 管理工具 > 使用统计」功能时，也无法获取相关数据 | | {
+  "date": "2026-05-08"
+} | {
+  "date": "2026-06-29",
+  "metrics": {
+    "app": 34,
+    "form_coop": 245,
+    "form_workflow": 109,
+    "dash": 75,
+    "etl": 52,
+    "aggregate": 29,
+    "public_link": 0,
+    "data_trigger": 100,
+    "automation": 43,
+    "bpa": 0,
+    "data": 353,
+    "daily_attachment_upload": 0,
+    "daily_automation_exec": 0
+  }
+} | https://hc.jiandaoyun.com/open/25795 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+资源用量接口 | 获取成员资源用量统计 | POST | https://api.jiandaoyun.com/api/v1/corp_usage/member_metrics | 1 次/秒 | 获取当前企业在指定日期的成员维度资源用量统计。 | | 参数 | 类型 | 必需 | 说明 |
+| --- | --- | --- | --- |
+| date | String | 否 | 统计日期，格式 yyyy-MM-dd。不传或传空字符串表示查询当前日期的前一日（T-1）的统计信息 |
+| member_ids | String[] | 否 | 成员 ID 列表，最多 10 个。空数组或不传表示分页查询全部成员 |
+| skip | Number | 否 | 分页偏移，默认 0 |
+| limit | Number | 否 | 分页大小，默认 20，最大 100 | | {
+  "date": "2026-05-08",
+  "member_ids": [
+    "65f000000000000000000011"
+  ],
+  "skip": 0,
+  "limit": 20
+} | {
+  "date": "2026-05-08",
+  "has_next": false,
+  "items": [
+    {
+      "member": {
+        "member_id": "65f000000000000000000011",
+        "name": "张三"
+      },
+      "metrics": {
+        "app": 2,
+        "form_coop": 10,
+        "form_workflow": 1,
+        "dash": 3,
+        "etl": 1,
+        "aggregate": 0,
+        "public_link": 2,
+        "data_trigger": 1,
+        "automation": 1,
+        "bpa": 0
+      }
+    }
+  ]
+} | https://hc.jiandaoyun.com/open/25796 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+审计日志接口 | 获取审计日志类型定义 | POST | https://api.jiandaoyun.com/api/v1/audit_log/domains | 30 次/秒 | 获取当前企业支持的审计日志范围和事件类型定义。调用时可先调用本接口，获取「日志范围（domain）」与「事件名称（event_types）」后，再调用审计日志明细接口按范围查询日志。 | | 参数 | 必须 | 类型 | 说明 |
+| --- | --- | --- | --- |
+| —— | — | — | 请求体传入空对象 {} | | {} | {
+  "domains": [
+    {
+      "domain": "login",
+      "event_types": [
+        "auth.session.login"
+      ]
+    },
+    {
+      "domain": "app_builder",
+      "event_types": [
+        "admin.app.create",
+        "admin.app.watermark_enable"
+      ]
+    }
+  ]
+} | https://hc.jiandaoyun.com/open/25780 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+审计日志接口 | 审计事件列表 | N/A | https://hc.jiandaoyun.com/open/25784 | N/A | 审计事件列表是指用户获取到的日志范围（domain）中的具体事件名称，列举登录、知识库、应用管理、平台管理等领域可用的全部审计事件。 |  |  | {
+  "domains": [
+    {
+      "domain": "login",
+      "event_types": [
+        "auth.session.login"
+      ]
+    },
+    {
+      "domain": "kms",
+      "event_types": [
+        "admin.kms.enable",
+        "admin.kms.disable",
+        "admin.kms.space_create"
+      ]
+    },
+    {
+      "domain": "app_builder",
+      "event_types": [
+        "admin.app.create",
+        "admin.app.delete",
+        "admin.form.create",
+        "admin.form.update",
+        "data.record.create",
+        "data.record.update",
+        "data.record.delete",
+        "data.record.export",
+        "admin.dash.create",
+        "admin.aggregate.create",
+        "system.automation.create",
+        "system.etl.create"
+      ]
+    },
+    {
+      "domain": "platform",
+      "event_types": [
+        "admin.platform.manager_add",
+        "admin.corp.rename",
+        "admin.member.invite",
+        "admin.member.remove",
+        "admin.dept.create",
+        "admin.role.create",
+        "api.key.create",
+        "api.key.disable",
+        "api.plugin.install"
+      ]
+    }
+  ]
+} | https://hc.jiandaoyun.com/open/25784 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+审计日志接口 | 获取审计日志明细 | POST | https://api.jiandaoyun.com/api/v1/audit_log/list | 30 次/秒 | 按范围查询当前企业的审计日志明细。 | | 参数 | 类型 | 必需 | 说明 |
+| --- | --- | --- | --- |
+| domain | String | 是 | 日志范围 |
+| time_range.start | String | 是 | 查询开始时间，UTC 时间。格式示例：2026-04-01T00:00:00.000Z |
+| time_range.end | String | 是 | 查询结束时间，UTC 时间。格式示例：2026-04-13T23:59:59.000Z |
+| event_types | String[] | 否 | 事件类型列表。不传表示查询当前日志范围（domain）支持的全部事件类型 |
+| limit | Number | 否 | 单次返回条数，默认 200，最大 200 |
+| cursor | String | 否 | 分页游标。首次查询不传；下一页使用上次响应的 cursor |
+| filters | Object | 否 | 过滤条件。actor_ids 按操作人成员 ID 过滤；app_ids 仅日志范围为应用管理（app_builder）时支持；entry_ids 仅日志范围为应用管理（app_builder）时支持 | | {
+  "domain": "login",
+  "time_range": {
+    "start": "2026-04-01T00:00:00.000Z",
+    "end": "2026-04-13T23:59:59.000Z"
+  },
+  "event_types": [
+    "auth.session.login"
+  ],
+  "filters": {
+    "actor_ids": [
+      "660000000000000000000010",
+      "660000000000000000000011"
+    ]
+  },
+  "limit": 100,
+  "cursor": ""
+} | {
+  "has_more": true,
+  "cursor": "MTc3NjE1OTAwMDAwMCw2NjExMjIzMzQ0NTU2Njc3ODg5OWFhYmI=",
+  "items": [
+    {
+      "event_id": "681f2de2-9722-34ca-bd2a-dda99b615e46",
+      "event_time": "2026-05-11T09:09:38.792Z",
+      "event_type": "data.record.print",
+      "domain": "app_builder",
+      "tenant": {
+        "id": "68665cf9f8acef49b8e29917"
+      },
+      "actor": {
+        "type": "user",
+        "id": "68665cf9f8acef49b8e29917",
+        "name": "z3",
+        "ip": "172.24.72.2",
+        "user_agent": "Mozilla/5.0",
+        "geo": null
+      },
+      "event": {
+        "category": "data",
+        "action": "print",
+        "outcome": "success",
+        "severity": "info"
+      },
+      "resource": {
+        "type": "form",
+        "id": "689d59d8d241955ee4908625",
+        "name": "车辆信息基础表",
+        "parent_id": "68994cb727cc65376feb985d",
+        "parent_type": "app"
+      },
+      "detail": {
+        "template": "data_print",
+        "params": {
+          "template_name": "系统模板",
+          "data_label": "A",
+          "link": "/dashboard/app/68994cb727cc65376feb985d/form/689d59d8d241955ee4908625/data/69c6297fbf7965a4d21e5ec2/qr_link"
+        }
+      }
+    }
+  ]
+} | https://hc.jiandaoyun.com/open/25786 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+### SHEET: 应用接口
+分类 | 接口名 | 请求方式 | 请求地址 | 请求频率 | 接口简介 | 请求参数 | 请求示例 (JSON) | 响应示例 (JSON) | 文档链接 | 调试台链接
+应用接口 | 用户应用查询 | POST | https://api.jiandaoyun.com/api/v5/app/list | 30 次/秒 | 仅获取 API Key 当中应用授权范围内的应用信息 | | 参数 | 类型 | 必需 | 说明 |
+|---|---|---|---|
+| limit | Number | 否 | 单次取数的数据条数，1~100，默认 100。 |
+| skip | Number | 否 | 需要跳过的数据条数，默认 0 。 | |  | {
+    "apps": [
+        {
+            "name": "应用名称1",
+            "app_id": "5d5a5bbb850a6d0604ab119"
+        },
+        {
+            "name": "应用名称2",
+            "app_id": "5d5a5c14850a6d0604ab11a4"
+        }
+    ]
+} | https://hc.jiandaoyun.com/open/18538 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+应用接口 | 用户表单查询 | POST | https://api.jiandaoyun.com/api/v5/app/entry/list | 30 次/秒 | 获取当前应用下所有表单信息 | | 参数 | 类型 | 必需 | 说明 |
+|---|---|---|---|
+| app_id | String | 是 | 应用ID。 |
+| limit | Number | 否 | 单次取数的数据条数，1~100，默认 100。 |
+| skip | Number | 否 | 需要跳过的数据条数，默认 0 。 | | {
+          "app_id": "5e0dca0cc9a2790006c11e02"
+ } | {
+    "forms": [
+        {
+            "name": "表单名称1",
+            "app_id": "5e0dca0cc9a2790006c11e02",
+            "entry_id": "56fcab0f02c4675e3fe9694a"
+        },
+        {
+            "name": "表单名称2",
+            "app_id": "5e0dca0cc9a2790006c11e02",
+            "entry_id": "5ed750af3c07c70f9c6eef78"
+        }
+    ]
+} | https://hc.jiandaoyun.com/open/18539 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+### SHEET: 表单接口
+分类 | 接口名 | 请求方式 | 请求地址 | 请求频率 | 接口简介 | 请求参数 | 请求示例 (JSON) | 响应示例 (JSON) | 文档链接 | 调试台链接
+表单接口 | 表单字段查询 | POST | https://api.jiandaoyun.com/api/v5/app/entry/widget/list | 30 次/秒 | 获取指定表单的字段信息，包括 V1/V2/V5 三个版本 | | 参数 | 类型 | 必需 | 说明 |
+|---|---|---|---|
+| app_id | String | 是 | 应用ID |
+| entry_id | String | 是 | 表单ID | | {
+    "app_id": "59264073a2a60c0c08e20bfb",
+    "entry_id": "59264073a2a60c0c08e20bfd"
+} | {
+    "widgets": [
+        {
+            "name": "_widget_1529400746031",
+            "widgetName": "_widget_1529400746031",
+            "label": "单行文本",
+            "type": "text"
+        },
+        {
+            "name": "_widget_1529400746045",
+            "widgetName": "_widget_1529400746045",
+            "label": "多行文本",
+            "type": "textarea"
+        },
+        {
+            "name": "_widget_1529400746056",
+            "widgetName": "_widget_1529400746056",
+            "label": "数字",
+            "type": "number"
+        },
+        {
+            "name": "_widget_1529400746068",
+            "widgetName": "_widget_1529400746068",
+            "label": "日期",
+            "type": "datetime"
+        },
+        {
+            "name": "_widget_1529400746079",
+            "widgetName": "_widget_1529400746079",
+            "label": "日期时间",
+            "type": "datetime"
+        },
+        {
+            "name": "_widget_1529400746090",
+            "widgetName": "_widget_1529400746090",
+            "label": "单选按钮组",
+            "type": "radiogroup"
+        },
+        {
+            "name": "_widget_1529400746105",
+            "widgetName": "_widget_1529400746105",
+            "label": "复选框组",
+            "type": "checkboxgroup"
+        },
+        {
+            "name": "_widget_1529400746119",
+            "widgetName": "_widget_1529400746119",
+            "label": "下拉框",
+            "type": "combo"
+        },
+        {
+            "name": "_widget_1529400746136",
+            "widgetName": "_widget_1529400746136",
+            "label": "下拉复选框",
+            "type": "combocheck"
+        },
+        {
+            "name": "_widget_1529400746157",
+            "widgetName": "_widget_1529400746157",
+            "label": "地址",
+            "type": "address"
+        },
+        {
+            "name": "_widget_1529400746173",
+            "widgetName": "_widget_1529400746173",
+            "label": "定位",
+            "type": "location"
+        },
+        {
+            "name": "_widget_1529400746191",
+            "widgetName": "_widget_1529400746191",
+            "label": "图片",
+            "type": "image"
+        },
+        {
+            "name": "_widget_1529400746209",
+            "widgetName": "_widget_1529400746209",
+            "label": "附件",
+            "type": "upload"
+        },
+        {
+            "name": "_widget_1529400746221",
+            "widgetName": "_widget_1529400746221",
+            "label": "子表单",
+            "type": "subform",
+            "items": [
+                // 同主表
+            ]
+        },
+        {
+            "name": "_widget_1529400746242",
+            "widgetName": "_widget_1529400746242",
+            "label": "选择数据",
+            "type": "linkdata"
+        },
+        {
+            "name": "_widget_1529400746242",
+            "widgetName": "_widget_1529400746242",
+            "label": "关联数据",
+            "type": "lookup"
+        },
+        {
+            "name": "_widget_1529400746254",
+            "widgetName": "_widget_1529400746254",
+            "label": "手写签名",
+            "type": "signature"
+        },
+        {
+            "name": "_widget_1529400746696",
+            "widgetName": "_widget_1529400746696",
+            "label": "成员单选",
+            "type": "user"
+        },
+        {
+            "name": "_widget_1529400746713",
+            "widgetName": "_widget_1529400746713",
+            "label": "成员多选",
+            "type": "usergroup"
+        },
+        {
+            "name": "_widget_1529400746729",
+            "widgetName": "_widget_1529400746729",
+            "label": "部门单选",
+            "type": "dept"
+        },
+        {
+            "name": "_widget_1529400746746",
+            "widgetName": "_widget_1529400746746",
+            "label": "部门多选",
+            "type": "deptgroup"
+        }
+    ],
+    "sysWidgets": [
+        { "name": "flowState" },
+        { "name": "wx_open_id" },
+        { "name": "wx_nickname" },
+        { "name": "wx_gender" },
+        { "name": "creator" },
+        { "name": "updater" },
+        { "name": "deleter" },
+        { "name": "ext" },
+        { "name": "createTime" },
+        { "name": "updateTime" },
+        { "name": "deleteTime" }
+    ],
+    "dataModifyTime": "2021-09-08T03:40:26.586Z"
+} | https://hc.jiandaoyun.com/open/14216 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+### SHEET: 数据接口
+分类 | 接口名 | 请求方式 | 请求地址 | 请求频率 | 接口简介 | 请求参数 | 请求示例 (JSON) | 响应示例 (JSON) | 文档链接 | 调试台链接
+数据接口 | 查询多条数据 | POST | https://api.jiandaoyun.com/api/v5/app/entry/data/list | 30 次/秒 | 通过查询多条数据接口，可以一次查询表单中的多条数据 | | 参数 | 类型 | 必需 | 说明 |
+|---|---|---|---|
+| app_id | String | 是 | 应用ID |
+| entry_id | String | 是 | 表单ID |
+| data_id | String | 否 | 分页符，上一次查询数据结果的最后一条数据的 ID，没有则留空 |
+| fields | Array | 否 | 需要查询的数据字段，暂不支持子表单字段。 |
+| filter | JSON | 否 | 数据筛选器 |
+| limit | Number | 否 | 查询的数据条数，1~100，默认10 | | {
+    "app_id": "59264073a2a60c0c08e20bfb",
+    "entry_id": "59264073a2a60c0c08e20bfd",
+    "data_id": "59e9a2fe283ffa7c11b1ddbf",
+    "limit": 100,
+    "fields": ["_widget_1508400000001", "_widget_1508400000002", "_widget_1508400000003"],
+    "filter": {
+        "rel": "and",
+        "cond": [
+            {
+                "field": "flowState",
+                "type": "flowstate",
+                "method": "eq",
+                "value": [0]
+            }
+        ]
+    }
+} | {
+    "data": [
+        {
+            "_id": "59e9a2fe283ffa7c11b1ddbe",
+            "appId": "59264073a2a60c0c08e20bfb",
+            "entryId": "59264073a2a60c0c08e20bfd",
+            "creator": {
+                "name": "小简",
+                "username": "xiaojian",
+                "status": 1,
+                "type": 0,
+                "departments": [1, 3],
+                "integrate_id": "xiaojian"
+            },
+            "createTime": "2017-10-20T22:41:51.430Z",
+            "updateTime": "2017-10-20T11:12:15.293Z",
+            "_widget_1741589364098": {
+                "id": "67ce8c18705dfcd1eef5c070"
+            },
+            "_widget_1432728651402": "A班",
+            "_widget_1615777739673": [
+                {
+                    "_id": "604ed0298e2ade077c7245f1",
+                    "_widget_1615777739744": "子表单数据1"
+                },
+                {
+                    "_id": "604ed0298e2ade077c7245f2",
+                    "_widget_1615777739744": "子表单数据2"
+                }
+            ]
+        },
+        {
+            "_id": "59e9a2fe283ffa7c11b1ddbf",
+            "appId": "59264073a2a60c0c08e20bfb",
+            "entryId": "59264073a2a60c0c08e20bfd",
+            "creator": {
+                "name": "小简",
+                "username": "xiaojian",
+                "status": 1,
+                "type": 0,
+                "departments": [1, 3],
+                "integrate_id": "xiaojian"
+            },
+            "createTime": "2017-10-20T22:41:51.430Z",
+            "updateTime": "2017-10-20T11:12:15.293Z",
+            "_widget_1725969783950": "67221b4fac0a62ac8f43a1c2",
+            "_widget_1741589364098": {
+                "id": "67ce8c18705dfcd1eef5c070"
+            },
+            "_widget_1432728651402": "B班",
+            "_widget_1615777739673": [
+                {
+                    "_id": "604ed0298e2ade077c7245f3",
+                    "_widget_1615777739744": "子表单数据1"
+                },
+                {
+                    "_id": "604ed0298e2ade077c7245f4",
+                    "_widget_1615777739744": "子表单数据2"
+                }
+            ]
+        }
+    ]
+} | https://hc.jiandaoyun.com/open/14220 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+数据接口 | 查询单条数据 | POST | https://api.jiandaoyun.com/api/v5/app/entry/data/get | 30 次/秒 | 通过查询单条数据接口，可以查询表单中的指定数据 | | 参数 | 类型 | 必需 | 说明 |
+|---|---|---|---|
+| app_id | String | 是 | 应用ID |
+| entry_id | String | 是 | 表单ID |
+| data_id | String | 是 | 数据 ID | | {
+   "app_id": "59264073a2a60c0c08e20bfb",
+   "entry_id": "59264073a2a60c0c08e20bfd",
+   "data_id": "59e9a2fe283ffa7c11b1ddbf"
+} | {
+    "data": {
+        "_id": "59e9a2fe283ffa7c11b1ddbf",
+        "appId": "59264073a2a60c0c08e20bfb",
+        "entryId": "59264073a2a60c0c08e20bfd",
+        "creator": {
+            "name": "小简",
+            "username": "xiaojian",
+            "status": 1,
+            "type": 0,
+            "departments": [1, 3],
+            "integrate_id": "xiaojian"
+        },
+        "updater": {
+            "name": "小简",
+            "username": "xiaojian",
+            "status": 1,
+            "type": 0,
+            "departments": [1, 3],
+            "integrate_id": "xiaojian"
+        },
+        "createTime": "2017-10-20T22:41:51.430Z",
+        "updateTime": "2017-10-20T11:12:15.293Z",
+        "_widget_1725969783950": "67221b4fac0a62ac8f43a1c2",
+        "_widget_1432728651402": "简道云",
+        "_widget_1432728651403": 100,
+        "_widget_1432728651404": "简道云是一个强大易用的应用搭建工具，可以快速把你的想法变成应用",
+        "_widget_1432728651405": "选项一",
+        "_widget_1432728651406": ["选项一", "选项二", "选项三"],
+        "_widget_1432728651407": "2018-01-01T10:10:10.000Z",
+        "_widget_1432728651408": { "id": "5b28effa49b561455dfda91e" },
+        "_widget_1432728651409": [{
+            "name": "image.jpg",
+            "size": 262144,
+            "mime": "image/jpeg",
+            "url": "https://files.jiandaoyun.com/lepxaifzcapghupffcaswikmhnyp"
+        }],
+        "_widget_1432728651410": [{
+            "name": "产品说明文档.pdf",
+            "size": 524288,
+            "mime": "application/pdf",
+            "url": "https://files.jiandaoyun.com/bogrebbkdbkfsbuldnjujoenclle"
+        }],
+        "_widget_1432728651411": {
+            "name": "image.png",
+            "size": 262144,
+            "mime": "image/png",
+            "url": "https://files.jiandaoyun.com/sxbikbrchwlylrgqwyfkjbjmuncp"
+        },
+        "_widget_1432728651412": {
+            "province": "江苏省",
+            "city": "无锡市",
+            "district": "梁溪区",
+            "detail": "清扬路138号茂业天地"
+        },
+        "_widget_1432728651413": {
+            "province": "江苏省",
+            "city": "无锡市",
+            "district": "梁溪区",
+            "detail": "清扬路138号茂业天地",
+            "lnglatXY": [120.31237, 31.49099]
+        },
+        "_widget_1652345009097": {
+            "verified": false,
+            "phone": "15852540044"
+        },
+        "_widget_1432728651414": {
+            "name": "小简",
+            "username": "xiaojian",
+            "status": 1,
+            "type": 0,
+            "departments": [1, 3],
+            "integrate_id": "xiaojian"
+        },
+        "_widget_1432728651415": [{
+            "name": "小简",
+            "username": "xiaojian",
+            "status": 1,
+            "type": 0,
+            "departments": [1, 3],
+            "integrate_id": "xiaojian"
+        }],
+        "_widget_1432728651416": {
+            "name": "经理部",
+            "dept_no": 1,
+            "type": 0,
+            "parent_no": 2,
+            "status": 1,
+            "integrate_id": 1
+        },
+        "_widget_1432728651417": [{
+            "name": "经理部",
+            "dept_no": 1,
+            "type": 0,
+            "parent_no": 2,
+            "status": 1,
+            "integrate_id": 1
+        }],
+        "_widget_1432728651408": [{"_id_sub": "subform..."}],
+        "_widget_1432728651528": {
+            "html": "<p>Hello, world!<img src=\"https://files.xxxxxx.com/xxx\" /></p>",
+            "attachments": [{
+                "name": "image1.png",
+                "size": 262144,
+                "mime": "image/png",
+                "url": "https://files.xxxxx.com/xxx"
+            }]
+        },
+        "wx_open_id": "wx98fb14481b3ab5a3",
+        "wx_nickname": "jiandaoyun",
+        "wx_gender": "男"
+    }
+} | https://hc.jiandaoyun.com/open/14221 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+数据接口 | 新建单条数据 | POST | https://api.jiandaoyun.com/api/v5/app/entry/data/create | 20 次/秒 | 通过新建单条数据接口，可以向指定的表单中添加单条数据 | | 参数 | 类型 | 必需 | 说明 | 默认 |
+|---|---|---|---|---|
+| app_id | String | 是 | 应用ID |  |
+| entry_id | String | 是 | 表单ID |  |
+| data | JSON | 是 | 数据内容 |  |
+| data_creator | String | 否 | 数据提交人（取成员编号 username，可从通讯录接口获取）。不能使用互联组织中外部对接人的 username | 企业创建者 |
+| is_start_workflow | Bool | 否 | 是否发起流程（仅流程表单有效） | false |
+| is_start_trigger | Bool | 否 | 是否触发智能助手 | false |
+| transaction_id | String | 否 | 事务ID；用于绑定一批上传的文件，若数据中包含附件或图片控件，则必须与"获取文件上传凭证和上传地址接口"中的 transaction_id 参数相同。 |  | | {
+    "app_id": "59264073a2a60c0c08e20bfb",
+    "entry_id": "59264073a2a60c0c08e20bfd",
+    "transaction_id": "87cd7d71-c6df-4281-9927-469094395677",
+    "data_creator": "Yonne",
+    "data": {
+        "_widget_1432728651402": { "value": "简道云" },
+        "_widget_1725969783950": { "value": "67221b4fac0a62ac8f43a1c3" },
+        "_widget_1432728651403": { "value": 100 },
+        "_widget_1432728651404": { "value": "简道云是一个强大易用的应用搭建工具，\n可以快速把你的想法变成应用" },
+        "_widget_1432728651405": { "value": "选项一" },
+        "_widget_1432728651406": { "value": ["选项一","选项二","选项三"] },
+        "_widget_1432728651407": { "value": "2018-01-01T10:10:10.000Z" },
+        "_widget_1432728651412": {
+            "value": {
+                "province": "江苏省",
+                "city": "无锡市",
+                "district": "梁溪区",
+                "detail": "清扬路138号茂业天地"
+            }
+        },
+        "_widget_1432728651413": {
+            "value": {
+                "province": "江苏省",
+                "city": "无锡市",
+                "district": "梁溪区",
+                "detail": "清扬路138号茂业天地",
+                "lnglatXY": [120.31237, 31.49099]
+            }
+        },
+        "_widget_1528854613291": {
+            "value": [
+                {
+                    "_widget_1528854614409": { "value": "子表单数据1" },
+                    "_widget_1528854615499": { "value": 1001 }
+                },
+                {
+                    "_widget_1528854614410": { "value": "子表单数据2" },
+                    "_widget_1528854615419": { "value": 1002 }
+                }
+            ]
+        },
+        "_widget_1652345009097": { "value": { "phone": "15852540044" } },
+        "_widget_1652345009126": { "value": "jian" },
+        "_widget_1652345009143": { "value": ["jian", "dao"] },
+        "_widget_1652345009157": { "value": 12 },
+        "_widget_1652345009174": { "value": [12, 13] },
+        "_widget_1432728651408": { "value": ["6b559cf1-b16c-43bd-a211-8fa8fdeae2ef","6b559cf1-b16c-43bd-a211-646ab85da8cb"] },
+        "_widget_1432728652567": { "value": ["6b559cf1-b16c-43bd-a211-74389cd8ae76","6b559cf1-b16c-43bd-a211-564e56a65bd6"] },
+        "_widget_1432728651528": { "value": "<p>Hello, world!<img data-key=\"6b559cf1-b16c-43bd-a211-74389cd8ae76\" width=\"100\" height=\"100\" /></p>" }
+    }
+} | {
+    "data": {
+        "_id": "59e9a2fe283ffa7c11b1ddbf",
+        "appId": "59264073a2a60c0c08e20bfb",
+        "entryId": "59264073a2a60c0c08e20bfd",
+        "creator": {
+            "name": "小简",
+            "username": "xiaojian",
+            "status": 1,
+            "type": 0,
+            "departments": [1, 3],
+            "integrate_id": "xiaojian"
+        },
+        "updater": {
+            "name": "小简",
+            "username": "xiaojian",
+            "status": 1,
+            "type": 0,
+            "departments": [1, 3],
+            "integrate_id": "xiaojian"
+        },
+        "createTime": "2017-10-20T22:41:51.430Z",
+        "updateTime": "2017-10-20T11:12:15.293Z",
+        "_widget_1432728651402": "简道云",
+        "_widget_1725969783950": "67221b4fac0a62ac8f43a1c3",
+        "_widget_1432728651403": 100,
+        "_widget_1432728651404": "简道云是一个强大易用的应用搭建工具，可以快速把你的想法变成应用",
+        "_widget_1432728651405": "选项一",
+        "_widget_1432728651406": ["选项一、选项二、选项三"],
+        "_widget_1432728651407": "2018-01-01T10:10:10.000Z",
+        "_widget_1432728651409": [{
+            "name": "image.jpg",
+            "size": 262144,
+            "mime": "image/jpeg",
+            "url": "https://files.jiandaoyun.com/lepxaifzcapghupffcaswikmhnyp"
+        }],
+        "_widget_1432728651410": [{
+            "name": "产品说明文档.pdf",
+            "size": 524288,
+            "mime": "application/pdf",
+            "url": "https://files.jiandaoyun.com/bogrebbkdbkfsbuldnjujoenclle"
+        }],
+        "_widget_1432728651411": {
+            "name": "image.png",
+            "size": 262144,
+            "mime": "image/png",
+            "url": "https://files.jiandaoyun.com/sxbikbrchwlylrgqwyfkjbjmuncp"
+        },
+        "_widget_1432728651412": {
+            "province": "江苏省",
+            "city": "无锡市",
+            "district": "梁溪区",
+            "detail": "清扬路138号茂业天地"
+        },
+        "_widget_1432728651413": {
+            "province": "江苏省",
+            "city": "无锡市",
+            "district": "梁溪区",
+            "detail": "清扬路138号茂业天地",
+            "lnglatXY": [120.31237, 31.49099]
+        },
+        "_widget_1652345009097": {
+            "verified": false,
+            "phone": "15852540044"
+        },
+        "_widget_1432728651414": {
+            "name": "小简",
+            "username": "xiaojian",
+            "status": 1,
+            "type": 0,
+            "departments": [1, 3],
+            "integrate_id": "xiaojian"
+        },
+        "_widget_1432728651415": [{
+            "name": "小简",
+            "username": "xiaojian",
+            "status": 1,
+            "type": 0,
+            "departments": [1, 3],
+            "integrate_id": "xiaojian"
+        }],
+        "_widget_1432728651416": {
+            "name": "经理部",
+            "dept_no": 1,
+            "type": 0,
+            "parent_no": 2,
+            "status": 1,
+            "integrate_id": 1
+        },
+        "_widget_1432728651417": [{
+            "name": "经理部",
+            "dept_no": 1,
+            "type": 0,
+            "parent_no": 2,
+            "status": 1,
+            "integrate_id": 1
+        }],
+        "_widget_1432728651408": [{"_id_sub": "subform..."}],
+        "_widget_1432728651528": {
+            "html": "<p>Hello, world!<img src=\"https://files.xxxxxx.com/xxx\" /></p>",
+            "attachments": [{
+                "name": "image1.png",
+                "size": 262144,
+                "mime": "image/png",
+                "url": "https://files.xxxxx.com/xxx"
+            }]
+        },
+        "wx_open_id": "wx98fb14481b3ab5a3",
+        "wx_nickname": "jiandaoyun",
+        "wx_gender": "男"
+    }
+} | https://hc.jiandaoyun.com/open/14222 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+数据接口 | 新建多条数据 | POST | https://api.jiandaoyun.com/api/v5/app/entry/data/batch_create | 10 次/秒 | 通过新建多条数据接口，可以向指定的表单中添加多条数据（最多 100 条） | | 参数 | 类型 | 必需 | 说明 | 默认 |
+|---|---|---|---|---|
+| app_id | String | 是 | 应用ID | —— |
+| entry_id | String | 是 | 表单ID |  |
+| data_list | Array | 是 | 数据内容数组 |  |
+| data_creator | String | 否 | 数据提交人（取成员编号 username，可从通讯录接口获取）。不能使用互联组织中外部对接人的 username | 企业创建者 |
+| transaction_id | String | 否 | 事务ID；用于表示一次事务，用于防止因重试而导致重复创建同一批数据，也用于绑定一批文件，建议使用 UUID 以免重复。 |  |
+| is_start_workflow | Bool | 否 | 是否发起流程（仅流程表单有效） | false | | {
+  "app_id": "59264073a2a60c0c08e20bfb",
+  "entry_id": "59264073a2a60c0c08e20bfd",
+  "transaction_id": "87cd7d71-c6df-4281-9927-469094395677",
+  "data_list": [
+    {
+        "_widget_1432728651402": { "value": "简道云1" },
+        "_widget_1432728651403": { "value": 100 },
+        "_widget_1725969783950": { "value": "67221b4fac0a62ac8f43a1c4" },
+        "_widget_1528854613291": {
+            "value": [
+                {
+                    "_widget_1528854614409": { "value": "子表单数据11" },
+                    "_widget_1528854615499": { "value": 1001 }
+                },
+                {
+                    "_widget_1528854614410": { "value": "子表单数据12" },
+                    "_widget_1528854615419": { "value": 1002 }
+                }
+            ]
+        }
+    },
+    {
+        "_widget_1432728651402": { "value": "简道云2" },
+        "_widget_1432728651403": { "value": 200 },
+        "_widget_1528854613291": {
+            "value": [
+                {
+                    "_widget_1528854614409": { "value": "子表单数据21" },
+                    "_widget_1528854615499": { "value": 2001 }
+                }
+            ]
+        }
+    },
+    {
+        "_widget_1432728651402": { "value": "简道云3" },
+        "_widget_1432728651403": { "value": 300 },
+        "_widget_1528854613291": {
+            "value": [
+                {
+                    "_widget_1528854614410": { "value": "子表单数据31" },
+                    "_widget_1528854615419": { "value": 3001 }
+                }
+            ]
+        }
+    }
+  ],
+  "is_start_workflow": true
+} | {
+    "status": "success",
+    "success_count": 3,
+    "success_ids": [
+        "200001181fe09728936510eb",
+        "200001181fe09728936510ec",
+        "200001181fe09728936510ed"
+    ]
+} | https://hc.jiandaoyun.com/open/14223 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+数据接口 | 修改单条数据 | POST | https://api.jiandaoyun.com/api/v5/app/entry/data/update | 20 次/秒 | 通过修改单条数据接口，可以对指定的单条数据进行修改 | | 参数 | 类型 | 必需 | 说明 | 默认 |
+|---|---|---|---|---|
+| app_id | String | 是 | 应用ID |  |
+| entry_id | String | 是 | 表单ID |  |
+| data_id | String | 是 | 数据 ID |  |
+| data | JSON | 是 | 数据内容，其他同新建单条数据接口，子表单需要注明子表单数据 ID |  |
+| is_start_trigger | Bool | 否 | 是否触发智能助手 | false |
+| transaction_id | String | 否 | 事务 ID；用于绑定一批上传的文件，若数据中包含附件或图片控件，则必须与"获取文件上传凭证和上传地址接口"中的 transaction_id 参数相同。 |  | | {
+   "app_id": "604eb6eea71d720006e1336e",
+   "entry_id": "604ecfca8e2ade077c72453a",
+   "transaction_id": "87cd7d71-c6df-4281-9927-469094395677",
+   "data_id": "6052e8072315c0075001d65e",
+   "data": {
+        "_widget_1615777739654": { "value": "张三" },
+        "_widget_1725969783950": { "value": "67221b4fac0a62ac8f43a1c3" },
+        "_widget_1615777739673": {
+            "value": [
+                {
+                    "_widget_1615777739744": { "value": "张三" }
+                },
+                {
+                    "_id": { "value": "606290aba392ca00076da000" },
+                    "_widget_1615777739744": { "value": "李四" }
+                },
+                {
+                    "_id": { "value": "606290aba392ca00076da0a9" },
+                    "_widget_1615777739744": { "value": "王五" }
+                }
+            ]
+        }
+    },
+    "is_start_trigger": true
+} | {
+    "data": {
+        "creator": {
+            "name": "小简",
+            "username": "xiaojian",
+            "status": 1,
+            "type": 0,
+            "departments": [1, 3],
+            "integrate_id": "xiaojian"
+        },
+        "updater": {
+            "name": "小简",
+            "username": "xiaojian",
+            "status": 1,
+            "type": 0,
+            "departments": [1, 3],
+            "integrate_id": "xiaojian"
+        },
+        "deleter": null,
+        "createTime": "2021-03-18T05:41:27.760Z",
+        "updateTime": "2021-03-30T02:46:21.563Z",
+        "deleteTime": null,
+        "_widget_1615777739654": "张三",
+        "_widget_1725969783950": "67221b4fac0a62ac8f43a1c3",
+        "_widget_1616052516346": "",
+        "_widget_1615777739673": [
+            { "_id": "606290fd0094210006e97551", "_widget_1615777739744": "张三" },
+            { "_id": "606290fd0094210006e97552", "_widget_1615777739744": "李四" },
+            { "_id": "606290aba392ca00076da0a9", "_widget_1615777739744": "王五" }
+        ],
+        "_id": "6052e8072315c0075001d65e",
+        "appId": "604eb6eea71d720006e1336e",
+        "entryId": "604ecfca8e2ade077c72453a",
+        "wx_open_id": "wx98fb14481b3ab5a3",
+        "wx_nickname": "jiandaoyun",
+        "wx_gender": "男"
+    }
+} | https://hc.jiandaoyun.com/open/14224 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+数据接口 | 修改多条数据 | POST | https://api.jiandaoyun.com/api/v5/app/entry/data/batch_update | 10 次/秒 | 通过修改多条数据接口，可以批量修改多条数据（最多 100 条，暂不支持子表单） | | 参数 | 类型 | 必需 | 说明 |
+|---|---|---|---|
+| app_id | String | 是 | 应用ID |
+| entry_id | String | 是 | 表单ID |
+| data_ids | Array | 是 | 要更新的数据 ID 数组 |
+| data | JSON | 是 | 数据内容，暂不支持子表单 |
+| transaction_id | String | 否 | 事务 ID；用于绑定一批上传的文件，若数据中包含附件或图片控件，则必须与"获取文件上传凭证和上传地址接口"中的 transaction_id 参数相同 | | {
+  "app_id": "59264073a2a60c0c08e20bfb",
+  "entry_id": "59264073a2a60c0c08e20bfd",
+  "transaction_id": "87cd7d71-c6df-4281-9927-469094395677",
+  "data_ids": [
+    "200001181fe09728936510eb",
+    "200001181fe09728936510ec",
+    "200001181fe09728936510ed"
+  ],
+  "data": {
+    "_widget_1432728651402": { "value": "简道云1" },
+    "_widget_1432728651403": { "value": 100 },
+    "_widget_1725969783950": { "value": "67221b4fac0a62ac8f43a1c4" }
+  }
+} | {
+    "status": "success",
+    "success_count": 3
+} | https://hc.jiandaoyun.com/open/14225 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+数据接口 | 删除单条数据 | POST | https://api.jiandaoyun.com/api/v5/app/entry/data/delete | 20 次/秒 | 通过删除单条数据接口，可以对指定的数据进行删除。 | | 参数 | 类型 | 必需 | 说明 | 默认 |
+|---|---|---|---|---|
+| app_id | String | 是 | 应用ID |  |
+| entry_id | String | 是 | 表单ID |  |
+| data_id | String | 是 | 数据 ID |  |
+| is_start_trigger | Bool | 否 | 是否触发智能助手 | false | | {
+    "app_id": "59264073a2a60c0c08e20bfb",
+    "entry_id": "59264073a2a60c0c08e20bfd",
+    "data_id": "6052e8072315c0075001d65e"
+} | {
+    "status": "success"
+} | https://hc.jiandaoyun.com/open/14226 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+数据接口 | 删除多条数据 | POST | https://api.jiandaoyun.com/api/v5/app/entry/data/batch_delete | 10 次/秒 | 通过删除多条数据接口，可以批量删除数据。一次最多支持删除 100 条数据。 | | 参数 | 必须 | 类型 | 说明 |
+|---|---|---|---|
+| app_id | 是 | String | 应用ID |
+| entry_id | 是 | String | 表单ID |
+| data_ids | 是 | String[] | 要删除的数据ID数组 | | {
+    "app_id": "59264073a2a60c0c08e20bfb",
+    "entry_id": "59264073a2a60c0c08e20bfd",
+    "data_ids": [
+        "200001181fe09728936510eb",
+        "200001181fe09728936510ec",
+        "200001181fe09728936510ed"
+    ]
+} | {  
+    "status": "success",
+    "success_count": 3
+} | https://hc.jiandaoyun.com/open/14527 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+### SHEET: 文件接口
+分类 | 接口名 | 请求方式 | 请求地址 | 请求频率 | 接口简介 | 请求参数 | 请求示例 (JSON) | 响应示例 (JSON) | 文档链接 | 调试台链接
+文件接口 | 文件 | POST | https://api.jiandaoyun.com/api/v5/app/entry/file/get_upload_token | 20 次/秒 | 获取文件上传凭证和上传地址接口。每次请求会获取 100 个文件上传凭证和上传地址。 | | 参数 | 类型 | 必需 | 说明 |
+|---|---|---|---|
+| app_id | String | 是 | 应用ID |
+| entry_id | String | 是 | 表单ID |
+| transaction_id | String | 是 | 事务ID | | {
+ "app_id": "59264073a2a60c0c08e20bfb",
+  "entry_id": "59264073a2a60c0c08e20bfd",
+  "transaction_id": "87cd7d71-c6df-4281-9927-469094395677"   //事务ID
+} | {
+    "token_and_url_list": [
+        {
+            "url": "https://upload.qiniup.com",
+            "token": "bM7UwVPyBBdPaleBZt21SWKzMy2qPUpn-05jZlas:ELIqACNut-t52UMPD-DZNrX8hTU=:eyJmc2l6ZU1pbiI6MSwiZnNpemVMaW1pdCI6MjA5NzE1MjAwLCJjYWxsYmFja0JvZHlUeXBlIjoiYXBwbGljYXRpb24vanNvbiIsImNhbGxiYWNrQm9keSI6IntcImFwcElkXCI6XCI2MWFjNzcxNTE0MjU3NDM2ODhlZWMwYzRcIixcImVudHJ5SWRcIjpcIjYxYWM3NzNhMTQyNTc0MzY4OGVlYzBjN1wiLFwia2V5XCI6XCIkKGtleSlcIixcImhhc2hcIjpcIiQoZXRhZylcIixcIm5hbWVcIjpcIiQoZm5hbWUpXCIsXCJzaXplXCI6XCIkKGZzaXplKVwiLFwibWltZVwiOlwiJChtaW1lVHlwZSlcIixcImJ1Y2tldFwiOlwiamR5LWZpbGVcIixcInVwbG9hZGVyXCI6XCI2MTFhMmQzNjRmMzQ3MDAwMDY3NWM5ZGRcIixcInNlc3Npb25JZFwiOlwic3NkXCJ9IiwiY2FsbGJhY2tIb3N0IjoiNTA3NS0xMTQtMjI0LTE3LTIxNi5uZ3Jvay5pbyIsImNhbGxiYWNrVXJsIjoiaHR0cDovLzUwNzUtMTE0LTIyNC0xNy0yMTYubmdyb2suaW8vZmlsZS91cGxvYWQvYXBpX2NhbGxiYWNrIiwiZm9yY2VTYXZlS2V5Ijp0cnVlLCJzYXZlS2V5IjoiYTJjOTkwY2ItMTlhZS00NDgwLTkyYzYtZDI3N2I5ZGQ2MmFhIiwic2NvcGUiOiJkbi1qZHktdXBsb2FkIiwiZGVhZGxpbmUiOjE2Mzk0ODU2NjV9"
+        },
+        {
+            "url": "https://upload.qiniup.com",
+            "token": "bM7UwVPyBBdPaleBZt21SWKzMylqPUpn-05jZlas:inKpUPPCKIWJ6CnZzHrRPnjXwio=:eyJmc226ZU1pbiI6MSwiZnNpemVMaW1pdCI6MjA5NzE1MjAwLCJjYWxsYmFja0JvZHlUeXBlIjoiYXBwbGljYXRpb24vanNvbiIsImNhbGxiYWNrQm9keSI6IntcImFwcElkXCI6XCI2MWFjNzcxNTE0MjU3NDM2ODhlZWMwYzRcIixcImVudHJ5SWRcIjpcIjYxYWM3NzNhMTQyNTc0MzY4OGVlYzBjN1wiLFwia2V5XCI6XCIkKGtleSlcIixcImhhc2hcIjpcIiQoZXRhZylcIixcIm5hbWVcIjpcIiQoZm5hbWUpXCIsXCJzaXplXCI6XCIkKGZzaXplKVwiLFwibWltZVwiOlwiJChtaW1lVHlwZSlcIixcImJ1Y2tldFwiOlwiamR5LWZpbGVcIixcInVwbG9hZGVyXCI6XCI2MTFhMmQzNjRmMzQ3MDAwMDY3NWM5ZGRcIixcInNlc3Npb25JZFwiOlwic3NkXCJ9IiwiY2FsbGJhY2tIb3N0IjoiNTA3NS0xMTQtMjI0LTE3LTIxNi5uZ3Jvay5pbyIsImNhbGxiYWNrVXJsIjoiaHR0cDovLzUwNzUtMTE0LTIyNC0xNy0yMTYubmdyb2suaW8vZmlsZS91cGxvYWQvYXBpX2NhbGxiYWNrIiwiZm9yY2VTYXZlS2V5Ijp0cnVlLCJzYXZlS2V5IjoiN2Y4Yzk3NDAtNmI2YS00OTQ0LWE0MzgtNjQ1Y2IzN2ViNmQ0Iiwic2NvcGUiOiJkbi1qZHktdXBsb2FkIiwiZGVhZGxpbmUiOjE2Mzk0ODU2NjV9"
+        }
+    ]
+} | https://hc.jiandaoyun.com/open/13287 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+### SHEET: 流程接口
+分类 | 接口名 | 请求方式 | 请求地址 | 请求频率 | 接口简介 | 请求参数 | 请求示例 (JSON) | 响应示例 (JSON) | 文档链接 | 调试台链接
+流程接口 | 查询流程实例审批意见 | POST | https://api.jiandaoyun.com/api/v1/app/{app_id}/entry/{entry_id}/data/{data_id}/approval_comments | 30 次/秒 | 该接口用来获取单条表单流程数据的审批意见。 | **URL 参数:**
+| 参数 | 类型 | 说明 |
+|---|---|---|
+| appId | String | 应用 ID |
+| entryId | String | 表单 ID |
+| dataId | String | 流程表单数据 ID |
+
+**Body 参数:**
+| 参数 | 类型 | 说明 |
+|---|---|---|
+| skip | Number | 偏移量,即跳过多少条审批意见。由于每次最多返回 100 条审批意见,因此如果要查询第 100 条之后的结果,需要将该参数设定为 100,如果需要查询第 200 条之后的结果,需要将该参数设定为 200,以此类推。 | | POST - /api/v1/app/{app_id}/entry/{entry_id}/data/{data_id}/approval_comments
+{
+    "approveCommentList": [
+        {
+            "operator": {
+                "_id": "5ed78abead7b951a243cc828",
+                "username": "jdy-y69rlimdfquz",
+                "status": 1，
+                "name": "AngelMsger"
+            },
+            "flowAction": "forward",
+            "comment": "一条审批意见",
+            "flowNodeName": "必须手写签名",
+            "signature_url": "https://files.jiandaoyun.com/FtMNaGofTPeLMFW5_5SCs8w2mX8h?e=1595347199&token=bM7UwVPyBBdPaleBZt21SWKzMylqPUpn-05jZlas:iac5fKQqYDZkF1YyvJUm4YRDPzg="
+        }
+    ]
+} |  | https://hc.jiandaoyun.com/open/16050 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+流程接口 | 查询流程实例信息 | POST | https://api.jiandaoyun.com/api/v6/workflow/instance/get | 30 次/秒 | 该接口用来查询流程实例信息。 | | 参数 | 必须 | 类型 | 说明 |
+|---|---|---|---|
+| instance_id | 是 | String | 实例 id，同 data_id |
+| tasks_type | 否 | number | 返回待办种类，0 表示不返回；1 表示全部返回 | | {
+    "instance_id": "63ff32d918fbc20007a4a082",
+    "tasks_type":1
+} | {
+    "app_id": "628d8c0d73544c0006a54bfd",
+    "form_id": "63f31ae8144f4a09ec197163",
+    "form_title": "物品信息借用",
+    "instance_id": "63ff32d918fbc20007a4a082",
+    "url": "https://www.jiandaoyun.com/workflow/process_instance/63ff32d918fbc20007a4a082",
+    "update_time": "2022-10-26T13:18:57.605Z",
+    "create_time": "2022-10-26T13:11:45.087Z",
+    "finish_time": null,
+    "status": 0,
+    "creator": {
+        "username": "xiaojian",
+        "name": "小简",
+        "departments": [
+            1
+        ],
+        "type": 0,
+        "status": 1
+    },
+    "tasks": [
+        {
+            "app_id": "628d8c0d73544c0006a54bfd",
+            "form_id": "63f31ae8144f4a09ec197163",
+            "form_title": "物品信息借用",
+            "title": "流程发起节点",
+            "instance_id": "63ff32d918fbc20007a4a082",
+            "task_id": "63f31ae8144f4a09ec197162",
+            "flow_id": 0,
+            "flow_name": "流程发起节点",
+            "url": "https://www.jiandaoyun.com/workflow/process_instance/63ff32d918fbc20007a4a082/task/63f31ae8144f4a09ec197162",
+            "assignee": {
+                "username": "xiaoyun",
+                "name": "小云",
+                "departments": [
+                    1
+                ],
+                "type": 0,
+                "status": 1
+            },
+            "creator": {
+                "username": "xiaojian",
+                "name": "小简",
+                "departments": [
+                    1
+                ],
+                "type": 0,
+                "status": 1
+            },
+            "create_time": "2022-10-26T13:11:45.087Z",
+            "create_action": "forward",
+            "finish_time": "2022-10-26T13:11:45.087Z",
+            "finish_action": "forward",
+            "status": 1
+         },
+        {
+            "app_id": "628d8c0d73544c0006a54bfd",
+            "form_id": "63f31ae8144f4a09ec197163",
+            "form_title": "物品信息借用",
+            "title": "审批",
+            "instance_id": "63ff32d918fbc20007a4a082",
+            "task_id": "63f31ae8144f4a09ec197163",
+            "flow_id": 2,
+            "flow_name": "审批",
+            "url": "https://www.jiandaoyun.com/workflow/process_instance/63ff32d918fbc20007a4a082/task/63f31ae8144f4a09ec197163",
+            "assignee": {
+                "username": "xiaoyun",
+                "name": "小云",
+                "departments": [
+                    1
+                ],
+                "type": 0,
+                "status": 1
+            },
+            "creator": {
+                "username": "xiaojian",
+                "name": "小简",
+                "departments": [
+                    1
+                ],
+                "type": 0,
+                "status": 1
+            },
+            "create_time": "2022-10-26T13:18:57.605Z",
+            "create_action": "forward",
+            "finish_time": null,
+            "finish_action": null,
+            "status": 0
+        }
+    ]
+} | https://hc.jiandaoyun.com/open/16051 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+流程接口 | 结束流程实例 | POST | https://api.jiandaoyun.com/api/v1/workflow/instance/close | 20 次/秒 | 该接口用于管理员结束当前流程实例。 | | 参数 | 必须 | 类型 | 说明 |
+|---|---|---|---|
+| instance_id | 是 | String | 实例 id，同 data_id。结束对应的流程实例。 | | {
+    "instance_id": "6358a65878b1fb0007aba61b"
+} | {
+    "status": "success"
+} | https://hc.jiandaoyun.com/open/16052 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+流程接口 | 查询我的待办 | POST | https://api.jiandaoyun.com/api/v6/workflow/task/list | 20 次/秒 | 该接口可以获取用户当前的流程待办信息。 | | 参数 | 必须 | 类型 | 说明 |
+|---|---|---|---|
+| username | 是 | String | 用户名，即成员编号 |
+| limit | 否 | Number | 分页参数，页大小 默认 10 最大 100 |
+| task_id | 否 | Number | 分页符，上一次查询待办列表时最后一条数据的 task_id，没有则留空。 | | {
+    "username": "xiaoyun",
+    "task_id": "63f31ae8144f4a09ec197163",
+    "limit": 10
+} | {
+    "has_more": false,
+    "tasks": [
+        {
+            "app_id": "628d8c0d73544c0006a54bfd",
+            "task_id": "63f31ae8144f4a09ec197163",
+            "form_id": "63ff33531c2f7e5fe8789b4b",
+            "instance_id": "628d8c0d73544c0006a54bfc",
+            "form_title": "待办测试表单标题",
+            "title": "待办标题",
+            "flow_id": 1,
+            "flow_name": "节点1",
+            "url": "",
+            "assignee": {
+                "username": "xiaoyun",
+                "name": "小云",
+                "departments": [
+                    1,
+                    3
+                ],
+                "type": 0,
+                "status": 1,
+                "integrate_id": "xiaoyun"
+            },
+            "creator": {
+                "username": "xiaojian",
+                "name": "小简",
+                "departments": [
+                    1,
+                    3
+                ],
+                "type": 0,
+                "status": 1,
+                "integrate_id": "xiaojian"
+            },
+            "create_time": "2022-10-26T13:18:57.605Z",
+            "create_action": "forward",
+            "finish_time": null,
+            "finish_action": null,
+            "status": 0
+        }
+    ]
+} | https://hc.jiandaoyun.com/open/16053 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+流程接口 | 流程待办提交 | POST | https://api.jiandaoyun.com/api/v1/workflow/task/approve | 20 次/秒 | 该接口用来提交流程待办。 | | 参数 | 必须 | 类型 | 说明 |
+|---|---|---|---|
+| username | 是 | String | 用户名，即成员编号 |
+| instance_id | 是 | String | 实例 id，同 data_id |
+| task_id | 是 | String | 任务 id（需要和 username 一一对应） |
+| comment | 否 | String | 审批意见 | | {
+    "username": "xiaoyun",
+    "instance_id":  "6358a65878b1fb0007aba61b",
+    "task_id": "6358a65878b1fb0007aba63c"
+} | {
+    "status": "success"
+} | https://hc.jiandaoyun.com/open/16054 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+流程接口 | 流程待办回退 | POST | https://api.jiandaoyun.com/api/v2/workflow/task/rollback | 20 次/秒 | 该接口用来回退流程待办。 | | 参数 | 必须 | 类型 | 说明 |
+|---|---|---|---|
+| username | 是 | String | 用户名，即成员编号 |
+| instance_id | 是 | String | 实例 id，同 data_id |
+| task_id | 是 | String | 任务 id（需要和 username 一一对应） |
+| flow_id | 否 | Number | 回退目标节点：节点配置为回退到指定节点时需要设置 flow_id,根据设置的节点进行回退；节点配置为回退到上一节点时无需设置 flow_id,即使设置了flow_id 也不根据设置的节点回退。 |
+| comment | 否 | String | 审批意见 |
+| back_type | 否 | Number | 回退人选择,节点回退操作配置「回退人选择」时,执行回退需要带该参数：1：正常流转；2：直达目标节点 | | {
+    "username": "xiaojian",
+    "instance_id": "635919d1a2cca9000734511c",
+    "task_id": "635919d1a2cca9000734513b",
+    "comment": ""回退",
+    "back_type": 1
+} | {
+    "status": "success"
+} | https://hc.jiandaoyun.com/open/16055 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+流程接口 | 流程待办转交 | POST | https://api.jiandaoyun.com/api/v1/workflow/task/transfer | 20 次/秒 | 该接口用来转交流程待办。 | | 参数 | 必须 | 类型 | 说明 |
+|---|---|---|---|
+| username | 是 | String | 用户名，即成员编号（注：此处用户名指的是当前节点的负责人，而非流程表单的创建者） |
+| instance_id | 是 | String | 实例 id，同 data_id |
+| task_id | 是 | String | 任务 id（需要和 username 一一对应） |
+| transfer_username | 是 | String | 转交用户 |
+| comment | 否 | String | 审批意见 | | {
+    "username":"xiaoyun",
+    "instance_id": "6358af7c1f4eab0007704076",
+    "task_id":"6358af8446f8db00072d6121",
+    "transfer_username":"xiaojian"
+} | {
+    "status": "success"
+} | https://hc.jiandaoyun.com/open/16056 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+流程接口 | 激活流程实例 | POST | https://api.jiandaoyun.com/api/v1/workflow/instance/activate | 20 次/秒 | 流程激活接口用于激活当前流程实例。 | | 参数 | 必须 | 类型 | 说明 |
+|---|---|---|---|
+| instance_id | 是 | string | 激活对应的流程实例 |
+| flow_id | 是 | number | 激活的节点 id | | {
+    "instance_id": "64c7274cd172150007f2533d",
+    "flow_id": 1
+} | {
+    "status": "success"
+} | https://hc.jiandaoyun.com/open/17366 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+流程接口 | 流程待办撤回 | POST | https://api.jiandaoyun.com/api/v2/workflow/task/revoke | 20 次/秒 | 流程待办撤回接口用于将流程待办撤回。 | | 参数 | 必须 | 类型 | 说明 |
+|---|---|---|---|
+| instance_id | 是 | string | 对应的流程实例 |
+| task_id | 否 | string | 需要撤回的待办实例 id (是指之前进行提交操作过的待办 id，不是当前的待办实例 id，选填：不传默认进行发起节点的撤回操作) |
+| username | 是 | string | 处理待办对应的用户名 |
+| comment | 否 | string | 撤回理由。当流程节点为「仅允许发起节点撤回」，且流程流转到不与发起节点相连的节点时，发起人在发起节点撤回流程时必填撤回理由。 | | {
+    "instance_id": "64c72910561073000755af52",
+    "task_id": "64c72910561073000755af7c",
+    "username": "jdy-90ahnts5a6rh",
+    "comment": "因XXX需要撤回至发起节点"
+} | {
+    "status": "success"
+} | https://hc.jiandaoyun.com/open/17367 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+流程接口 | 流程待办加签 | POST | https://api.jiandaoyun.com/api/v2/workflow/task/add_sign | 20 次/秒 | 流程待办加签是指，对当前流程的待办加签。 | | 参数 | 必须 | 类型 | 说明 |
+|---|---|---|---|
+| instance_id | 是 | string | 对应的流程实例 |
+| task_id | 是 | string | 待办实例 id |
+| username | 是 | string | 待办对应的用户名 |
+| comment | 否 | String | （选填）审批意见 |
+| add_sign_type | 是 | number | 加签类型（0 前加签 / 1 后加签 / 2 并加签） |
+| add_sign_usernames | 是 | string[] | 被加签人的用户名 | | {
+  "instance_id": "64c72a03561073000755afd8",
+  "task_id": "64c72a03561073000755b001",
+  "username": "jdy-90ahnts5a6rh",
+  "comment": "Approval",
+  "add_sign_type": 1,
+  "add_sign_usernames": [
+    "R-vmTE0o3N",
+    "R-vmTE0o3P"
+  ]
+} | {
+    "status": "success"
+} | https://hc.jiandaoyun.com/open/17368 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+流程接口 | 查询流程日志 | POST | https://api.jiandaoyun.com/api/v1/workflow/instance/logs | 30 次/秒 | 该接口用来查询流程日志信息，目前仅支持返回包含审批意见的流程日志。 | | 参数 | 必须 | 类型 | 说明 |
+|---|---|---|---|
+| instance_id | 是 | string | 实例 id，同 data_id |
+| types | 是 | string[] | 返回的日志类型,可选项；审批意见："comment" |
+| limit | 否 | number | 分页参数,页大小默认 100 ，最大 100 |
+| skip | 否 | number | 分页参数,跳过前面数据条数,默认为 0 | | {
+    "instance_id": "659cba93489a49c06f7d4281",
+    "types": [
+        "comment"
+    ],
+    "skip": 0,
+    "limit": 10
+} | {
+    "logs": [
+        {
+            "flow_id": 1,
+            "flow_name": "必须手写签名",
+            "create_time": "2024-01-09T03:16:35.447Z",
+            "create_action": "forward",
+            "finish_time": "2024-01-09T03:17:03.239Z",
+            "finish_action": "forward",
+            "operator": {
+                "username": "xiaojian",
+                "name": "小简",
+                "departments": [
+                    1
+                ],
+                "type": 0,
+                "status": 1
+            },
+            "comment": "一条审批意见",
+            "signature": {
+                "url": "https://files.jiandaoyun.com/FtMNaGofTPeLMFW5_5SCs8w2mX8h?e=1595347199&token=bM7UwVPyBBdPaleBZt21SWKzMylqPUpn-05jZlas:iac5fKQqYDZkF1YyvJUm4YRDPzg="
+            },
+            "attachments": [
+                {
+                    "name": "WechatIMG21.jpeg",
+                    "size": 74935,
+                    "mime": "image/jpeg",
+                    "url": "https://files.jiandaoyun.com/FtMNaGofTPeLMFW5_5SCs8w2mX8h?e=1595347199&token=bM7UwVPyBBdPaleBZt21SWKzMylqPUpn-05jZlas:iac5fKQqYDZkF1YyvJUm4YRDPzg="
+                },
+                {
+                    "name": "6b2cc009-141d-44c4-b5fc-5d01667ee0f8.jpg",
+                    "size": 33174,
+                    "mime": "image/jpeg",
+                    "url": "https://files.jiandaoyun.com/FtMNaGofTPeLMFW5_5SCs8w2mX8h?e=1595347199&token=bM7UwVPyBBdPaleBZt21SWKzMylqPUpn-05jZlas:iac5fKQqYDZkF1YyvJUm4YRDPzg="
+                },
+                {
+                    "name": "24x24.png",
+                    "size": 34281,
+                    "mime": "image/png",
+                    "url": "https://files.jiandaoyun.com/FtMNaGofTPeLMFW5_5SCs8w2mX8h?e=1595347199&token=bM7UwVPyBBdPaleBZt21SWKzMylqPUpn-05jZlas:iac5fKQqYDZkF1YyvJUm4YRDPzg="
+                }
+            ]
+        }
+    ]
+} | https://hc.jiandaoyun.com/open/18793 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+流程接口 | 流程待办否决 | POST | https://api.jiandaoyun.com/api/v1/workflow/task/reject | 20 次/秒 | 流程待办否决接口用于将流程待办否决。 | | 参数 | 必须 | 类型 | 说明 |
+|---|---|---|---|
+| instance_id | 是 | string | 对应的流程实例 |
+| task_id | 是 | string | 待办实例id |
+| username | 是 | string | 待办对应的用户名 |
+| comment | 否 | String | 审批意见（选填） | | {
+    "instance_id": "64c72a03561073000755afd8",
+    "task_id": "64c72a03561073000755b001",
+    "username": "jdy-90ahnts5a6rh",
+    "comment": "不同意"
+} | {
+    "status": "success"
+} | https://hc.jiandaoyun.com/open/21608 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+流程接口 | 查询抄送列表 | POST | https://api.jiandaoyun.com/api/v1/workflow/cc/list | 5 次/秒 | 该插件用于查询抄送列表，目前仅支持查询 90 天内的抄送数据。 | | 参数 | 必须 | 类型 | 说明 |
+|---|---|---|---|
+| username | 是 | string | 用户名，即成员编号 |
+| skip | 否 | number | 分页参数，跳过前面数据条数。默认 0 |
+| limit | 否 | number | 分页参数,页大小默认 10， 最大 100 |
+| read_status | 否 | string | 已读状态，已读："read"；未读："unread"；全部："all"（默认） | | {
+    "username":"xiaoyun",
+    "skip": 0,
+    "limit": 1,
+    "read_status": "all"
+} | {
+    "cc_list": [
+        {
+            "app_id": "67c1584ea70e38aa41a9b466",
+            "form_id": "67c1649dfee1fc583c98be20",
+            "task_id": "67c164a8fee1fc583c98be7f",
+            "instance_id": "67c164a8fee1fc583c98be59",
+            "form_title": "抄送全部已读",
+            "title": "节点1",
+            "flow_id": 1,
+            "flow_name": "节点1",
+            "url": "https://www.jiandaoyun.com/workflow/process_instance/67c164a8fee1fc583c98be59/task/67c164a8fee1fc583c98be7f",
+            "assignee": {
+                "username": "xiaoyun",
+                "name": "小云",
+                "departments": [
+                    1,
+                    3
+                ],
+                "type": 0,
+                "status": 1,
+                "integrate_id": "xiaoyun"
+            },
+            "creator": {
+                "username": "xiaojian",
+                "name": "小简",
+                "departments": [
+                    1,
+                    3
+                ],
+                "type": 0,
+                "status": 1,
+                "integrate_id": "xiaojian"
+            },
+            "create_time": "2025-02-28T07:24:24.321Z",
+            "status": 1,
+            "start_time": "2025-02-28T07:24:24.323Z",
+            "finish_time": "2025-02-28T07:24:27.608Z",
+            "start_action": "forward"
+        }
+    ],
+    "has_more": true
+} | https://hc.jiandaoyun.com/open/22875 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+### SHEET: 通讯录-成员接口
+分类 | 接口名 | 请求方式 | 请求地址 | 请求频率 | 接口简介 | 请求参数 | 请求示例 (JSON) | 响应示例 (JSON) | 文档链接 | 调试台链接
+通讯录-成员接口 | 获取成员信息 | POST | https://api.jiandaoyun.com/api/v5/corp/user/get | 30 次/秒 | 根据 username 获取指定成员的名称和部门编号。支持公共模式和集成模式。 | | 参数 | 必需 | 类型 | 说明 |
+|---|---|---|---|
+| username | 是 | String | 成员编号 | | {
+    "username": "jiandaoyun"
+} | {
+  "user": {
+    "username": "jiandaoyun",
+    "name": "小云",
+    "departments": [1,3],
+    "type": 0,
+    "status": 1,
+    "integrate_id": "jiandaoyun"
+  }
+} | https://hc.jiandaoyun.com/open/18509 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-成员接口 | 添加成员 | POST | https://api.jiandaoyun.com/api/v5/corp/user/create | 20 次/秒 | 在指定部门下添加一位成员，该成员用户自动激活（可直接通过单点登录进行访问，并且会占用1个用户数），但是没有手机、邮箱和密码等个人注册信息。仅支持公共模式。 | | 参数 | 是否必需 | 类型 | 说明 |
+|---|---|---|---|
+| name | 是 | String | 昵称 |
+| departments | 否 | Number[] | 用户所属部门列表 |
+| username | 否 | String | 成员编号（成员编号仅支持字母、数字和下划线） | | {
+    "username": "jiandaoyun",
+    "name": "小云",
+    "departments": [1, 3]
+} | {
+  "user": {
+    "username": "jiandaoyun",
+    "name": "小云",
+    "departments": [1,3],
+    "type": 0,
+    "status": 1
+  }
+} | https://hc.jiandaoyun.com/open/18510 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-成员接口 | 修改成员 | POST | https://api.jiandaoyun.com/api/v5/corp/user/update | 20 次/秒 | 修改指定成员的信息，比如部门、昵称。仅支持公共模式。 | | 参数 | 是否必需 | 类型 | 说明 |
+|---|---|---|---|
+| username | 是 | String | 成员编号 |
+| name | 否 | String | 昵称 |
+| departments | 否 | Number[] | 用户所属部门列表 | | {
+    "username": "jiandaoyun",
+     "name": "小云",
+    "departments": [4]
+} | {
+  "user": {
+    "username": "jiandaoyun",
+    "name": "小云",
+    "departments": [1,3],
+    "type": 0,
+    "status": 1
+  }
+} | https://hc.jiandaoyun.com/open/18511 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-成员接口 | 删除成员 | POST | https://api.jiandaoyun.com/api/v5/corp/user/delete | 20 次/秒 | 从通讯录中删除指定成员编号的用户。仅支持公共模式。 | | 参数 | 必需 | 类型 | 说明 |
+|---|---|---|---|
+| username | 是 | String | 成员编号 | | {
+    "username": "jiandaoyun"
+} | {
+    "status": "success"
+} | https://hc.jiandaoyun.com/open/18512 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-成员接口 | 批量删除成员 | POST | https://api.jiandaoyun.com/api/v5/corp/user/batch_delete | 10 次/秒 | 对成员进行批量删除。（仅支持公共模式） | | 参数 | 是否必需 | 类型 | 说明 |
+|---|---|---|---|
+| usernames | 是 | Array | 成员编号列表 | | {
+    "usernames": ["tester", "developer"]
+} | {
+    "status": "success"
+} | https://hc.jiandaoyun.com/open/18513 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-成员接口 | 增量导入成员 | POST | https://api.jiandaoyun.com/api/v5/corp/user/import | 10 次/秒 | 本接口以企业内的 username（成员编号）为主键，更新创建企业成员。（仅支持公共模式） | | 参数 | 是否必需 | 类型 | 说明 |
+|---|---|---|---|
+| users | 是 | Json[] | 成员列表 |
+| users[].username | 是 | String | 成员编号 |
+| users[].name | 是 | String | 昵称 |
+| users[].departments | 是 | Number[] | 所在部门编号列表 | | {
+    "users": [{
+        "username": "coding_master",
+        "name": "小简",
+        "departments": [1, 3]
+    }]
+} | {
+    "status": "success"
+} | https://hc.jiandaoyun.com/open/18514 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+### SHEET: 通讯录-部门接口
+分类 | 接口名 | 请求方式 | 请求地址 | 请求频率 | 接口简介 | 请求参数 | 请求示例 (JSON) | 响应示例 (JSON) | 文档链接 | 调试台链接
+通讯录-部门接口 | （递归）获取部门成员 | POST | https://api.jiandaoyun.com/api/v5/corp/department/user/list | 10 次/秒 | 能够（递归）获取指定部门编号下的所有成员。支持公共模式和集成模式。 | | 参数 | 类型 | 是否必需 | 说明 |
+|---|---|---|---|
+| dept_no | Number | 是 | 部门编号 |
+| has_child | Boolean | 否 | 是否递归获取所有成员。默认为 false，即只获取当前部门下的成员，而不获取其子部门的成员。 | | {
+   "dept_no":1,
+  "has_child": true
+} | {
+  "users": [
+    {
+      "username": "aubrey",
+      "name": "aubrey",
+      "departments": [1],
+      "type": 0,
+      "status": 1
+    }
+  ]
+} | https://hc.jiandaoyun.com/open/18515 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-部门接口 | （递归）获取部门列表 | POST | https://api.jiandaoyun.com/api/v6/corp/department/list | 10 次/秒 | 能够（递归）获取指定部门 id 的所有子部门。支持公共模式和集成模式。 | | 参数 | 是否必需 | 类型 | 说明 |
+|---|---|---|---|
+| dept_no | 是 | Number | 部门编号 |
+| has_child | 否 | Boolean | 是否递归获取所有子部门。默认为 false，即只获取一级子部门。 | | {
+  "dept_no": 1,
+  "has_child": true
+} | {
+  "departments": [
+    {
+      "dept_no": 3,
+      "name": "销售部",
+      "parent_no": 1,
+      "type": 0,
+      "status": 1
+    },
+    {
+      "dept_no": 33,
+      "name": "华东区销售小组",
+      "parent_no": 3,
+      "type": 0,
+      "status": 1,
+      "seq": 2
+    }
+  ]
+} | https://hc.jiandaoyun.com/open/18516 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-部门接口 | 创建部门 | POST | https://api.jiandaoyun.com/api/v6/corp/department/create | 20 次/秒 | 创建一个新部门。仅支持公共模式。 | | 参数 | 是否必需 | 类型 | 说明 |
+|---|---|---|---|
+| name | 是 | String | 部门名称（最多不超过 50 个字符） |
+| parent_no | 否 | Number | 父部门编号，不传默认为根部门 |
+| dept_no | 否 | Number | 部门编号，不传自动生成（上限 9007199254740991） | | {
+    "name": "研发部门",
+    "parent_no": 1,
+    "dept_no": 2
+} | {
+  "department": {
+    "dept_no": 2,
+    "name": "研发部门",
+    "parent_no": 1,
+    "type": 0,
+    "status": 1,
+    "seq": 1
+  }
+} | https://hc.jiandaoyun.com/open/18517 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-部门接口 | 修改部门 | POST | https://api.jiandaoyun.com/api/v6/corp/department/update | 20 次/秒 | 修改指定部门的部门信息。仅支持公共模式。 | | 参数 | 是否必需 | 类型 | 说明 |
+|---|---|---|---|
+| name | 否 | String | 部门名称 |
+| parent_no | 否 | Integer | 上级部门编号 |
+| dept_no | 是 | Number | 部门编号 |
+| seq | 否 | number | 部门排序 |
+
+注：请求参数中的 name 、 parent_no 和 seq 至少填写一个。 | {
+    "dept_no": 3,
+    "name": "测试部门",
+    "parent_no": 1,
+    "seq": 1
+} | {
+  "department": {
+    "dept_no": 3,
+    "name": "测试部门",
+    "parent_no": 2,
+    "type": 0,
+    "status": 1,
+    "seq": 1
+  }
+} | https://hc.jiandaoyun.com/open/18518 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-部门接口 | 删除部门 | POST | https://api.jiandaoyun.com/api/v5/corp/department/delete | 20 次/秒 | 将指定部门从通组织架构接中移除。仅支持公共模式。 | | 参数 | 类型 | 是否必需 | 说明 |
+|---|---|---|---|
+| dept_no | Number | 是 | 部门编号 | | {
+    "dept_no": 1
+} | {
+    "status": "success"
+} | https://hc.jiandaoyun.com/open/18519 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-部门接口 | 获取集成模式部门编号 | POST | https://api.jiandaoyun.com/api/v6/corp/department/dept_no/get | 30 次/秒 | 本接口可以通过第三方平台的通讯录部门的 ID 获取其对应的简道云通讯录部门编号。仅支持集成模式。 | | 参数 | 是否必需 | 类型 | 说明 |
+|---|---|---|---|
+| integrate_id | 是 | String | 第三方平台通讯录的部门 ID，如钉钉/企业微信/飞书的通讯录部门 ID。 | | {
+     "integrate_id": "1005"
+} | {
+  "department": {
+    "dept_no": 1005,
+    "name": "产品部门",
+    "parent_no": 2,
+    "type": 0,
+    "status": 1,
+    "integrate_id": "1005",
+    "seq": 1
+  }
+} | https://hc.jiandaoyun.com/open/18520 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-部门接口 | 全量导入部门 | POST | https://api.jiandaoyun.com/api/v5/corp/department/import | 10 次/秒 | 本接口以 dept_no（部门编号）为主键，全量覆盖企业内的通讯录部门树。仅支持公共模式。 | | 参数 | 是否必需 | 类型 | 说明 |
+|---|---|---|---|
+| departments | 是 | Array | 部门列表 |
+| departments[].dept_no | 是 | Number | 部门编号（上限 9007199254740991） |
+| departments[].name | 是 | String | 部门名称 |
+| departments[].parent_no | 否 | Number | 父部门编号，不传默认为根部门下 | | {
+    "departments": [{
+        "dept_no": 11,
+        "name": "研发部门",
+        "parent_no": 1
+    }, {
+     "dept_no": 12,
+     "name": "测试部门",
+     "parent_no": 1
+    }]
+} | {
+    "status": "success"
+} | https://hc.jiandaoyun.com/open/18521 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-部门接口 | 获取部门主管列表 | POST | https://api.jiandaoyun.com/api/v6/corp/department/manager/get | 20 次/秒 | 获取指定部门下的主管成员列表 | | 参数 | 类型 | 是否必需 | 说明 |
+|---|---|---|---|
+| dept_no | number | 是 | 部门编号 | | {
+  "dept_no": 1
+} | {
+  "dept_managers": [
+    {
+      "username": "zhangsan",
+      "name": "张三",
+      "departments": [1, 2],
+      "type": 0,
+      "status": 1
+    }
+  ]
+} | https://hc.jiandaoyun.com/open/25948 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-部门接口 | 设置部门主管 | POST | https://api.jiandaoyun.com/api/v6/corp/department/manager/update | 20 次/秒 | 设置指定部门的主管成员，以全量覆盖方式更新。 | | 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| dept_no | number | 是 | 部门编号 |
+| managers | string[] | 是 | 主管成员用户名列表，传入空数组 [] 可清空所有主管 | | {
+  "dept_no": 1,
+  "managers": ["zhangsan", "lisi"]
+} | {
+  "dept_managers": [
+    {
+      "username": "zhangsan",
+      "name": "张三",
+      "departments": [1, 2],
+      "type": 0,
+      "status": 1
+    },
+    {
+      "username": "lisi",
+      "name": "李四",
+      "departments": [1],
+      "type": 0,
+      "status": 1
+    }
+  ]
+} | https://hc.jiandaoyun.com/open/25949 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+### SHEET: 通讯录-角色接口
+分类 | 接口名 | 请求方式 | 请求地址 | 请求频率 | 接口简介 | 请求参数 | 请求示例 (JSON) | 响应示例 (JSON) | 文档链接 | 调试台链接
+通讯录-角色接口 | 列出角色 | POST | https://api.jiandaoyun.com/api/v5/corp/role/list | 30 次/秒 | 将角色列出来。支持公共模式和集成模式。 | | 参数 | 类型 | 是否必需 | 说明 |
+|---|---|---|---|
+| skip | Number | 否 | 偏移量 |
+| limit | Number | 否 | limit，不传递时默认值为 1 |
+| has_internal | Boolean | 否 | 是否包含自建角色默认为 true |
+| has_sync | Boolean | 否 | 是否包含集成角色默认为 true | | {
+    "skip": 0,
+    "limit": 3,
+    "has_internal": true,
+    "has_sync": true
+} | {
+    "roles": [
+        {
+            "role_no": 3,
+            "group_no": 2547,
+            "name": "设计中心",
+            "type": 0,
+            "status": 1
+        },
+        {
+            "role_no": 2551,
+            "group_no": 2550,
+            "name": "销售总监",
+            "type": 0,
+           "status": 1
+        },
+        {
+            "role_no": 2552,
+            "group_no": 2550,
+            "name": "销售主管",
+            "type": 0,
+           "status": 1
+        }
+    ]
+} | https://hc.jiandaoyun.com/open/18522 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-角色接口 | 创建一个自建角色 | POST | https://api.jiandaoyun.com/api/v5/corp/role/create | 20 次/秒 | 只能创建内部自建角色。支持公共模式和集成模式。 | | 参数 | 类型 | 是否必需 | 说明 |
+|---|---|---|---|
+| name | String | 是 | 角色名称 |
+| group_no | Number | 是 | 角色组编号 | | {
+    "group_no": 2547,
+    "name": "研发中心"
+} | {
+  "role": {
+    "role_no": 2558,
+    "group_no": 2547,
+    "name": "研发中心",
+    "type": 0,
+    "status": 1
+  }
+} | https://hc.jiandaoyun.com/open/18523 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-角色接口 | 更新一个自建角色 | POST | https://api.jiandaoyun.com/api/v5/corp/role/update | 20 次/秒 | 对自建角色进行更新。支持公共模式和集成模式， 但集成模式下只支持对自建角色的操作，不支持对第三方同步过来的角色操作。 | | 参数 | 类型 | 是否必需 | 说明 |
+|---|---|---|---|
+| role_no | Number | 是 | 角色编号 |
+| group_no | Number | 是 | 角色组编号 |
+| name | String | 否 | 角色名称 | | {
+    "role_no": 2558,
+    "group_no": 2547,
+    "name": "研发部门"
+} | {
+  "role": {
+    "role_no": 2558,
+    "group_no": 2547,
+    "name": "研发部门",
+    "type": 0,
+    "status": 1
+  }
+} | https://hc.jiandaoyun.com/open/18524 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-角色接口 | 删除一个自建角色 | POST | https://api.jiandaoyun.com/api/v5/corp/role/delete | 20 次/秒 | 对某个自建角色进行删除。支持公共模式和集成模式， 但集成模式下只支持对自建角色的操作，不支持对第三方同步过来的角色操作。 | | 参数 | 类型 | 是否必需 | 说明 |
+|---|---|---|---|
+| role_no | Number | 是 | 角色编号 | | {
+    "role_no": 2558
+} | {
+    "status": "success"
+} | https://hc.jiandaoyun.com/open/18525 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-角色接口 | 列出角色下的成员 | POST | https://api.jiandaoyun.com/api/v5/corp/role/user/list | 30 次/秒 | 列出角色下的所有成员信息。支持公共模式和集成模式。 | | 参数 | 位置 | 是否必需 | 说明 |
+|---|---|---|---|
+| skip | Number | 否 | 分页偏移 |
+| limit | Number | 否 | 分页大小，最大值为 10000。 |
+| role_no | Number | 是 | 角色编号 |
+| has_manage_range | Boolean | 否 | 是否包含分管部门信息，默认值为 false。 | | {
+    "skip": 0,
+    "limit": 3,
+    "role_no": 72,
+    "has_manage_range": true
+} | {
+    "users": [
+  {
+    "username": "jdy-xulalikdbj82",
+    "name": "frank",
+    "departments": [212],
+    "type": 0,
+    "status": 1,
+    "deptarments_range": [378,1157],
+    "has_child": true
+  },
+  {
+    "username": "R-E9rRNbwL",
+    "name": "成员删除1",
+    "departments": [338,226],
+    "type": 0,
+    "status": 1,
+    "deptarments_range": [1157],
+    "has_child": false
+  },
+  {
+    "username": "UPDATE",
+    "name": "testadmin",
+    "departments": [1],
+    "type": 0,
+    "status": 1
+  }
+   ]
+} | https://hc.jiandaoyun.com/open/18526 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-角色接口 | 为自建角色批量添加成员 | POST | https://api.jiandaoyun.com/api/v5/corp/role/add_members | 10 次/秒 | 为自建的角色批量添加成员。支持公共模式和集成模式， 但集成模式下只支持对自建角色的操作，不支持对第三方同步过来的角色操作。 | | 参数 | 类型 | 是否必须 | 说明 |
+|---|---|---|---|
+| role_no | Number | 是 | 角色编号，示例：3 |
+| usernames | String[] | 是 | 员工工号 | | {
+    "role_no": 3,
+    "usernames": [
+         "fr0005",
+         "fr008"
+    ]
+} | {
+    "status": "success"
+} | https://hc.jiandaoyun.com/open/18527 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-角色接口 | 为自建角色批量移除成员 | POST | https://api.jiandaoyun.com/api/v5/corp/role/remove_members | 10 次/秒 | 将成员从角色中批量移除。支持公共模式和集成模式， 但集成模式下只支持对自建角色的操作。 | | 参数 | 类型 | 是否必须 | 说明 |
+|---|---|---|---|
+| role_no | Number | 是 | 角色编号，示例：3 |
+| usernames | String[] | 是 | 员工工号 | | {
+    "role_no": 3,
+    "usernames": [
+        "fr0005",
+        "fr008"
+    ]
+} | {
+    "status": "success"
+} | https://hc.jiandaoyun.com/open/18528 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+### SHEET: 通讯录-角色组接口
+分类 | 接口名 | 请求方式 | 请求地址 | 请求频率 | 接口简介 | 请求参数 | 请求示例 (JSON) | 响应示例 (JSON) | 文档链接 | 调试台链接
+通讯录-角色组接口 | 列出自建角色组 | POST | https://api.jiandaoyun.com/api/v5/corp/role_group/list | 30 次/秒 | 将角色组全部拉取出来。支持公共模式和集成模式。 | | 参数 | 类型 | 是否必需 | 说明 |
+|---|---|---|---|
+| skip | Integer | 否 | 偏移量 |
+| limit | Integer | 否 | limit |
+| has_internal | Boolean | 否 | 是否包含自建角色组默认为 true |
+| has_sync | Boolean | 否 | 是否包含集成角色组默认为 true | | {
+    "skip": 0,
+    "limit": 3,
+    "has_internal": true,
+    "has_sync": true
+} | {
+    "role_groups": [
+        {
+            "group_no": 2547,
+            "name": "默认",
+            "type": 0,
+            "status": 1
+        },
+        {
+            "group_no": 2550,
+            "name": "CRM角色组",
+            "type": 0,
+            "status": 1
+        },
+        {
+            "group_no": 2556,
+            "name": "营销中心",
+            "type": 0,
+            "status": 1
+        }
+    ]
+} | https://hc.jiandaoyun.com/open/18529 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-角色组接口 | 创建自建角色组 | POST | https://api.jiandaoyun.com/api/v5/corp/role_group/create | 20 次/秒 | 通过接口新建角色组。支持公共模式和集成模式。 | | 参数 | 类型 | 是否必需 | 说明 |
+|---|---|---|---|
+| name | String | 是 | 角色组名称 | | {
+    "name": "研发中心"
+} | {
+  "role_group": {
+    "group_no": 2559,
+    "name": "研发中心",
+    "type": 0,
+    "status": 1
+  }
+} | https://hc.jiandaoyun.com/open/18530 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-角色组接口 | 更新自建角色组 | POST | https://api.jiandaoyun.com/api/v5/corp/role_group/update | 20 次/秒 | 更新创建好的角色组信息。支持公共模式和集成模式，但集成模式下只支持对自建角色操作，不支持对第三方同步的角色操作。 | | 参数 | 类型 | 是否必须 | 说明 |
+|---|---|---|---|
+| role_group_no | Integer | 是 | 角色组编号 |
+| name | String | 是 | 角色组名称 | | {
+    "role_group_no": 2559,
+    "name": "研发部门"
+} | {
+  "role_group": {
+    "group_no": 2559,
+    "name": "研发部门",
+    "type": 0,
+    "status": 1
+  }
+} | https://hc.jiandaoyun.com/open/18531 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-角色组接口 | 删除自建角色组 | POST | https://api.jiandaoyun.com/api/v5/corp/role_group/delete | 20 次/秒 | 删除创建好的角色组信息。支持公共模式和集成模式，但集成模式下只支持对自建角色操作，不支持对第三方同步的角色操作。 | | 参数 | 类型 | 是否必须 | 说明 |
+|---|---|---|---|
+| role_group_no | Number | 是 | 角色组编号 | | {
+    "role_group_no": 2561
+} | {
+    "status": "success"
+} | https://hc.jiandaoyun.com/open/18532 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+### SHEET: 通讯录-企业互联接口
+分类 | 接口名 | 请求方式 | 请求地址 | 请求频率 | 接口简介 | 请求参数 | 请求示例 (JSON) | 响应示例 (JSON) | 文档链接 | 调试台链接
+通讯录-企业互联接口 | 列出我连接的企业 | POST | https://api.jiandaoyun.com/api/v5/corp/guest/department/list | 30 次/秒 | 能够获取所有外部部门的列表。支持公共模式和集成模式。 | | 参数 | 类型 | 是否必须 | 说明 |
+|---|---|---|---|
+| dept_no | integer | 否 | 部门编号，不填则返回所有外部部门 | | {
+    "dept_no": 1012
+} | {
+    "dept_list": [
+        {
+         "name": "帆软软件有限公司",
+         "dept_no": 1012,
+         "type": 2,
+          "status": 1
+        }
+    ]
+} | https://hc.jiandaoyun.com/open/18533 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-企业互联接口 | 列出我连接的企业的对接人 | POST | https://api.jiandaoyun.com/api/v5/corp/guest/user/list | 30 次/秒 | 能够获取外部对接人的列表部列出来。支持公共模式和集成模式。 | | 参数 | 类型 | 是否必需 | 说明 |
+|---|---|---|---|
+| dept_no | Integer | 否 | 部门编号，不填则返回全部 | | {
+    "dept_no":19
+} | {
+  "member_list": [
+    {
+      "name": "Purl",
+      "username": "R-ww9a61c11fc226842f-#admin",
+      "departments": [
+        19
+      ],
+      "type": 2,
+      "status": 1
+    }
+  ]
+} | https://hc.jiandaoyun.com/open/18534 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+通讯录-企业互联接口 | 获取我连接的企业对接人的详细信息 | POST | https://api.jiandaoyun.com/api/v5/corp/guest/user/get | 30 次/秒 | 获取某个对接人的详细信息。 | | 参数 | 类型 | 是否必需 | 说明 |
+|---|---|---|---|
+| username | String | 是 | 成员编号 | | {
+    "username": "R-611e10175402f70006bcdc2c-jdy-e4703i1mde61"
+} | {
+  "member": {
+    "name": "peach",
+    "username": "R-611e10175402f70006bcdc2c-jdy-e4703i1mde61",
+    "departments": [
+      62
+    ],
+    "type": 2,
+    "status": 1
+  }
+} | https://hc.jiandaoyun.com/open/18535 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+### SHEET: 资源用量接口
+分类 | 接口名 | 请求方式 | 请求地址 | 请求频率 | 接口简介 | 请求参数 | 请求示例 (JSON) | 响应示例 (JSON) | 文档链接 | 调试台链接
+资源用量接口 | 获取应用资源用量统计 | POST | https://api.jiandaoyun.com/api/v1/corp_usage/app_metrics | 1 次/秒 | 获取当前企业在指定日期的应用维度资源用量统计。 | | 参数 | 类型 | 必需 | 说明 |
+| --- | --- | --- | --- |
+| date | String | 否 | 统计日期，格式 yyyy-MM-dd。不传或传空字符串表示查询当前日期的前一日（T-1）的统计信息 |
+| app_ids | String[] | 否 | 应用 ID 列表，最多 10 个。空数组或不传表示分页查询全部应用 |
+| skip | Number | 否 | 分页偏移，默认 0 |
+| limit | Number | 否 | 分页大小，默认 20，最大 100 | | {
+  "date": "2026-05-08",
+  "app_ids": [
+    "65f000000000000000000001"
+  ],
+  "skip": 0,
+  "limit": 20
+} | {
+  "date": "2026-05-08",
+  "has_next": false,
+  "items": [
+    {
+      "app_id": "65f000000000000000000001",
+      "app_name": "CRM",
+      "creator": {
+        "member_id": "65f000000000000000000011",
+        "name": "张三"
+      },
+      "created_at": "2026-01-01T00:00:00+08:00",
+      "last_edit_at": "2026-05-06T12:00:00+08:00",
+      "last_visit_at": "2026-05-06T18:00:00+08:00",
+      "metrics": {
+        "app": 1,
+        "form_coop": 20,
+        "form_workflow": 3,
+        "dash": 2,
+        "etl": 1,
+        "aggregate": 1,
+        "public_link": 5,
+        "data_trigger": 2,
+        "automation": 1,
+        "bpa": 0,
+        "data": 2,
+        "daily_attachment_upload": 0,
+        "daily_automation_exec": 0
+      }
+    }
+  ]
+} | https://hc.jiandaoyun.com/open/25791 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+资源用量接口 | 获取平台资源用量统计 | POST | https://api.jiandaoyun.com/api/v1/corp_usage/overview | 1 次/秒 | 获取当前企业在指定日期的平台资源用量概览。注：接口只返回企业维度的汇总指标，不返回应用或成员明细。 | | 参数 | 类型 | 必需 | 说明 |
+| --- | --- | --- | --- |
+| date | String | 否 | 统计日期，格式 yyyy-MM-dd。不传或传空字符串表示查询当前日期的前一日（T-1）的统计信息<br>注：1）date 默认为东八区时间，即中国时间。2）指定 date 时，不能晚于当前日期的前一日（T-1），最多支持查询最近 180 天。3）使用该接口时，若从未使用过「管理后台 > 管理工具 > 使用统计」功能，将无法获取相关数据，指标字段返回值为 0。4）当 date 合法但传入时间早于第一次使用「管理后台 > 管理工具 > 使用统计」功能时，也无法获取相关数据 | | {
+  "date": "2026-05-08"
+} | {
+  "date": "2026-06-29",
+  "metrics": {
+    "app": 34,
+    "form_coop": 245,
+    "form_workflow": 109,
+    "dash": 75,
+    "etl": 52,
+    "aggregate": 29,
+    "public_link": 0,
+    "data_trigger": 100,
+    "automation": 43,
+    "bpa": 0,
+    "data": 353,
+    "daily_attachment_upload": 0,
+    "daily_automation_exec": 0
+  }
+} | https://hc.jiandaoyun.com/open/25795 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+资源用量接口 | 获取成员资源用量统计 | POST | https://api.jiandaoyun.com/api/v1/corp_usage/member_metrics | 1 次/秒 | 获取当前企业在指定日期的成员维度资源用量统计。 | | 参数 | 类型 | 必需 | 说明 |
+| --- | --- | --- | --- |
+| date | String | 否 | 统计日期，格式 yyyy-MM-dd。不传或传空字符串表示查询当前日期的前一日（T-1）的统计信息 |
+| member_ids | String[] | 否 | 成员 ID 列表，最多 10 个。空数组或不传表示分页查询全部成员 |
+| skip | Number | 否 | 分页偏移，默认 0 |
+| limit | Number | 否 | 分页大小，默认 20，最大 100 | | {
+  "date": "2026-05-08",
+  "member_ids": [
+    "65f000000000000000000011"
+  ],
+  "skip": 0,
+  "limit": 20
+} | {
+  "date": "2026-05-08",
+  "has_next": false,
+  "items": [
+    {
+      "member": {
+        "member_id": "65f000000000000000000011",
+        "name": "张三"
+      },
+      "metrics": {
+        "app": 2,
+        "form_coop": 10,
+        "form_workflow": 1,
+        "dash": 3,
+        "etl": 1,
+        "aggregate": 0,
+        "public_link": 2,
+        "data_trigger": 1,
+        "automation": 1,
+        "bpa": 0
+      }
+    }
+  ]
+} | https://hc.jiandaoyun.com/open/25796 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+### SHEET: 审计日志接口
+分类 | 接口名 | 请求方式 | 请求地址 | 请求频率 | 接口简介 | 请求参数 | 请求示例 (JSON) | 响应示例 (JSON) | 文档链接 | 调试台链接
+审计日志接口 | 获取审计日志类型定义 | POST | https://api.jiandaoyun.com/api/v1/audit_log/domains | 30 次/秒 | 获取当前企业支持的审计日志范围和事件类型定义。调用时可先调用本接口，获取「日志范围（domain）」与「事件名称（event_types）」后，再调用审计日志明细接口按范围查询日志。 | | 参数 | 必须 | 类型 | 说明 |
+| --- | --- | --- | --- |
+| —— | — | — | 请求体传入空对象 {} | | {} | {
+  "domains": [
+    {
+      "domain": "login",
+      "event_types": [
+        "auth.session.login"
+      ]
+    },
+    {
+      "domain": "app_builder",
+      "event_types": [
+        "admin.app.create",
+        "admin.app.watermark_enable"
+      ]
+    }
+  ]
+} | https://hc.jiandaoyun.com/open/25780 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+审计日志接口 | 审计事件列表 | N/A | https://hc.jiandaoyun.com/open/25784 | N/A | 审计事件列表是指用户获取到的日志范围（domain）中的具体事件名称，列举登录、知识库、应用管理、平台管理等领域可用的全部审计事件。 |  |  | {
+  "domains": [
+    {
+      "domain": "login",
+      "event_types": [
+        "auth.session.login"
+      ]
+    },
+    {
+      "domain": "kms",
+      "event_types": [
+        "admin.kms.enable",
+        "admin.kms.disable",
+        "admin.kms.space_create"
+      ]
+    },
+    {
+      "domain": "app_builder",
+      "event_types": [
+        "admin.app.create",
+        "admin.app.delete",
+        "admin.form.create",
+        "admin.form.update",
+        "data.record.create",
+        "data.record.update",
+        "data.record.delete",
+        "data.record.export",
+        "admin.dash.create",
+        "admin.aggregate.create",
+        "system.automation.create",
+        "system.etl.create"
+      ]
+    },
+    {
+      "domain": "platform",
+      "event_types": [
+        "admin.platform.manager_add",
+        "admin.corp.rename",
+        "admin.member.invite",
+        "admin.member.remove",
+        "admin.dept.create",
+        "admin.role.create",
+        "api.key.create",
+        "api.key.disable",
+        "api.plugin.install"
+      ]
+    }
+  ]
+} | https://hc.jiandaoyun.com/open/25784 | https://wxwork.jiandaoyun.com/open/open_api/explorer
+审计日志接口 | 获取审计日志明细 | POST | https://api.jiandaoyun.com/api/v1/audit_log/list | 30 次/秒 | 按范围查询当前企业的审计日志明细。 | | 参数 | 类型 | 必需 | 说明 |
+| --- | --- | --- | --- |
+| domain | String | 是 | 日志范围 |
+| time_range.start | String | 是 | 查询开始时间，UTC 时间。格式示例：2026-04-01T00:00:00.000Z |
+| time_range.end | String | 是 | 查询结束时间，UTC 时间。格式示例：2026-04-13T23:59:59.000Z |
+| event_types | String[] | 否 | 事件类型列表。不传表示查询当前日志范围（domain）支持的全部事件类型 |
+| limit | Number | 否 | 单次返回条数，默认 200，最大 200 |
+| cursor | String | 否 | 分页游标。首次查询不传；下一页使用上次响应的 cursor |
+| filters | Object | 否 | 过滤条件。actor_ids 按操作人成员 ID 过滤；app_ids 仅日志范围为应用管理（app_builder）时支持；entry_ids 仅日志范围为应用管理（app_builder）时支持 | | {
+  "domain": "login",
+  "time_range": {
+    "start": "2026-04-01T00:00:00.000Z",
+    "end": "2026-04-13T23:59:59.000Z"
+  },
+  "event_types": [
+    "auth.session.login"
+  ],
+  "filters": {
+    "actor_ids": [
+      "660000000000000000000010",
+      "660000000000000000000011"
+    ]
+  },
+  "limit": 100,
+  "cursor": ""
+} | {
+  "has_more": true,
+  "cursor": "MTc3NjE1OTAwMDAwMCw2NjExMjIzMzQ0NTU2Njc3ODg5OWFhYmI=",
+  "items": [
+    {
+      "event_id": "681f2de2-9722-34ca-bd2a-dda99b615e46",
+      "event_time": "2026-05-11T09:09:38.792Z",
+      "event_type": "data.record.print",
+      "domain": "app_builder",
+      "tenant": {
+        "id": "68665cf9f8acef49b8e29917"
+      },
+      "actor": {
+        "type": "user",
+        "id": "68665cf9f8acef49b8e29917",
+        "name": "z3",
+        "ip": "172.24.72.2",
+        "user_agent": "Mozilla/5.0",
+        "geo": null
+      },
+      "event": {
+        "category": "data",
+        "action": "print",
+        "outcome": "success",
+        "severity": "info"
+      },
+      "resource": {
+        "type": "form",
+        "id": "689d59d8d241955ee4908625",
+        "name": "车辆信息基础表",
+        "parent_id": "68994cb727cc65376feb985d",
+        "parent_type": "app"
+      },
+      "detail": {
+        "template": "data_print",
+        "params": {
+          "template_name": "系统模板",
+          "data_label": "A",
+          "link": "/dashboard/app/68994cb727cc65376feb985d/form/689d59d8d241955ee4908625/data/69c6297fbf7965a4d21e5ec2/qr_link"
+        }
+      }
+    }
+  ]
+} | https://hc.jiandaoyun.com/open/25786 | https://wxwork.jiandaoyun.com/open/open_api/explorer

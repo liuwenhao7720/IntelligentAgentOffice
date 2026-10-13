@@ -6,7 +6,8 @@ from datetime import datetime
 from typing import Optional
 
 from sqlalchemy import (
-    JSON, Boolean, Column, DateTime, Float, ForeignKey, Integer, String, Text, create_engine,
+    JSON, Boolean, Column, DateTime, Float, ForeignKey, Integer, String, Text,
+    UniqueConstraint, create_engine,
 )
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 
@@ -22,7 +23,9 @@ class User(Base):
     name = Column(String(64))
     department = Column(String(64), default="")
     position = Column(String(64), default="")
-    role = Column(String(32), default="staff")  # staff / admin
+    role = Column(String(32), default="staff")  # staff / manager / compliance / admin（auth.ROLE_PERMS）
+    # 账号状态：active / disabled（停用即登录隔离，token 每请求查库即时生效）
+    status = Column(String(16), default="active")
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
@@ -72,8 +75,17 @@ class ChatSession(Base):
     status = Column(String(16), default="open")
     variables = Column(JSON, default=dict)
     rating = Column(Integer, nullable=True)
+    # 附件3 §3.4：留痕可关不可删 —— standard / metadata_only（仅元数据留痕）
+    privacy = Column(String(16), default="standard")
+    # 成熟规则审核放行（附件5 §8.3）：awaiting_review/approved/revising/rejected/""
+    review_status = Column(String(16), default="")
+    reviewed_by = Column(String(64), default="")
+    review_note = Column(Text, default="")
+    reviewed_at = Column(DateTime, nullable=True)
     tokens_in = Column(Integer, default=0)
     tokens_out = Column(Integer, default=0)
+    # 来源频道：workbench（工作台，存量默认）/ chat（智能对话模块）
+    channel = Column(String(16), default="workbench")
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     messages = relationship("SessionMessage", back_populates="session", cascade="all, delete-orphan")
@@ -89,6 +101,28 @@ class SessionMessage(Base):
     is_final = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     session = relationship("ChatSession", back_populates="messages")
+
+
+class ChatAttachment(Base):
+    """智能对话模块的上传附件：文件留存 + 解析文本（注入对话上下文）。
+
+    留痕规则（与会话一致：可关不可删）：
+    - 未绑定会话（session_id 为空）的附件允许删除（用户传错了可撤回）；
+    - 一旦随消息绑定会话即不可删，作为留痕的一部分保留。
+    """
+    __tablename__ = "chat_attachments"
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"), index=True)
+    session_id = Column(Integer, ForeignKey("chat_sessions.id"), nullable=True, index=True)
+    filename = Column(String(256))            # 原始文件名（仅展示用）
+    ext = Column(String(16), default="")      # 小写扩展名（不含点）
+    size_bytes = Column(Integer, default=0)
+    storage_path = Column(String(512))        # 服务端存储路径（uuid.ext）
+    mime = Column(String(128), default="")
+    extracted_text = Column(Text, default="")  # 解析出的文本（注入上下文用）
+    extract_status = Column(String(16), default="ok")  # ok / failed / unsupported
+    note = Column(String(256), default="")     # 解析备注（如"扫描件无文本"）
+    created_at = Column(DateTime, default=datetime.utcnow)
 
 
 class EditDiff(Base):
@@ -114,6 +148,7 @@ class Asset(Base):
     department = Column(String(64), default="")
     visibility = Column(String(16), default="dept")
     tags = Column(JSON, default=list)
+    distributed_to = Column(JSON, default=list)  # 附件3 §3.1：归档与分发记录（发到哪个群/目录）
     featured = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
@@ -188,8 +223,76 @@ class TaskItem(Base):
     ai_user_feedback = Column(JSON, default=dict)
     ai_leader_assigned = Column(Boolean, default=False)
     ai_blocking_others = Column(Boolean, default=False)
+    # 今日工作安排三态标记（手册 1.5：B0 固定会议 / 他人要求 / 今日固定）
+    is_meeting = Column(Boolean, default=False)
+    is_other_request = Column(Boolean, default=False)
+    is_today_fixed = Column(Boolean, default=False)
+    # 简道云数据 ID（同步来源行，用于状态回写；空=本地任务）
+    jdy_data_id = Column(String(64), default="", index=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class Briefing(Base):
+    """简道云自动化文稿（早宣/晚总/周计划/周总结/项目结项）落库。
+
+    附件5 §8.5：部门经理需要按部门查看早宣/晚总推送量与问题清单，
+    因此生成与推送都必须持久化（含推送回执 entry_id）。
+    """
+    __tablename__ = "briefings"
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"), index=True)
+    department = Column(String(64), default="", index=True)
+    kind = Column(String(32), index=True)       # morning/evening/weekly_plan/weekly_summary/project_closure
+    title = Column(String(256), default="")
+    content = Column(Text, default="")
+    wecom_card = Column(Text, default="")
+    jdy_payload = Column(JSON, default=dict)    # 汇总 payload
+    jdy_tasks = Column(JSON, default=list)      # 解析出的逐条任务 payload
+    pushed = Column(Boolean, default=False)
+    push_mode = Column(String(16), default="")  # mock/live
+    jdy_entry_ids = Column(JSON, default=list)  # 推送回执
+    pushed_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class JdyRecord(Base):
+    """简道云表单数据本地镜像（单向：简道云 → 本项目；v-crm 镜像模式的通用表实现）。
+
+    raw 结构：{"_fields": {widget_id: 原始值}, "_labels": {widget_id: 字段中文名}}
+    —— 记录自描述标签，前端无需预知表单结构即可友好展示。
+    """
+    __tablename__ = "jdy_records"
+    __table_args__ = (UniqueConstraint("entry_id", "data_id", name="uq_jdy_record"),)
+    id = Column(Integer, primary_key=True)
+    entry_id = Column(String(64), index=True)
+    data_id = Column(String(64))
+    kind = Column(String(32), index=True)          # task / knowledge（对应已配置表单）
+    # 投影列（列表/搜索用；取不到的字段留空，raw 里仍有原文）
+    title = Column(String(256), default="", index=True)
+    status = Column(String(32), default="")
+    owner = Column(String(128), default="")
+    dept = Column(String(64), default="")
+    due_time = Column(String(32), default="")
+    submit_time = Column(String(32), default="")
+    raw = Column(JSON, default=dict)
+    synced_at = Column(DateTime, default=datetime.utcnow)
+
+
+class JdySyncLog(Base):
+    """简道云拉取同步留痕（对齐 v-crm SyncLog 语义）。"""
+    __tablename__ = "jdy_sync_logs"
+    id = Column(Integer, primary_key=True)
+    scope = Column(String(64), default="")          # task / knowledge / full
+    status = Column(String(16), default="success")  # success / failed / skipped
+    message = Column(String(512), default="")
+    items = Column(Integer, default=0)              # 本轮镜像记录数
+    created_n = Column(Integer, default=0)
+    updated_n = Column(Integer, default=0)
+    pruned_n = Column(Integer, default=0)
+    truncated = Column(Boolean, default=False)      # 拉取被 max_pages 截断（本轮跳过 prune）
+    duration_ms = Column(Integer, default=0)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
 
 class ExportCheck(Base):
@@ -199,7 +302,10 @@ class ExportCheck(Base):
     case_no = Column(String(32), unique=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), index=True)
     customer_name = Column(String(128), default="")
-    country = Column(String(64), default="")
+    middleman = Column(String(128), default="")          # 中间商（EXP-01 链条识别）
+    country = Column(String(64), default="")             # 目的地/签约国
+    arrival_country = Column(String(64), default="")     # 运抵国（EXP-03）
+    end_user_country = Column(String(64), default="")    # 最终用户所在国（EXP-03）
     end_user = Column(String(128), default="")
     end_use = Column(String(256), default="")
     product_desc = Column(String(256), default="")
@@ -209,11 +315,13 @@ class ExportCheck(Base):
     item_control = Column(String(16), default="unknown")    # EAR99/controlled/dual_use/unknown
     license_needed = Column(String(16), default="unknown")  # yes/no/unknown
     red_flags = Column(JSON, default=list)
-    decision = Column(String(16), default="pending")        # pass/reject/escalate/pending
+    decision = Column(String(16), default="pending")        # pending/manual_review/escalate/reject/pass（附件1 §2.4）
     decision_note = Column(Text, default="")
     checklist = Column(JSON, default=list)
     attachments = Column(JSON, default=list)
     reviewed_by = Column(String(64), default="")
+    review_note = Column(Text, default="")
+    reviewed_at = Column(DateTime, nullable=True)
     status = Column(String(16), default="draft")            # draft/submitted/approved/rejected
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -239,6 +347,83 @@ SessionLocal = sessionmaker(bind=_engine, autoflush=False, autocommit=False, fut
 
 def init_db() -> None:
     Base.metadata.create_all(_engine)
+
+
+def _table_columns(insp, table: str) -> set:
+    try:
+        return {c["name"] for c in insp.get_columns(table)}
+    except Exception:  # noqa: BLE001
+        return set()
+
+
+def migrate_db() -> None:
+    """轻量迁移：为已存在的表补充新增列（create_all 不会 ALTER）。
+
+    幂等 + 多 worker 并发安全：
+    - 按 inspect 检查后再 ADD COLUMN；
+    - 并发 ALTER 时另一进程可能已抢先加列（PG: DuplicateColumn / SQLite: duplicate column），
+      捕获后跳过即可（列已存在即目标状态）。
+    """
+    from sqlalchemy import inspect, text
+    from sqlalchemy.exc import OperationalError, ProgrammingError
+
+    insp = inspect(_engine)
+    bool_default = "FALSE" if _engine.dialect.name == "postgresql" else "0"
+    json_default = "'{}'" if _engine.dialect.name == "postgresql" else "'{}'"
+    # 表 -> [(列名, DDL 类型后缀)]（附件4 门禁1：结构变更必须有迁移路径）
+    plan = {
+        "task_items": [
+            ("is_meeting", f"BOOLEAN DEFAULT {bool_default}"),
+            ("is_other_request", f"BOOLEAN DEFAULT {bool_default}"),
+            ("is_today_fixed", f"BOOLEAN DEFAULT {bool_default}"),
+            ("jdy_data_id", "VARCHAR(64) DEFAULT ''"),
+        ],
+        "chat_sessions": [
+            ("privacy", "VARCHAR(16) DEFAULT 'standard'"),
+            ("review_status", "VARCHAR(16) DEFAULT ''"),
+            ("reviewed_by", "VARCHAR(64) DEFAULT ''"),
+            ("review_note", "TEXT DEFAULT ''"),
+            ("reviewed_at", "TIMESTAMP NULL"),
+            ("channel", "VARCHAR(16) DEFAULT 'workbench'"),
+        ],
+        "users": [
+            ("status", "VARCHAR(16) DEFAULT 'active'"),
+        ],
+        "export_checks": [
+            ("middleman", "VARCHAR(128) DEFAULT ''"),
+            ("arrival_country", "VARCHAR(64) DEFAULT ''"),
+            ("end_user_country", "VARCHAR(64) DEFAULT ''"),
+            ("review_note", "TEXT DEFAULT ''"),
+            ("reviewed_at", "TIMESTAMP NULL"),
+        ],
+        "assets": [
+            ("distributed_to", "JSON"),
+        ],
+        "scenarios": [
+            ("kpi_links", "JSON"),
+            ("security_level", "VARCHAR(16) DEFAULT 'normal'"),
+            ("workflow_stage", "VARCHAR(64) DEFAULT ''"),
+            ("usage_steps", "VARCHAR(256) DEFAULT ''"),
+            ("maturity", "VARCHAR(16) DEFAULT 'draft'"),
+        ],
+    }
+    for table, columns in plan.items():
+        if table not in insp.get_table_names():
+            continue
+        existing = _table_columns(insp, table)
+        for col, ddl in columns:
+            if col in existing:
+                continue
+            try:
+                with _engine.begin() as conn:
+                    conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {col} {ddl}"))
+                print(f"[migrate] {table} +{col}")
+            except (ProgrammingError, OperationalError) as e:
+                # 并发 worker 已加列（DuplicateColumn / duplicate column name）→ 视为成功
+                msg = str(e).lower()
+                if "already exists" in msg or "duplicate column" in msg or "duplicate_column" in msg:
+                    continue
+                raise
 
 
 def ping_db() -> bool:

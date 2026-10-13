@@ -6,6 +6,7 @@
 """
 from __future__ import annotations
 
+import re
 from datetime import datetime, date, timedelta
 from typing import Optional
 
@@ -55,6 +56,41 @@ AI_EXT_FIELDS = [
 ]
 
 
+def _jdy_scalar(v):
+    """简道云字段值归一：v5 返回可能是标量/{"value":...}/列表。"""
+    if isinstance(v, dict):
+        v = v.get("value", v.get("name", ""))
+    if isinstance(v, list):
+        return ",".join(str(_jdy_scalar(x)) for x in v if x is not None)
+    return "" if v is None else v
+
+
+def jdy_row_to_task(row: dict) -> dict:
+    """简道云「任务管理」行 → 任务池字典（按 JDY_FIELD_MAP，widget ID 已对照字段汇总表核对）。"""
+    def g(key: str, default=""):
+        w = JDY_FIELD_MAP.get(key)
+        if not w:
+            return default
+        v = _jdy_scalar(row.get(w))
+        return default if v == "" else v
+
+    owner = g("owner") or g("collaborators")
+    return {
+        "jdy_data_id": str(row.get("_id") or ""),
+        "external_task_no": str(g("external_task_no")),
+        "title": str(g("title"))[:250],
+        "description": str(g("description")),
+        "project_name": str(g("project_name")),
+        "status": str(g("status", "待办")),
+        "start_time": str(g("start_time"))[:32],
+        "due_time": str(g("due_time"))[:32],
+        "estimated_hours": float(g("estimated_hours", 1) or 1),
+        "priority": str(g("priority", "中")),
+        "owner": str(owner),
+        "source": "jdy",
+    }
+
+
 def classify_task(t: dict, today: Optional[date] = None) -> str:
     """三类归类（实施方案 4.2）。"""
     today = today or date.today()
@@ -70,7 +106,7 @@ def classify_task(t: dict, today: Optional[date] = None) -> str:
     elif due == today:
         assignee_today = True
 
-    if fixed or is_meeting or leader or t.get("is_other_request") or assignee_today and t.get("is_today_fixed"):
+    if fixed or is_meeting or leader or t.get("is_other_request") or (assignee_today and t.get("is_today_fixed")):
         return TYPE_FIXED
     if due and due < today and status not in ("已完成", "已验收", "done", "completed"):
         return TYPE_OVERDUE
@@ -163,8 +199,11 @@ def plan_today(
             -float(x.get("ai_priority_score") or 0),
         ))
     else:
+        # manual_order（时间轴拖拽）优先于评分：已手动排序的在前、按序值，其余按评分
         pool.sort(key=lambda x: (
             bucket_order.index(x["bucket"]),
+            0 if x.get("manual_order") is not None else 1,
+            float(x.get("manual_order") or 0),
             -float(x.get("ai_priority_score") or 0),
         ))
 
@@ -198,8 +237,22 @@ def plan_today(
         k = t["ai_source_type"]
         by_type[k] = by_type.get(k, 0) + 1
 
+    # 提醒（附件3 §五 提醒/跟踪）：逾期与今日到期的非固定任务
+    reminders = []
+    for t in enriched:
+        due = _parse_date(t.get("due_time"))
+        if not due or t.get("status") in ("已完成", "已验收"):
+            continue
+        if due < today:
+            reminders.append({"id": t.get("id"), "title": t.get("title"), "level": "overdue",
+                              "text": f"已逾期：{t.get('title')}"})
+        elif due == today:
+            reminders.append({"id": t.get("id"), "title": t.get("title"), "level": "today",
+                              "text": f"今日到期：{t.get('title')}"})
+
     return {
         "date": today.isoformat(),
+        "reminders": reminders,
         "capacity": {
             "total": total, "rest": rest_minutes, "fixed": fixed_minutes,
             "comm": comm_minutes, "buffer": buffer, "available": available,
@@ -222,6 +275,33 @@ def plan_today(
     }
 
 
+# 会议/固定事项识别（手册 1.5：B0 固定会议不可打乱）
+_MEETING_RE = re.compile(r"(会议|例会|晨会|早会|周会|月会|评审会|协调会|交班会|电话会|视频会|腾讯会议|zoom|teams)", re.I)
+_TIME_RE = re.compile(r"(上午|下午|中午|晚上|今早|明早)?\s*(\d{1,2})\s*[:：点]\s*(\d{1,2})?")
+
+
+def _guess_fixed_time(text: str) -> str:
+    """从口语中抽取固定时间点，返回 HH:MM；无则空串。"""
+    m = _TIME_RE.search(text)
+    if not m:
+        return ""
+    period, hh, mm = m.group(1) or "", int(m.group(2)), m.group(3)
+    minute = int(mm) if mm else 0
+    if period in ("下午", "晚上") and hh < 12:
+        hh += 12
+    if period == "中午" and hh < 12:
+        hh = 12 if hh == 12 else hh
+    if not (0 <= hh <= 23 and 0 <= minute <= 59):
+        return ""
+    return f"{hh:02d}:{minute:02d}"
+
+
+def _as_bool(v) -> bool:
+    if isinstance(v, bool):
+        return v
+    return str(v).strip().lower() in ("1", "true", "yes", "是")
+
+
 def capture_natural(text: str, source: str = "manual", owner: str = "") -> dict:
     """自然语言 → 候选任务（AI 抽取，简版 + 模型增强）。"""
     # 启发式切分：分号/换行/顿号
@@ -230,17 +310,21 @@ def capture_natural(text: str, source: str = "manual", owner: str = "") -> dict:
     candidates = []
     for i, p in enumerate(parts[:20]):
         due = _guess_due(p)
+        is_meeting = bool(_MEETING_RE.search(p))
+        fixed_time = _guess_fixed_time(p)
         candidates.append({
             "title": p[:80],
             "description": p,
             "source": source,
             "owner": owner,
             "due_time": due,
-            "estimated_hours": 2.0,
-            "ai_urgency": 4 if due else 3,
+            "estimated_hours": 1.0 if is_meeting else 2.0,
+            "ai_urgency": 4 if (due or fixed_time) else 3,
             "ai_importance": 3,
             "ai_complexity": 3,
             "ai_impact_scope": "个人",
+            "is_meeting": is_meeting,
+            "ai_fixed_start": fixed_time,
             "ai_dedup_key": _dedup_key(p),
             "created_today": True,
             "confidence": 0.6,
@@ -258,7 +342,9 @@ def capture_with_llm(text: str, source: str = "manual", owner: str = "") -> dict
         "你是任务采集助理。从下列口语/消息/邮件片段中抽取任务列表。\n"
         "输出 JSON 数组，每项：title, description, due_time(YYYY-MM-DD可空), "
         "estimated_hours(数字), ai_urgency(1-5), ai_importance(1-5), ai_complexity(1-5), "
-        "ai_impact_scope(个人/他人/部门/公司/生产采购), ai_leader_assigned(bool)。\n"
+        "ai_impact_scope(个人/他人/部门/公司/生产采购), ai_leader_assigned(bool), "
+        "is_meeting(bool，是否为会议), ai_fixed_start(HH:MM可空，仅当有明确时间点), "
+        "is_other_request(bool，是否他人临时要求)。\n"
         "禁止编造不存在的任务。\n\n输入：\n" + text[:3000]
     )
     result = gateway.chat(
@@ -281,6 +367,9 @@ def capture_with_llm(text: str, source: str = "manual", owner: str = "") -> dict
                 it["source"] = source
                 it["owner"] = owner
                 it["created_today"] = True
+                it["is_meeting"] = _as_bool(it.get("is_meeting"))
+                it["is_other_request"] = _as_bool(it.get("is_other_request"))
+                it["ai_leader_assigned"] = _as_bool(it.get("ai_leader_assigned"))
                 it["ai_dedup_key"] = _dedup_key(it.get("title", ""))
                 candidates.append(it)
         except Exception:  # noqa: BLE001

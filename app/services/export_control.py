@@ -92,6 +92,56 @@ RED_FLAG_RULES = [
 ]
 
 
+# ---------------------------------------------------------------------------
+# 制裁名单筛查源（附件1 WBS T19：屏蔽源可插拔）
+# 默认 LocalSanctionsProvider（本地参考名单+关键词）；配置 SANCTIONS_API_URL/KEY 后
+# 切换为 HttpSanctionsProvider，调用正式名单服务，失败自动降级本地，不影响初筛主流程。
+# ---------------------------------------------------------------------------
+class SanctionsProvider:
+    name = "base"
+
+    def screen(self, customer_name: str, end_user: str, country_code: str) -> dict:
+        """返回 {"hits": [str], "source": str}。"""
+        raise NotImplementedError
+
+
+class LocalSanctionsProvider(SanctionsProvider):
+    name = "local-reference"
+
+    def screen(self, customer_name: str, end_user: str, country_code: str) -> dict:
+        hits = []
+        if country_code in WESTERN_SANCTIONS_REFERENCE:
+            hits.append(f"目的地代码 {country_code} 出现在西方制裁参考名单（仅风险提示，不自动否决）")
+        return {"hits": hits, "source": self.name}
+
+
+class HttpSanctionsProvider(SanctionsProvider):
+    name = "external-api"
+
+    def __init__(self, url: str, api_key: str) -> None:
+        self.url = url
+        self.api_key = api_key
+
+    def screen(self, customer_name: str, end_user: str, country_code: str) -> dict:
+        import httpx
+        payload = {"customer": customer_name, "end_user": end_user, "country": country_code}
+        with httpx.Client(timeout=15) as client:
+            resp = client.post(self.url, json=payload,
+                               headers={"Authorization": f"Bearer {self.api_key}"})
+            resp.raise_for_status()
+            obj = resp.json() or {}
+        hits = [str(h) for h in (obj.get("hits") or obj.get("matches") or [])]
+        return {"hits": hits, "source": self.name}
+
+
+def get_sanctions_provider() -> SanctionsProvider:
+    from ..config import get_settings
+    s = get_settings()
+    if s.sanctions_api_url:
+        return HttpSanctionsProvider(s.sanctions_api_url, s.sanctions_api_key)
+    return LocalSanctionsProvider()
+
+
 @dataclass
 class CheckItem:
     code: str
@@ -115,22 +165,20 @@ class ScreeningResult:
     warnings: list = field(default_factory=list)
 
 
-# 检查清单：两用物项分类与许可前置为最高优先级
+# 检查清单：与《开发方案_岗位KPI与出口管制升级版》§2.2「十二项检查清单」逐项对齐
 BASE_CHECKLIST = [
     ("EXP-01", "客户/中间商/最终用户主体识别完整", True),
-    ("EXP-02", "最终用途书面说明已获取（民用/工业/其他）", True),
+    ("EXP-02", "最终用途书面说明已获取", True),
     ("EXP-03", "目的地/运抵国/最终用户所在国一致或已解释", True),
-    ("EXP-04", "两用物项/敏感物项分类（对照《两用物项出口管制清单》）", True),
-    ("EXP-05", "是否列入中国出口管制清单/是否需要出口许可证", True),
-    ("EXP-06", "技术资料外发边界确认（图纸/源码/工艺/计算书）", True),
-    ("EXP-07", "最终用户与最终用途真实性核验（EUC/现场/公开信息）", True),
-    ("EXP-08", "红旗清单逐条核对", True),
-    ("EXP-09", "西方制裁名单提示筛查（OFAC/BIS/UN/EU — 仅风险提示）", True),
-    ("EXP-10", "中国不可靠实体清单/管控名单筛查", True),
-    ("EXP-11", "合同含出口管制、再出口、最终用途条款", True),
-    ("EXP-12", "合规官人工审核记录与放行/否决签字", True),
-    ("EXP-13", "档案留存（≥5 年或按公司/法规定）", False),
-    ("EXP-14", "最终用户/最终用途承诺书（EUC）", False),
+    ("EXP-04", "制裁名单筛查（OFAC/BIS/UN/EU/中国不可靠实体）", True),
+    ("EXP-05", "物项出口管制分类（EAR99 / 管控 / 两用）", True),
+    ("EXP-06", "是否需要出口许可证", True),
+    ("EXP-07", "技术资料外发边界确认（图纸/源码/工艺）", True),
+    ("EXP-08", "合同出口管制与制裁条款已纳入", True),
+    ("EXP-09", "红旗清单逐条核对", True),
+    ("EXP-10", "合规官/授权人审批记录", True),
+    ("EXP-11", "档案留存（≥5 年或按公司制度）", False),
+    ("EXP-12", "最终用户/最终用途承诺书（EUC）", False),
 ]
 
 
@@ -200,6 +248,10 @@ def screen(
     product_desc: str,
     hs_code: str = "",
     extra_red_flags: list[str] | None = None,
+    middleman: str = "",
+    arrival_country: str = "",
+    end_user_country: str = "",
+    sanctions_provider: SanctionsProvider | None = None,
 ) -> ScreeningResult:
     """出口管制初筛。结论仅供合规官人工审核，系统不替代放行权。"""
     r = ScreeningResult()
@@ -213,11 +265,18 @@ def screen(
     else:
         r.country_risk = "low"
 
-    # 2) 西方制裁提示
-    hits = []
-    if code in WESTERN_SANCTIONS_REFERENCE:
-        hits.append(f"目的地 {country or code} 出现在西方制裁参考名单（仅风险提示，不自动否决）")
-    use_text = f"{customer_name} {end_user} {end_use}".lower()
+    # 2) 制裁名单筛查（EXP-04）：屏蔽源可插拔（T19），外部源失败降级本地
+    provider = sanctions_provider or get_sanctions_provider()
+    try:
+        sres = provider.screen(customer_name, end_user, code)
+        hits = list(sres.get("hits") or [])
+        r.warnings.append(f"制裁名单筛查源：{sres.get('source')}")
+    except Exception as e:  # noqa: BLE001 — 外部名单服务不可用不得阻断初筛
+        hits = []
+        if code in WESTERN_SANCTIONS_REFERENCE:
+            hits.append(f"目的地 {country or code} 出现在西方制裁参考名单（仅风险提示，不自动否决）")
+        r.warnings.append(f"外部制裁名单服务不可用，已降级本地参考名单：{e}")
+    use_text = f"{customer_name} {middleman} {end_user} {end_use}".lower()
     for kw in MILITARY_END_USE_KEYWORDS + WMD_END_USE_KEYWORDS:
         if kw.lower() in use_text:
             hits.append(f"最终用途/主体描述出现敏感关键词：{kw}")
@@ -280,25 +339,34 @@ def screen(
         r.license_needed = "no?"
         r.decision_note = "初筛未见阻断项；仍须完成检查清单、红旗核对与合规官审核后放行。"
 
-    # 6) 红旗
+    # 6) 红旗（附件1 §2.3：命中即升级，不得继续报价/签约）
     flags = []
     if not (end_user or "").strip():
         flags.append("未提供最终用户")
     if not (end_use or "").strip():
         flags.append("未提供最终用途")
-    if (end_user or "").strip() and (customer_name or "").strip() and end_user.strip() != customer_name.strip():
-        flags.append("收货客户与最终用户不一致，请说明中间商角色")
+    if (end_user or "").strip() and (customer_name or "").strip() \
+            and end_user.strip() != customer_name.strip() and not (middleman or "").strip():
+        flags.append("收货客户与最终用户不一致且未说明中间商角色")
+    # EXP-03：目的地/运抵国/最终用户所在国一致性
+    arr = _norm_country(arrival_country) if (arrival_country or "").strip() else ""
+    euc = _norm_country(end_user_country) if (end_user_country or "").strip() else ""
+    if arr and euc and arr != euc:
+        flags.append("运抵国与最终用户所在国不一致且无合理解释")
+    elif (arr and arr != code) or (euc and euc != code):
+        r.warnings.append("目的地/运抵国/最终用户所在国不完全一致，请在审查单中作出解释（EXP-03）")
     for text_rule, desc in RED_FLAG_RULES:
         key = text_rule[:2]
-        if key and key in f"{end_use}{customer_name}{product_desc}":
+        if key and key in f"{end_use}{customer_name}{middleman}{product_desc}":
             flags.append(desc)
     if extra_red_flags:
         flags.extend([x for x in extra_red_flags if x])
     r.red_flags = flags
 
-    if flags and r.decision == "pending":
+    # 红旗命中即升级复核（pending 与 manual_review 均升级；reject 硬闸不受影响）
+    if flags and r.decision in ("pending", "manual_review"):
         r.decision = "escalate"
-        r.decision_note = (r.decision_note or "") + " 存在红旗项，必须升级人工复核。"
+        r.decision_note = (r.decision_note or "") + " 存在红旗项，必须升级人工复核，红旗未关闭不得推进。"
 
     # 硬闸保护：WMD/军用+受控绝不可被降级
     if (wmd or military) and item_control in ("dual_use", "controlled"):
@@ -306,15 +374,22 @@ def screen(
         r.license_needed = "yes"
 
     r.checklist = build_checklist()
-    if (customer_name or "").strip():
+    # EXP-01 主体识别：客户 + 最终用户（有中间商时需已填写）
+    if (customer_name or "").strip() and (end_user or "").strip():
         r.checklist[0]["status"] = "pass"
+    # EXP-02 最终用途书面说明
     if (end_use or "").strip():
         r.checklist[1]["status"] = "pass"
-    if code not in {"XX", ""}:
+    # EXP-03 国别一致性（一致或已解释）
+    if code not in {"XX", ""} and not (arr and euc and arr != euc):
         r.checklist[2]["status"] = "pass"
+    # EXP-04 制裁名单筛查（本次已执行）
+    r.checklist[3]["status"] = "pass" if not hits else "fail"
+    # EXP-05 物项分类
     if r.item_control != "unknown":
-        r.checklist[3]["status"] = "pass"
-    r.checklist[8]["status"] = "pass" if not hits else "fail"
+        r.checklist[4]["status"] = "pass"
+    # EXP-09 红旗逐条核对（本次已执行）
+    r.checklist[8]["status"] = "pass" if not flags else "fail"
     return r
 
 

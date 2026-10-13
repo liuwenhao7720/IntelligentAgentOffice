@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""T04 模型网关：Mimo / DeepSeek / Kimi 统一适配 + 推荐切换 + 降级 + 计量。
+"""T04 模型网关：Mimo / DeepSeek / Kimi / MiniMax 统一适配 + 推荐切换 + 降级 + 计量。
 OpenAI 兼容接口；无密钥时 mock，便于本地验收。
 """
 from __future__ import annotations
@@ -13,6 +13,8 @@ import httpx
 
 from ..config import get_settings
 
+# 对外仅暴露三模型（附件3 §二「三款模型、三条定位」、附件4 技术基线「一主一备」）。
+# MiniMax 适配代码保留在 _provider_config 中备用，但不注册别名、不在 /models 暴露。
 MODEL_ALIASES = {
     "mimo": "mimo",
     "deepseek": "deepseek",
@@ -60,7 +62,19 @@ class ModelGateway:
             return "deepseek", self.s.deepseek_api_key, self.s.deepseek_base_url, self.s.deepseek_model
         if name == "kimi":
             return "kimi", self.s.kimi_api_key, self.s.kimi_base_url, self.s.kimi_model
+        if name == "minimax":
+            return "minimax", self.s.minimax_api_key, self.s.minimax_base_url, self.s.minimax_model
         raise ValueError(f"unknown model: {name}")
+
+    def _temperature(self, provider: str, temperature: float) -> float:
+        """按供应商强制覆盖 temperature（如 kimi k3 仅允许 1，由 KIMI_TEMPERATURE 配置）。"""
+        raw = {"kimi": self.s.kimi_temperature}.get(provider, "")
+        if raw:
+            try:
+                return float(raw)
+            except ValueError:
+                pass
+        return temperature
 
     def available_models(self) -> list[dict]:
         out = []
@@ -117,7 +131,7 @@ class ModelGateway:
         payload = {
             "model": model_id,
             "messages": messages,
-            "temperature": temperature,
+            "temperature": self._temperature(provider, temperature),
             "max_tokens": max_tokens,
             "stream": True,
         }
@@ -157,7 +171,7 @@ class ModelGateway:
         payload = {
             "model": model_id,
             "messages": messages,
-            "temperature": temperature,
+            "temperature": self._temperature(provider, temperature),
             "max_tokens": max_tokens,
         }
         with httpx.Client(timeout=self.s.request_timeout) as client:
