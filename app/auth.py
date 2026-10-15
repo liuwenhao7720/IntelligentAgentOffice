@@ -109,8 +109,8 @@ ROLE_PERMS: dict[str, set[str]] = {
     "staff": set(),
     # 部门经理：查看本部门早宣/晚总推送统计与未推送名单（附件5 §8.5）+ 手动触发简道云同步
     "manager": {"briefing.stats.dept", "jdy.sync"},
-    # 合规官：出口管制审查单终审（附件1 §2.4/G5、WBS T20）
-    "compliance": {"export.review"},
+    # 合规官：出口管制审查单终审（附件1 §2.4/G5、WBS T20）+ 合规规则/资料资产维护
+    "compliance": {"export.review", "compliance.rules"},
     # 管理员：全部权限（* 通配）
     "admin": {"*"},
 }

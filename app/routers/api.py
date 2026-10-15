@@ -220,6 +220,12 @@ def create_session(body: SessionCreate, db: Session = Depends(get_db), user: Use
         scenario = db.get(Scenario, body.scenario_id)
         if not scenario:
             raise HTTPException(404, "场景不存在")
+    # 关联任务项目（合规审查前移：工作台凭项目读取审查结果）
+    tp_code = body.task_project_code.strip()
+    if tp_code:
+        proj = db.execute(select(TaskProject).where(TaskProject.code == tp_code)).scalar_one_or_none()
+        if not proj or (proj.user_id != user.id and user.role != "admin"):
+            raise HTTPException(404, "任务项目不存在")
     title = body.title or (scenario.title if scenario else "自由对话")
     session = ChatSession(
         user_id=user.id,
@@ -228,6 +234,7 @@ def create_session(body: SessionCreate, db: Session = Depends(get_db), user: Use
         model=body.model or (scenario.default_model if scenario else "mimo"),
         variables=body.variables or {},
         privacy=body.privacy or "standard",
+        task_project_code=tp_code,
     )
     db.add(session)
     db.commit()
@@ -310,6 +317,35 @@ def generate(
         ).scalar() or 0
         quota_exceeded = used >= quota
 
+    # ------------------------------------------------------------------
+    # 合规审查前移闸口（附件：审查在项目初步分析阶段完成，工作台只调用审查结果）
+    # - 会话属于任务项目时，读取项目绑定的审查单结论（绝不重复调用 screen()）；
+    # - 出口管制/敏感场景 + 项目会话：审查未放行（未审查/在途/升级/否决）→ 409 阻断并引导；
+    # - 其余情况仅把审查结论随响应带回（前端展示徽标、留痕可查）。
+    # ------------------------------------------------------------------
+    compliance_info = None
+    tp_code = (getattr(s, "task_project_code", "") or "").strip()
+    if tp_code:
+        from ..services.compliance_rules import project_compliance_state
+        proj = db.execute(select(TaskProject).where(TaskProject.code == tp_code)).scalar_one_or_none()
+        check = None
+        if proj and getattr(proj, "export_check_case_no", ""):
+            check = db.execute(
+                select(ExportCheck).where(ExportCheck.case_no == proj.export_check_case_no)
+            ).scalar_one_or_none()
+        compliance_info = {**project_compliance_state(check), "project_code": tp_code}
+        if scenario and getattr(scenario, "security_level", "normal") in ("export_control", "sensitive") \
+                and compliance_info["state"] != "approved":
+            _audit(db, user, "session.generate.blocked", f"session:{s.id}",
+                   project=tp_code, compliance_state=compliance_info["state"])
+            raise HTTPException(409, {
+                "message": f"合规审查前移：该出口管制场景属于项目 {tp_code}，"
+                           f"须先在项目初步分析阶段完成合规审查并放行。{compliance_info['message']}",
+                "error_code": "compliance_required",
+                "project_code": tp_code,
+                "compliance": compliance_info,
+            })
+
     history = [{"role": m.role, "content": m.content} for m in s.messages if m.role in ("user", "assistant")]
     messages = build_messages(template, s.variables or {}, body.extra_instructions, history)
 
@@ -357,6 +393,8 @@ def generate(
         "tokens_in": result.tokens_in,
         "tokens_out": result.tokens_out,
         "sensitive_hits": sensitive_hits,
+        # 审查前移：项目合规结论随响应带回（工作台只展示/留痕，不重复审查）
+        "compliance": compliance_info,
     }
 
 
@@ -585,6 +623,8 @@ def stats(db: Session = Depends(get_db), user: User = Depends(require_admin)):
 # ---------- 出口管制合规 ----------
 @router.post("/export-checks", response_model=ExportCheckOut)
 def create_export_check(body: ExportCheckIn, db: Session = Depends(get_db), user: User = Depends(current_user)):
+    # 审查规则取自合规规则资产库（compliance_rules 表，合规官可在线维护）
+    from ..services.compliance_rules import load_rules
     result = screen(
         customer_name=body.customer_name,
         country=body.country,
@@ -596,10 +636,18 @@ def create_export_check(body: ExportCheckIn, db: Session = Depends(get_db), user
         middleman=body.middleman,
         arrival_country=body.arrival_country,
         end_user_country=body.end_user_country,
+        rules=load_rules(db),
     )
     from datetime import datetime as _dt
     import uuid as _uuid
     case_no = "EXP" + _dt.utcnow().strftime("%Y%m%d%H%M%S") + _uuid.uuid4().hex[:4].upper()
+    # 审查前移：关联任务项目时回填绑定（项目初步分析阶段完成审查的凭据）
+    tp_code = body.task_project_code.strip()
+    project = None
+    if tp_code:
+        project = db.execute(select(TaskProject).where(TaskProject.code == tp_code)).scalar_one_or_none()
+        if not project or (project.user_id != user.id and user.role not in ("admin", "compliance")):
+            raise HTTPException(404, "关联的任务项目不存在")
     row = ExportCheck(
         case_no=case_no,
         user_id=user.id,
@@ -621,19 +669,29 @@ def create_export_check(body: ExportCheckIn, db: Session = Depends(get_db), user
         decision_note=result.decision_note,
         checklist=result.checklist,
         status="submitted",
+        task_project_code=tp_code,
     )
+    if project is not None:
+        project.export_check_case_no = case_no
+        project.customer_name = project.customer_name or body.customer_name.strip()
+        project.country = project.country or body.country.strip()
     db.add(row)
     db.commit()
     db.refresh(row)
-    _audit(db, user, "export_check.create", f"export:{row.case_no}", decision=result.decision)
+    _audit(db, user, "export_check.create", f"export:{row.case_no}", decision=result.decision,
+           project=tp_code or None)
     return row
 
 
 @router.get("/export-checks", response_model=list[ExportCheckOut])
-def list_export_checks(db: Session = Depends(get_db), user: User = Depends(current_user)):
+def list_export_checks(project: str = "",
+                       db: Session = Depends(get_db), user: User = Depends(current_user)):
     stmt = select(ExportCheck)
-    if user.role != "admin":
+    # 合规官是终审人，须能看到全部待审单（含项目初步分析阶段前移产生的单子）
+    if user.role not in ("admin", "compliance"):
         stmt = stmt.where(ExportCheck.user_id == user.id)
+    if project.strip():
+        stmt = stmt.where(ExportCheck.task_project_code == project.strip())
     return db.execute(stmt.order_by(ExportCheck.created_at.desc()).limit(100)).scalars().all()
 
 
@@ -642,7 +700,7 @@ def get_export_check(case_no: str, db: Session = Depends(get_db), user: User = D
     row = db.execute(select(ExportCheck).where(ExportCheck.case_no == case_no)).scalar_one_or_none()
     if not row:
         raise HTTPException(404, "审查单不存在")
-    if row.user_id != user.id and user.role != "admin":
+    if row.user_id != user.id and user.role not in ("admin", "compliance"):
         raise HTTPException(403, "无权查看")
     return row
 
@@ -773,6 +831,22 @@ def kpi_scenario_map(db: Session = Depends(get_db), user: User = Depends(require
     return out
 
 # ---------- 任务项目（资料文件夹 → Mimo项目 → 工作流） ----------
+def _attach_compliance(db: Session, rows: list[TaskProject]) -> list[TaskProject]:
+    """批量装配项目合规审查结果摘要（审查前移后，列表/工作台只读取结果）。
+
+    按项目绑定的审查单号一次 IN 查询，避免 N+1；结果挂到 row.compliance（schema 可选字段）。
+    """
+    case_nos = [r.export_check_case_no for r in rows if getattr(r, "export_check_case_no", "")]
+    checks = {}
+    if case_nos:
+        from ..services.compliance_rules import project_compliance_state
+        for c in db.execute(select(ExportCheck).where(ExportCheck.case_no.in_(case_nos))).scalars().all():
+            checks[c.case_no] = project_compliance_state(c)
+    for r in rows:
+        r.compliance = checks.get(getattr(r, "export_check_case_no", "") or "", None)
+    return rows
+
+
 @router.post("/task-projects", response_model=TaskProjectOut)
 def create_task_project(body: TaskProjectIn, db: Session = Depends(get_db), user: User = Depends(current_user)):
     from datetime import datetime as _dt
@@ -791,20 +865,24 @@ def create_task_project(body: TaskProjectIn, db: Session = Depends(get_db), user
         folder_name=folder_name or "",
         materials=body.materials or [],
         scenario_id=body.scenario_id,
+        customer_name=body.customer_name.strip(),
+        country=body.country.strip(),
         status="materials_ready" if (body.folder_path or body.materials) else "created",
         progress=[{"step": "1-创建任务项目", "status": "done", "note": "登记资料文件夹"}],
     )
     db.add(row)
     db.commit()
     db.refresh(row)
-    _audit(db, user, "task_project.create", f"tp:{row.code}")
+    _audit(db, user, "task_project.create", f"tp:{row.code}",
+           customer=row.customer_name, country=row.country)
     return row
 
 
 @router.get("/task-projects", response_model=list[TaskProjectOut])
 def list_task_projects(db: Session = Depends(get_db), user: User = Depends(current_user)):
     stmt = select(TaskProject).where(TaskProject.user_id == user.id).order_by(TaskProject.updated_at.desc())
-    return db.execute(stmt.limit(100)).scalars().all()
+    rows = db.execute(stmt.limit(100)).scalars().all()
+    return _attach_compliance(db, list(rows))
 
 
 @router.get("/task-projects/{code}", response_model=TaskProjectOut)
@@ -812,7 +890,7 @@ def get_task_project(code: str, db: Session = Depends(get_db), user: User = Depe
     row = db.execute(select(TaskProject).where(TaskProject.code == code)).scalar_one_or_none()
     if not row or (row.user_id != user.id and user.role != "admin"):
         raise HTTPException(404, "任务项目不存在")
-    return row
+    return _attach_compliance(db, [row])[0]
 
 
 @router.patch("/task-projects/{code}", response_model=TaskProjectOut)
@@ -845,6 +923,11 @@ def update_task_project(code: str, body: TaskProjectUpdate, db: Session = Depend
         row.outputs = list(row.outputs or []) + [body.output]
     if body.status is not None:
         row.status = body.status
+    # 初步分析要素更新（客户/国别变化属重大合规变化：提示重新审查由前端引导）
+    if body.customer_name is not None:
+        row.customer_name = body.customer_name.strip()
+    if body.country is not None:
+        row.country = body.country.strip()
     db.commit()
     db.refresh(row)
     _audit(db, user, "task_project.update", f"tp:{row.code}", status=row.status)
@@ -866,6 +949,7 @@ def session_for_project(code: str, body: SessionCreate, db: Session = Depends(ge
         title="[%s] %s" % (row.code, body.title or (scenario.title if scenario else "任务会话")),
         model=body.model or (scenario.default_model if scenario else "mimo"),
         variables=body.variables or {},
+        task_project_code=row.code,  # 工作台合规闸口：生成时读取该项目审查结果
     )
     db.add(session)
     row.status = "running"

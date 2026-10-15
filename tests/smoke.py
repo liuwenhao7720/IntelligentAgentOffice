@@ -21,6 +21,11 @@ sys.path.insert(0, str(ROOT))
 # 冒烟需要管理员接口：将测试员加入开发登录管理员白名单（须在导入 app 前强制设置，
 # 避免继承外部环境变量导致结果不确定）
 os.environ["DEV_ADMIN_USERS"] = "测试员"
+# 进程隔离：未显式指定 DATABASE_URL 时使用独立临时库，避免工作区默认 ./vflo_office.db
+# 中的存量用户/数据影响断言（如"越权尝试者"钳制验证要求该用户此前不存在）
+import tempfile  # noqa: E402
+os.environ.setdefault("DATABASE_URL",
+                      f"sqlite:///{tempfile.mkdtemp(prefix='vflo_smoke_')}/smoke.db")
 
 from fastapi.testclient import TestClient  # noqa: E402
 

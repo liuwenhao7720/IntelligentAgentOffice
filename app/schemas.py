@@ -101,6 +101,8 @@ class SessionCreate(BaseModel):
     variables: dict = Field(default_factory=dict)
     # 附件3 §3.4：个人隐私场景可申请「仅元数据留痕」（审计轨迹仍保留，内容不落库）
     privacy: str = Field(default="standard", pattern="^(standard|metadata_only)$")
+    # 所属任务项目（工作台合规闸口凭它读取项目审查结果）
+    task_project_code: str = Field(default="", max_length=32)
 
 
 class GenerateIn(BaseModel):
@@ -133,6 +135,7 @@ class SessionOut(BaseModel):
     tokens_in: int
     tokens_out: int
     channel: str = "workbench"
+    task_project_code: str = ""
     created_at: datetime
     updated_at: datetime
     messages: list[MessageOut] = Field(default_factory=list)
@@ -185,6 +188,8 @@ class ExportCheckIn(BaseModel):
     product_desc: str = Field(default="", max_length=256)
     hs_code: str = Field(default="", max_length=32)
     extra_red_flags: list[str] = Field(default_factory=list, max_length=20)
+    # 审查前移：关联任务项目（项目初步分析阶段审查的凭据；绑定后工作台只读结果）
+    task_project_code: str = Field(default="", max_length=32)
 
 
 class ExportCheckOut(BaseModel):
@@ -210,6 +215,7 @@ class ExportCheckOut(BaseModel):
     reviewed_by: str = ""
     review_note: str = ""
     reviewed_at: Optional[datetime] = None
+    task_project_code: str = ""
     created_at: datetime
     model_config = {"from_attributes": True}
 
@@ -231,6 +237,9 @@ class TaskProjectIn(BaseModel):
     department: str = ""
     position: str = ""
     scenario_id: Optional[int] = None
+    # 项目初步分析要素（涉外项目建议填写，供合规审查前移调用）
+    customer_name: str = Field(default="", max_length=128)
+    country: str = Field(default="", max_length=64)
 
 
 class TaskProjectUpdate(BaseModel):
@@ -241,6 +250,8 @@ class TaskProjectUpdate(BaseModel):
     status: Optional[str] = None
     progress_note: Optional[str] = None
     output: Optional[dict] = None
+    customer_name: Optional[str] = Field(default=None, max_length=128)
+    country: Optional[str] = Field(default=None, max_length=64)
 
 
 class TaskProjectOut(BaseModel):
@@ -259,6 +270,11 @@ class TaskProjectOut(BaseModel):
     status: str
     progress: list
     outputs: list
+    customer_name: str = ""
+    country: str = ""
+    export_check_case_no: str = ""
+    # 合规审查结果摘要（列表接口批量装配；工作台只读取该结果，不重复审查）
+    compliance: Optional[dict] = None
     created_at: datetime
     updated_at: datetime
     model_config = {"from_attributes": True}

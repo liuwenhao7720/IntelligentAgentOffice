@@ -86,6 +86,8 @@ class ChatSession(Base):
     tokens_out = Column(Integer, default=0)
     # 来源频道：workbench（工作台，存量默认）/ chat（智能对话模块）
     channel = Column(String(16), default="workbench")
+    # 所属任务项目（工作台合规闸口：生成时读取该项目的合规审查结果，不重复审查）
+    task_project_code = Column(String(32), default="", index=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     messages = relationship("SessionMessage", back_populates="session", cascade="all, delete-orphan")
@@ -181,6 +183,10 @@ class TaskProject(Base):
     # Mimo V2.6 项目绑定
     mimo_project = Column(String(128), default="")  # Mimo 中的项目名/ID
     mimo_ready = Column(Integer, default=0)  # 0未建 1已建
+    # 项目初步分析要素（合规审查前移：立项/初步分析阶段完成审查，工作台只调用结果）
+    customer_name = Column(String(128), default="")   # 客户名称（涉外项目必填）
+    country = Column(String(64), default="")          # 目的地/签约国
+    export_check_case_no = Column(String(32), default="")  # 绑定的合规审查单号（初步分析阶段产出）
     # 工作流
     scenario_id = Column(Integer, ForeignKey("scenarios.id"), nullable=True)
     workflow_stage = Column(String(64), default="")
@@ -295,6 +301,34 @@ class JdySyncLog(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
+class ComplianceRule(Base):
+    """合规审查规则与资料资产（可调用配置，附件：合规审查规则与资料配置）。
+
+    category：
+    - country_list   国家名单（value.codes=[]；code=western/watch/normal_coop）
+    - item_hints     物项提示词表（value.words=[]；code=nuclear/chembio/missile/military/industrial/process）
+    - end_use_redline 最终用途红线关键词（value.words=[]；code=wmd/military）
+    - red_flag       红旗规则（value.trigger/desc）
+    - checklist      检查清单项（value.required=bool）
+    - decision_note  决策规则文案（value.text；code=reject_wmd/escalate_dual_use/...）
+    - resource       资料资产：审查规则文件/选型软件/模板等
+                     （value={type: 软件|文档|网址|模板, link, applicable, version}）
+    """
+    __tablename__ = "compliance_rules"
+    __table_args__ = (UniqueConstraint("category", "code", name="uq_compliance_rule"),)
+    id = Column(Integer, primary_key=True)
+    category = Column(String(32), index=True)
+    code = Column(String(64))
+    name = Column(String(256), default="")
+    value = Column(JSON, default=dict)
+    description = Column(String(512), default="")
+    enabled = Column(Boolean, default=True)
+    sort = Column(Integer, default=0)
+    updated_by = Column(String(64), default="")
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
 class ExportCheck(Base):
     """V-FLO 出口管制合规审查单（执行留痕，不可删改历史）。"""
     __tablename__ = "export_checks"
@@ -322,6 +356,8 @@ class ExportCheck(Base):
     reviewed_by = Column(String(64), default="")
     review_note = Column(Text, default="")
     reviewed_at = Column(DateTime, nullable=True)
+    # 审查前移：审查单所属任务项目（项目初步分析阶段完成审查的凭据）
+    task_project_code = Column(String(32), default="", index=True)
     status = Column(String(16), default="draft")            # draft/submitted/approved/rejected
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -378,6 +414,11 @@ def migrate_db() -> None:
             ("is_today_fixed", f"BOOLEAN DEFAULT {bool_default}"),
             ("jdy_data_id", "VARCHAR(64) DEFAULT ''"),
         ],
+        "task_projects": [
+            ("customer_name", "VARCHAR(128) DEFAULT ''"),
+            ("country", "VARCHAR(64) DEFAULT ''"),
+            ("export_check_case_no", "VARCHAR(32) DEFAULT ''"),
+        ],
         "chat_sessions": [
             ("privacy", "VARCHAR(16) DEFAULT 'standard'"),
             ("review_status", "VARCHAR(16) DEFAULT ''"),
@@ -385,9 +426,7 @@ def migrate_db() -> None:
             ("review_note", "TEXT DEFAULT ''"),
             ("reviewed_at", "TIMESTAMP NULL"),
             ("channel", "VARCHAR(16) DEFAULT 'workbench'"),
-        ],
-        "users": [
-            ("status", "VARCHAR(16) DEFAULT 'active'"),
+            ("task_project_code", "VARCHAR(32) DEFAULT ''"),
         ],
         "export_checks": [
             ("middleman", "VARCHAR(128) DEFAULT ''"),
@@ -395,6 +434,10 @@ def migrate_db() -> None:
             ("end_user_country", "VARCHAR(64) DEFAULT ''"),
             ("review_note", "TEXT DEFAULT ''"),
             ("reviewed_at", "TIMESTAMP NULL"),
+            ("task_project_code", "VARCHAR(32) DEFAULT ''"),
+        ],
+        "users": [
+            ("status", "VARCHAR(16) DEFAULT 'active'"),
         ],
         "assets": [
             ("distributed_to", "JSON"),

@@ -520,3 +520,23 @@ select:disabled { opacity: 0.55; cursor: not-allowed; }
   .tab-panel { padding: 16px 14px 40px; }
   .tabs { overflow-x: auto; flex-wrap: nowrap; }
 }
+
+/* ---------- 主动贡献知识库弹层 ---------- */
+.kb-tabs { display: flex; gap: 8px; margin: 8px 0 10px; flex-wrap: wrap; }
+.kb-tab {
+  width: auto; padding: 7px 14px; border: 1px solid var(--line); border-radius: 999px;
+  background: #fff; color: var(--ink); font-size: 13px; cursor: pointer;
+}
+.kb-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.kb-method { padding: 10px 12px; background: var(--accent-soft); border-radius: 10px; margin-bottom: 6px; }
+.kb-method textarea {
+  width: 100%; margin-top: 0; border: 1px solid var(--line); border-radius: 8px;
+  padding: 8px 10px; font-size: 13px; font-family: inherit; resize: vertical;
+}
+.modal-card textarea { font-family: inherit; }
+
+/* ---------- 合规审查前移：状态徽标 ---------- */
+.badge.comp-ok { background: var(--ok-soft); color: var(--ok); }
+.badge.comp-warn { background: #fef3e6; color: var(--warn); }
+.badge.comp-bad { background: #fde8e8; color: var(--danger); }
+.badge.comp-none { background: var(--accent-soft); color: var(--accent); }

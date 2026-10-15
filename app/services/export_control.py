@@ -108,9 +108,13 @@ class SanctionsProvider:
 class LocalSanctionsProvider(SanctionsProvider):
     name = "local-reference"
 
+    def __init__(self, codes: set | None = None) -> None:
+        # 西方制裁参考名单可配置（compliance_rules 表 country_list/western）
+        self.codes = {c.upper() for c in codes} if codes else WESTERN_SANCTIONS_REFERENCE
+
     def screen(self, customer_name: str, end_user: str, country_code: str) -> dict:
         hits = []
-        if country_code in WESTERN_SANCTIONS_REFERENCE:
+        if country_code in self.codes:
             hits.append(f"目的地代码 {country_code} 出现在西方制裁参考名单（仅风险提示，不自动否决）")
         return {"hits": hits, "source": self.name}
 
@@ -182,11 +186,32 @@ BASE_CHECKLIST = [
 ]
 
 
-def build_checklist(results: dict | None = None) -> list[dict]:
+def rules_from_constants() -> dict:
+    """从模块常量组装规则集（与 compliance_rules.load_rules 同构；DB 未配置时的兜底）。"""
+    return {
+        "western_sanctions": set(WESTERN_SANCTIONS_REFERENCE),
+        "watch_countries": set(WATCH_COUNTRIES),
+        "normal_coop": set(NORMAL_COOP_COUNTRIES),
+        "item_hints": {
+            "nuclear": list(NUCLEAR_HINTS), "chembio": list(CHEMBIO_HINTS),
+            "missile": list(MISSILE_HINTS), "military": list(MILITARY_HINTS),
+            "industrial": list(INDUSTRIAL_DUAL_USE_HINTS), "process": list(PROCESS_HINTS),
+        },
+        "wmd_keywords": list(WMD_END_USE_KEYWORDS),
+        "military_keywords": list(MILITARY_END_USE_KEYWORDS),
+        "red_flag_rules": [(t, d) for t, d in RED_FLAG_RULES],
+        "checklist": list(BASE_CHECKLIST),
+        "decision_notes": {},
+        "source": "default",
+    }
+
+
+def build_checklist(results: dict | None = None,
+                    items: list | None = None) -> list[dict]:
     results = results or {}
     return [
         {"code": c, "name": n, "required": req, "status": results.get(c, "pending")}
-        for c, n, req in BASE_CHECKLIST
+        for c, n, req in (items or BASE_CHECKLIST)
     ]
 
 
@@ -205,8 +230,27 @@ def _norm_country(country: str) -> str:
     return c[:2] if c else "XX"
 
 
-def classify_item(product_desc: str, end_use: str = "") -> tuple[str, str, list[str]]:
-    """返回 (item_control, item_category, warnings)。重点：两用物项与敏感物项。"""
+def classify_item(product_desc: str, end_use: str = "",
+                  hints: dict | None = None) -> tuple[str, str, list[str]]:
+    """返回 (item_control, item_category, warnings)。重点：两用物项与敏感物项。
+
+    hints：规则资产库 item_hints 类（load_rules 输出）。
+    - hints=None：完全使用模块内置常量（向后兼容）；
+    - hints 显式传入：以传入为准，缺键 = 该类别已停用/未配置（不再回退常量），
+      保证合规官在 DB 中停用某类提示词立即生效。
+    """
+    if hints is None:
+        hints = {
+            "nuclear": NUCLEAR_HINTS, "chembio": CHEMBIO_HINTS, "missile": MISSILE_HINTS,
+            "military": MILITARY_HINTS, "industrial": INDUSTRIAL_DUAL_USE_HINTS,
+            "process": PROCESS_HINTS,
+        }
+    nuclear = hints.get("nuclear") or []
+    chembio = hints.get("chembio") or []
+    missile = hints.get("missile") or []
+    military = hints.get("military") or []
+    industrial = hints.get("industrial") or []
+    process = hints.get("process") or []
     text = f"{product_desc} {end_use}".lower()
     warnings: list[str] = []
 
@@ -214,25 +258,25 @@ def classify_item(product_desc: str, end_use: str = "") -> tuple[str, str, list[
         return any(w.lower() in text for w in words)
 
     # 优先级：核/生化/导弹 > 军品 > 工业两用 > 工艺 > 民用
-    if hit(NUCLEAR_HINTS):
+    if hit(nuclear):
         warnings.append("命中核两用品/相关技术提示，必须按《两用物项出口管制清单》核类条款分类")
         return "dual_use", "nuclear", warnings
-    if hit(CHEMBIO_HINTS):
+    if hit(chembio):
         warnings.append("命中生化两用品提示，必须正式分类")
         return "dual_use", "chembio", warnings
-    if hit(MISSILE_HINTS):
+    if hit(missile):
         warnings.append("命中导弹/无人系统相关提示，必须正式分类")
         return "dual_use", "missile", warnings
-    if hit(MILITARY_HINTS):
+    if hit(military):
         warnings.append("命中军品/常规武器提示，须军品出口资质与许可判断")
         return "controlled", "military", warnings
-    if hit(INDUSTRIAL_DUAL_USE_HINTS):
+    if hit(industrial):
         warnings.append(
             "【V-FLO重点】命中工业两用/敏感技术提示（泵/密封/驱动/特种材料等），"
             "必须由合规官对照《两用物项出口管制清单》逐项分类，不得以「民品」默认放行"
         )
         return "dual_use", "industrial", warnings
-    if hit(PROCESS_HINTS):
+    if hit(process):
         warnings.append("石化/化工成套工艺提示：需结合最终用途判断是否落入两用管制范围")
         return "unclear", "process", warnings
 
@@ -252,47 +296,64 @@ def screen(
     arrival_country: str = "",
     end_user_country: str = "",
     sanctions_provider: SanctionsProvider | None = None,
+    rules: dict | None = None,
 ) -> ScreeningResult:
-    """出口管制初筛。结论仅供合规官人工审核，系统不替代放行权。"""
+    """出口管制初筛。结论仅供合规官人工审核，系统不替代放行权。
+
+    rules：合规规则资产（compliance_rules.load_rules 的输出，DB 可配置）；
+    None 时回退模块内置常量（rules_from_constants），二者经种子同源。
+    规则语义：R 中存在的键以其为准（显式空集 = 已清空）；缺键才回退内置常量。
+    """
+    R = rules or rules_from_constants()
+    western = R.get("western_sanctions", set(WESTERN_SANCTIONS_REFERENCE))
+    watch = R.get("watch_countries", set(WATCH_COUNTRIES))
+    wmd_kws = R.get("wmd_keywords", list(WMD_END_USE_KEYWORDS))
+    mil_kws = R.get("military_keywords", list(MILITARY_END_USE_KEYWORDS))
+    rf_rules = R.get("red_flag_rules", [(t, d) for t, d in RED_FLAG_RULES])
+    notes = R.get("decision_notes", {})
+
     r = ScreeningResult()
     code = _norm_country(country)
 
     # 1) 国家风险：西方名单仅作提示，不自动否决
-    if code in WESTERN_SANCTIONS_REFERENCE:
+    if code in western:
         r.country_risk = "high" if code in {"IR", "KP", "SY", "CU"} else "medium"
-    elif code in WATCH_COUNTRIES:
+    elif code in watch:
         r.country_risk = "medium"
     else:
         r.country_risk = "low"
 
     # 2) 制裁名单筛查（EXP-04）：屏蔽源可插拔（T19），外部源失败降级本地
     provider = sanctions_provider or get_sanctions_provider()
+    if isinstance(provider, LocalSanctionsProvider) and rules:
+        provider = LocalSanctionsProvider(codes=set(western))
     try:
         sres = provider.screen(customer_name, end_user, code)
         hits = list(sres.get("hits") or [])
         r.warnings.append(f"制裁名单筛查源：{sres.get('source')}")
     except Exception as e:  # noqa: BLE001 — 外部名单服务不可用不得阻断初筛
         hits = []
-        if code in WESTERN_SANCTIONS_REFERENCE:
+        if code in western:
             hits.append(f"目的地 {country or code} 出现在西方制裁参考名单（仅风险提示，不自动否决）")
         r.warnings.append(f"外部制裁名单服务不可用，已降级本地参考名单：{e}")
     use_text = f"{customer_name} {middleman} {end_user} {end_use}".lower()
-    for kw in MILITARY_END_USE_KEYWORDS + WMD_END_USE_KEYWORDS:
+    for kw in list(mil_kws) + list(wmd_kws):
         if kw.lower() in use_text:
             hits.append(f"最终用途/主体描述出现敏感关键词：{kw}")
     r.sanctions_hit = "possible" if hits else "none"
     for h in hits:
         r.warnings.append(h)
 
-    # 3) 物项分类（重点）
-    item_control, item_cat, item_warns = classify_item(product_desc, end_use)
+    # 3) 物项分类（重点；提示词表来自规则资产）
+    item_control, item_cat, item_warns = classify_item(
+        product_desc, end_use, hints=R.get("item_hints"))
     r.item_control = item_control
     r.item_category = item_cat
     r.warnings.extend(item_warns)
 
     # 4) 最终用途红线判定
-    wmd = any(k.lower() in use_text for k in WMD_END_USE_KEYWORDS)
-    military = any(k.lower() in use_text for k in MILITARY_END_USE_KEYWORDS)
+    wmd = any(k.lower() in use_text for k in wmd_kws)
+    military = any(k.lower() in use_text for k in mil_kws)
 
     # 5) 决策（V-FLO 政策）
     #    硬闸仅：大规模杀伤性武器用途 + 受控/两用物项 → 禁止
@@ -302,14 +363,14 @@ def screen(
     if wmd and item_control in ("dual_use", "controlled"):
         r.decision = "reject"
         r.license_needed = "yes"
-        r.decision_note = (
+        r.decision_note = notes.get("reject_wmd") or (
             "【硬闸】最终用途指向大规模杀伤性武器且物项属两用/受控范围，禁止出口。"
             "立即停止报价/签约/发运/技术外发，并上报合规官与管理层。"
         )
     elif military and item_control in ("dual_use", "controlled"):
         r.decision = "reject"
         r.license_needed = "yes"
-        r.decision_note = (
+        r.decision_note = notes.get("reject_military") or (
             "【硬闸】军用最终用途 + 两用/受控物项，禁止在未取得军品出口许可与合规官书面批准前出口。"
             "本系统默认拒绝，须走专项审批。"
         )
@@ -318,18 +379,18 @@ def screen(
     ):
         r.decision = "escalate"
         r.license_needed = "unknown"
-        r.decision_note = (
+        r.decision_note = notes.get("escalate_dual_use") or (
             "【重点把关】两用物项/敏感物项：必须由合规官对照《两用物项出口管制清单》"
             "完成正式分类并判断是否需要出口许可证；无分类结论与许可判断不得签约/发运/外发技术资料。"
         )
     elif item_control == "unclear":
         r.decision = "escalate"
         r.license_needed = "unknown"
-        r.decision_note = "物项性质不明（工艺成套类），必须人工分类确认后放行。"
-    elif code in WESTERN_SANCTIONS_REFERENCE:
+        r.decision_note = notes.get("escalate_unclear") or "物项性质不明（工艺成套类），必须人工分类确认后放行。"
+    elif code in western:
         r.decision = "manual_review"
         r.license_needed = "unknown"
-        r.decision_note = (
+        r.decision_note = notes.get("manual_review_sanctions") or (
             "【人工审核放行】目的地出现在西方制裁参考名单。按集团原则："
             "中国与该国存在有限度正常合作，不自动拒绝；由合规官结合中国法规、"
             "最终用途、物项分类、支付与物流路径，决定是否放行/附加条件/否决。"
@@ -337,7 +398,8 @@ def screen(
     else:
         r.decision = "pending"
         r.license_needed = "no?"
-        r.decision_note = "初筛未见阻断项；仍须完成检查清单、红旗核对与合规官审核后放行。"
+        r.decision_note = notes.get("pending_default") or \
+            "初筛未见阻断项；仍须完成检查清单、红旗核对与合规官审核后放行。"
 
     # 6) 红旗（附件1 §2.3：命中即升级，不得继续报价/签约）
     flags = []
@@ -355,10 +417,10 @@ def screen(
         flags.append("运抵国与最终用户所在国不一致且无合理解释")
     elif (arr and arr != code) or (euc and euc != code):
         r.warnings.append("目的地/运抵国/最终用户所在国不完全一致，请在审查单中作出解释（EXP-03）")
-    for text_rule, desc in RED_FLAG_RULES:
-        key = text_rule[:2]
+    for text_rule, desc in rf_rules:
+        key = str(text_rule)[:2]
         if key and key in f"{end_use}{customer_name}{middleman}{product_desc}":
-            flags.append(desc)
+            flags.append(str(desc))
     if extra_red_flags:
         flags.extend([x for x in extra_red_flags if x])
     r.red_flags = flags
@@ -373,23 +435,30 @@ def screen(
         r.decision = "reject"
         r.license_needed = "yes"
 
-    r.checklist = build_checklist()
+    r.checklist = build_checklist(items=R.get("checklist"))
+
+    def _set(code_: str, ok: bool) -> None:
+        for item in r.checklist:
+            if item["code"] == code_:
+                item["status"] = "pass" if ok else "fail"
+                break
+
     # EXP-01 主体识别：客户 + 最终用户（有中间商时需已填写）
     if (customer_name or "").strip() and (end_user or "").strip():
-        r.checklist[0]["status"] = "pass"
+        _set("EXP-01", True)
     # EXP-02 最终用途书面说明
     if (end_use or "").strip():
-        r.checklist[1]["status"] = "pass"
+        _set("EXP-02", True)
     # EXP-03 国别一致性（一致或已解释）
     if code not in {"XX", ""} and not (arr and euc and arr != euc):
-        r.checklist[2]["status"] = "pass"
+        _set("EXP-03", True)
     # EXP-04 制裁名单筛查（本次已执行）
-    r.checklist[3]["status"] = "pass" if not hits else "fail"
+    _set("EXP-04", not hits)
     # EXP-05 物项分类
     if r.item_control != "unknown":
-        r.checklist[4]["status"] = "pass"
+        _set("EXP-05", True)
     # EXP-09 红旗逐条核对（本次已执行）
-    r.checklist[8]["status"] = "pass" if not flags else "fail"
+    _set("EXP-09", not flags)
     return r
 
 

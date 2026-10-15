@@ -189,6 +189,65 @@ class JDYClient:
         except Exception as e:  # noqa: BLE001
             return PushResult(ok=False, mode="live", message=str(e))
 
+    def upload_file(self, entry_id: str, filename: str, content: bytes,
+                    mime: str = "") -> PushResult:
+        """上传附件文件到简道云（POST /api/v5/app/entry/data/file/upload，multipart）。
+
+        成功时 entry_id 字段携带 fileToken，创建数据时附件控件值用
+        [{"fileToken": ..., "name": 文件名}]。APIKey 未开通文件权限时接口返回
+        401/403 —— 本方法返回 ok=False，由调用方降级（如把附件名写入备注）。
+        """
+        if self.mock or not entry_id:
+            return PushResult(ok=True, mode="mock",
+                              entry_id=f"MOCK-FILE-{datetime.utcnow().strftime('%Y%m%d%H%M%S')}",
+                              message=f"[MOCK] 已模拟上传附件 {filename}",
+                              raw={"name": filename})
+        url = self._v5_url("/app/entry/data/file/upload")
+        try:
+            with httpx.Client(timeout=60) as client:
+                resp = client.post(
+                    url,
+                    headers={"Authorization": f"Bearer {self.api_key}"},
+                    data={"app_id": self.app_id, "entry_id": entry_id},
+                    files={"file": (filename, content, mime or "application/octet-stream")},
+                )
+            if resp.status_code in (401, 403):
+                return PushResult(ok=False, mode="live",
+                                  message="APIKey 无文件上传权限（HTTP %s），"
+                                          "请在简道云开放平台为该 APIKey 开通文件上传" % resp.status_code)
+            resp.raise_for_status()
+            obj = resp.json() or {}
+            data = obj.get("data") or {}
+            token = str(data.get("fileToken") or data.get("file_token") or "")
+            return PushResult(ok=bool(token), mode="live", entry_id=token, raw=obj,
+                              message="" if token else f"上传响应缺少 fileToken：{obj}")
+        except Exception as e:  # noqa: BLE001
+            return PushResult(ok=False, mode="live", message=str(e))
+
+    def list_departments(self) -> dict[str, int]:
+        """通讯录部门 名称 → dept_no（POST /api/v5/corp/department/list）。
+
+        知识库「部门」控件仅接受 dept_no 数字；本方法供写入前把部门名解析为编号。
+        mock/失败返回空字典（调用方降级：部门字段跳过，名称并入备注）。
+        """
+        if self.mock:
+            return {}
+        url = self._v5_url("/corp/department/list")
+        try:
+            with httpx.Client(timeout=20) as client:
+                resp = client.post(url, headers={"Authorization": f"Bearer {self.api_key}"}, json={})
+                resp.raise_for_status()
+                obj = resp.json() or {}
+        except Exception:  # noqa: BLE001 — 部门解析失败不阻断主流程
+            return {}
+        out: dict[str, int] = {}
+        for d in obj.get("departments") or []:
+            name = str(d.get("name") or "").strip()
+            no = d.get("dept_no")
+            if name and isinstance(no, int):
+                out[name] = no
+        return out
+
     def count_form(self, entry_id: str, filter: dict | None = None,  # noqa: A002
                    limit: int = 100, max_pages: int = 20) -> int:
         """统计数据条数（T18 KPI 取数的基础）。"""
@@ -256,8 +315,31 @@ TASK_LABEL_TO_WIDGET = {
 # 日期/时间字段：v5 要求 ISO 格式
 _DATE_WIDGETS = {"_widget_1667894235099", "_widget_1667894235119"}
 
-# widget → 中文标签静态兜底（任务管理表；list_widgets 失败/未配置时镜像展示仍友好）
-WIDGET_LABEL_FALLBACK: dict[str, str] = {v: k for k, v in TASK_LABEL_TO_WIDGET.items()}
+# ---------------------------------------------------------------------------
+# 知识库表单字段映射（已对线上表单 68ad15ab88c411d76390e0a2 的 widget/list 实测核对）
+# 表单字段：客户/项目/问题/回答/附件/备注/国家/部门（部门为 dept 控件，仅接受 dept_no 数字）
+# ---------------------------------------------------------------------------
+KNOWLEDGE_LABEL_TO_WIDGET = {
+    "客户": "_widget_1756173740163",
+    "项目": "_widget_1756173740164",
+    "问题": "_widget_1756173740165",
+    "回答": "_widget_1768902936664",
+    "附件": "_widget_1767494919162",
+    "备注": "_widget_1756173740167",
+    "国家": "_widget_1756173740168",
+    "部门": "_widget_1756196363918",
+}
+
+# 合并映射（两表字段标签无重名冲突，已逐一核对）
+LABEL_TO_WIDGET: dict[str, str] = {**TASK_LABEL_TO_WIDGET, **KNOWLEDGE_LABEL_TO_WIDGET}
+
+# 附件控件（upload 类型只接受文件对象结构 list[dict]）
+_ATTACH_WIDGETS = {"_widget_1668085072214", KNOWLEDGE_LABEL_TO_WIDGET["附件"]}
+# 部门控件（dept 类型只接受 dept_no 数字；名称须先经 list_departments 解析）
+_DEPT_WIDGETS = {KNOWLEDGE_LABEL_TO_WIDGET["部门"]}
+
+# widget → 中文标签静态兜底（任务管理表 + 知识库表；list_widgets 失败/未配置时镜像展示仍友好）
+WIDGET_LABEL_FALLBACK: dict[str, str] = {v: k for k, v in LABEL_TO_WIDGET.items()}
 
 
 def _to_iso_date(v):
@@ -276,15 +358,23 @@ def to_widget_payload(data: dict) -> dict:
 
     - 已是 _widget_ 开头的键直接包装；
     - 未识别的字段名丢弃（由调用方保证字段在映射表内）；
-    - 附件字段仅在值为合法结构（list[dict]）时透传，否则跳过（避免 live 模式报错）。
+    - 附件字段仅在值为合法结构（list[dict]）时透传，否则跳过（避免 live 模式报错）；
+    - 部门控件仅接受 dept_no 数字（名称须先由 list_departments 解析），其余跳过。
     """
     out: dict = {}
     for k, v in (data or {}).items():
-        widget = k if str(k).startswith("_widget_") else TASK_LABEL_TO_WIDGET.get(str(k))
+        widget = k if str(k).startswith("_widget_") else LABEL_TO_WIDGET.get(str(k))
         if not widget:
             continue
-        if widget == "_widget_1668085072214" and not (isinstance(v, list) and (not v or isinstance(v[0], dict))):
+        if widget in _ATTACH_WIDGETS and not (isinstance(v, list) and (not v or isinstance(v[0], dict))):
             continue  # 附件只接受文件对象结构
+        if widget in _DEPT_WIDGETS:
+            if isinstance(v, str) and v.strip().isdigit():
+                v = int(v.strip())
+            elif isinstance(v, bool) or not isinstance(v, (int, float, list)):
+                continue  # 未解析的部门名不写入（避免 live 校验报错）
+            if isinstance(v, list) and not all(isinstance(x, (int, float)) and not isinstance(x, bool) for x in v):
+                continue
         if widget in _DATE_WIDGETS:
             v = _to_iso_date(v)
             if not v:
@@ -330,11 +420,29 @@ def build_jdy_task(
     return payload
 
 
-def build_jdy_knowledge(title: str, content: str, tags: list | None = None, dept: str = "") -> dict:
+def build_jdy_knowledge(
+    question: str,
+    answer: str,
+    customer: str = "",
+    project: str = "",
+    country: str = "",
+    remark: str = "",
+    dept: str | int | None = "",
+    attachments: Optional[list] = None,
+) -> dict:
+    """构造知识库表单 payload（字段已对线上表单 68ad15ab88c411d76390e0a2 核对）。
+
+    - question/answer 为必填主体（问题/回答）；
+    - dept 传部门名称时仅作记录，真正写入需先经 list_departments 解析为 dept_no；
+    - attachments 为 [{"fileToken": ..., "name": ...}] 结构（由 upload_file 取得）。
+    """
     return {
-        "文档标题": title,
-        "文档内容": content,
-        "标签": tags or [],
-        "所属部门": dept,
-        "提交时间": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
+        "问题": question,
+        "回答": answer,
+        "客户": customer,
+        "项目": project,
+        "国家": country,
+        "备注": remark,
+        "部门": dept or "",
+        "附件": attachments or [],
     }

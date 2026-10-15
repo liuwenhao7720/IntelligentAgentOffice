@@ -5,13 +5,16 @@
 - 进程内 TestClient + 独立临时 SQLite
 - monkeypatch jdy.query_form / list_widgets 造假数据，全程无真实网络
 - 覆盖：upsert 新建/更新、prune 删除消失行、截断跳过 prune、同步日志、
-  API 读取/详情/权限、mock 降级
+  API 读取/详情/权限、mock 降级、
+  任务列表时间段(period)×日期口径(date_field)×个人/部门(person/dept)过滤、
+  部门选项拆分(/jdy/depts)与分页(limit/offset)
 """
 from __future__ import annotations
 
 import os
 import sys
 import tempfile
+from datetime import date, timedelta
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -41,6 +44,7 @@ W_STATUS = JDY_FIELD_MAP["status"]
 W_OWNER = JDY_FIELD_MAP["owner"]
 W_DEPT = JDY_FIELD_MAP["dept"]
 W_DUE = JDY_FIELD_MAP["due_time"]
+W_START = JDY_FIELD_MAP["start_time"]
 
 
 def check(name: str, cond: bool, detail: object = "") -> None:
@@ -60,6 +64,18 @@ def make_task_row(i: int, title: str, status: str = "进行中") -> dict:
         W_DEPT: [{"name": "项目部"}],
         W_DUE: "2026-10-20T00:00:00.000Z",
     }
+
+
+def make_row_full(data_id: str, title: str, due: str = "", start: str = "",
+                  owner: str = "张三", dept: str = "项目部") -> dict:
+    """过滤测试用行：due/start 传 YYYY-MM-DD（模拟简道云 ISO 时间串）。"""
+    row = {"_id": data_id, W_TITLE: title, W_STATUS: "进行中",
+           W_OWNER: [{"name": owner}], W_DEPT: [{"name": dept}]}
+    if due:
+        row[W_DUE] = f"{due}T00:00:00.000Z"
+    if start:
+        row[W_START] = f"{start}T00:00:00.000Z"
+    return row
 
 
 # 可控的拉取桩
@@ -159,6 +175,99 @@ def main() -> int:
         r = client.get("/api/v1/jdy/data/knowledge/kn-1", headers=h_staff)
         kf = r.json()["fields"]
         check("知识库标签映射（widget→中文）", kf.get("文档标题") == "俄罗斯项目经验", kf)
+
+        print("[filter] 任务列表 时间段×日期口径×个人/部门过滤")
+        today = date.today()
+        yesterday = today - timedelta(days=1)
+        week_start = today - timedelta(days=today.weekday())      # 本周一
+        last_week_day = week_start - timedelta(days=3)            # 上周内一天
+        d_today, d_yesterday, d_lastweek = (today.isoformat(), yesterday.isoformat(),
+                                            last_week_day.isoformat())
+        _STUB["task"] = [
+            make_row_full("ft-a", "今日截止任务", due=d_today, start=d_today, owner="张三", dept="项目部"),
+            make_row_full("ft-b", "昨日截止任务", due=d_yesterday, owner="李四", dept="销售部"),
+            make_row_full("ft-c", "上周截止任务", due=d_lastweek, owner="王五", dept="项目部,销售部"),
+            make_row_full("ft-d", "老任务今日开始", due="2020-01-15", start=d_today, owner="张三", dept="综合部"),
+        ]
+        r = client.post("/api/v1/jdy/sync", headers=h_admin)
+        check("过滤夹具同步 4 条", r.json()["entries"]["task"]["items"] == 4,
+              r.json()["entries"]["task"])
+
+        def _ids(url: str):
+            resp = client.get(url, headers=h_staff)
+            assert resp.status_code == 200, resp.text
+            body = resp.json()
+            return {x["data_id"] for x in body["items"]}, body["total"]
+
+        ids, total = _ids("/api/v1/jdy/data/task?period=today&date_field=due")
+        check("今天（按截止）仅今日任务", ids == {"ft-a"} and total == 1, (ids, total))
+
+        ids, _ = _ids("/api/v1/jdy/data/task?period=today&date_field=submit")
+        check("今天（按开始/提交）含当日开始的老任务", ids == {"ft-a", "ft-d"}, ids)
+
+        ids, _ = _ids("/api/v1/jdy/data/task?period=yesterday&date_field=due")
+        check("昨天（按截止）", ids == {"ft-b"}, ids)
+
+        ids, _ = _ids("/api/v1/jdy/data/task?period=this_week&date_field=due")
+        expect_week = {"ft-a"} | ({"ft-b"} if yesterday >= week_start else set())
+        check("本周（按截止）含周内任务、排除上周与2020",
+              ids == expect_week and "ft-c" not in ids and "ft-d" not in ids, ids)
+
+        ids, _ = _ids("/api/v1/jdy/data/task?period=last_week&date_field=due")
+        check("上周（按截止）", ids == {"ft-c"}, ids)
+
+        ids, _ = _ids("/api/v1/jdy/data/task?period=this_month&date_field=due")
+        check("本月（按截止）含今日、排除2020老任务",
+              "ft-a" in ids and "ft-d" not in ids, ids)
+
+        ids, total = _ids("/api/v1/jdy/data/task")
+        check("缺省不过滤（向后兼容旧契约）",
+              total == 4 and ids == {"ft-a", "ft-b", "ft-c", "ft-d"}, (total, ids))
+
+        ids, _ = _ids("/api/v1/jdy/data/task?person=张三")
+        check("按个人姓名过滤", ids == {"ft-a", "ft-d"}, ids)
+
+        ids, _ = _ids("/api/v1/jdy/data/task?person=项目部")
+        check("按部门名称过滤", ids == {"ft-a", "ft-c"}, ids)
+
+        ids, _ = _ids("/api/v1/jdy/data/task?period=this_week&date_field=due&person=张三")
+        check("时间段+个人组合过滤", ids == {"ft-a"}, ids)
+
+        ids, _ = _ids("/api/v1/jdy/data/task?dept=项目部")
+        check("部门下拉过滤（组合部门记录按原子命中）", ids == {"ft-a", "ft-c"}, ids)
+
+        ids, _ = _ids("/api/v1/jdy/data/task?dept=销售部")
+        check("部门过滤命中组合记录另一端", ids == {"ft-b", "ft-c"}, ids)
+
+        ids, _ = _ids("/api/v1/jdy/data/task?dept=综合部")
+        check("部门过滤单一命中", ids == {"ft-d"}, ids)
+
+        ids, _ = _ids("/api/v1/jdy/data/task?dept=项目部&period=this_week&date_field=due")
+        check("部门+时间段组合过滤", ids == {"ft-a"}, ids)
+
+        r = client.get("/api/v1/jdy/depts?kind=task", headers=h_staff)
+        depts = r.json()["depts"]
+        check("部门选项接口 200", r.status_code == 200, r.text)
+        check("部门选项齐全", {"项目部", "销售部", "综合部"} <= set(depts), depts)
+        check("组合部门已拆分为原子项", all("," not in x and "，" not in x for x in depts), depts)
+        r = client.get("/api/v1/jdy/depts?kind=unknown", headers=h_staff)
+        check("部门选项非法 kind 422", r.status_code == 422, r.status_code)
+
+        r = client.get("/api/v1/jdy/data/task?limit=2", headers=h_staff)
+        check("分页第 1 页", r.json()["total"] == 4 and len(r.json()["items"]) == 2
+              and r.json()["limit"] == 2 and r.json()["offset"] == 0, r.json().get("total"))
+        r = client.get("/api/v1/jdy/data/task?limit=2&offset=2", headers=h_staff)
+        check("分页第 2 页", len(r.json()["items"]) == 2 and r.json()["offset"] == 2, r.json())
+        r = client.get("/api/v1/jdy/data/task?limit=2&offset=4", headers=h_staff)
+        check("分页越界空页", r.json()["items"] == [] and r.json()["total"] == 4, r.json())
+        r = client.get("/api/v1/jdy/data/task?period=this_week&date_field=due&limit=1", headers=h_staff)
+        check("过滤+分页切片",
+              r.json()["total"] == len(expect_week) and len(r.json()["items"]) == 1, r.json())
+
+        r = client.get("/api/v1/jdy/data/task?period=foo", headers=h_staff)
+        check("非法 period 422", r.status_code == 422, r.status_code)
+        r = client.get("/api/v1/jdy/data/task?date_field=foo", headers=h_staff)
+        check("非法 date_field 422", r.status_code == 422, r.status_code)
 
         print("[perm] 权限")
         r = client.post("/api/v1/jdy/sync", headers=h_staff)

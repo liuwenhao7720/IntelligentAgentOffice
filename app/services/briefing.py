@@ -236,9 +236,10 @@ def build_project_closure(
             description=result.text[:2000],
         ),
         "knowledge_payload": build_jdy_knowledge(
-            title=f"【结项知识】{project}",
-            content=knowledge_text or result.text[:2000],
-            tags=["项目结项", "知识沉淀"],
+            question=f"【结项知识】{project}",
+            answer=knowledge_text or result.text[:2000],
+            project=project,
+            remark="项目结项 · 知识沉淀",
         ),
         "improvement_hints": _extract_section(result.text, "流程改进建议"),
     }

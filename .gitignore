@@ -53,3 +53,6 @@ dist/
 # OS
 *~
 .cache/
+
+# Docker buildx 本地缓存
+.buildx/

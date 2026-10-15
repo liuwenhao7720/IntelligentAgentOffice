@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>V-FLO 极简智能办公系统</title>
-  <link rel="stylesheet" href="/static/styles.css?v=20261012.3" />
+  <link rel="stylesheet" href="/static/styles.css?v=20261015.1" />
 </head>
 <body>
   <div id="app">
@@ -155,7 +155,38 @@
           <button id="btn-jdy-sync" class="primary hidden" style="width:auto"
             title="立即从简道云全量拉取一次（admin/部门经理）">⇄ 立即同步</button>
         </div>
+        <!-- 任务管理专用过滤条：时间段 × 日期口径 × 部门 × 个人（默认本周+按截止时间，避免一次展示全部任务） -->
+        <div class="toolbar" id="jdy-task-filters">
+          <select id="jdy-period" title="按时间段过滤（默认本周，避免一次性显示全部任务）">
+            <option value="today">今天</option>
+            <option value="yesterday">昨天</option>
+            <option value="this_week" selected>本周</option>
+            <option value="last_week">上周</option>
+            <option value="this_month">本月</option>
+            <option value="all">全部时间段</option>
+          </select>
+          <select id="jdy-date-field" title="时间段以哪个日期口径为准">
+            <option value="due" selected>按截止时间</option>
+            <option value="submit">按开始/提交时间</option>
+          </select>
+          <select id="jdy-dept" title="按部门过滤（选项来自镜像数据）">
+            <option value="">全部部门</option>
+          </select>
+          <input id="jdy-person" placeholder="姓名或部门关键字…" title="按负责人姓名或部门名称模糊过滤" />
+          <span id="jdy-total" class="muted" style="font-size:12px;align-self:center"></span>
+        </div>
         <div id="jdy-list" class="asset-list"></div>
+        <!-- 分页条（任务/知识库通用） -->
+        <div class="toolbar" id="jdy-pager" style="margin-top:8px">
+          <button id="btn-jdy-prev" class="secondary" style="width:auto;padding:4px 12px">‹ 上一页</button>
+          <span id="jdy-page-info" class="muted" style="font-size:12px;align-self:center">第 1 页</span>
+          <button id="btn-jdy-next" class="secondary" style="width:auto;padding:4px 12px">下一页 ›</button>
+          <select id="jdy-page-size" title="每页条数">
+            <option value="20">20 条/页</option>
+            <option value="50" selected>50 条/页</option>
+            <option value="100">100 条/页</option>
+          </select>
+        </div>
         <details id="jdy-logs-box" class="ws-params hidden" style="margin-top:10px">
           <summary>🧾 同步日志（最近 20 条）</summary>
           <div id="jdy-logs" style="padding:10px 14px"></div>
@@ -175,7 +206,12 @@
           <input id="tp-folder" placeholder="资料文件夹路径，如 D:/V-FLO任务/20260927-项目周报-俄罗斯泵站" />
           <button id="btn-tp-create" class="primary" style="width:auto">创建任务项目</button>
         </div>
-        <p class="hint" style="margin:2px 4px">文件夹命名规范（手册 §1.2）：<code>日期-任务-项目名</code>，如 20260927-项目周报-俄罗斯泵站</p>
+        <div class="toolbar">
+          <input id="tp-customer" placeholder="客户名称（涉外项目必填，供初步分析合规审查）" />
+          <input id="tp-country" placeholder="目的地/签约国，如 俄罗斯 / UZ" />
+        </div>
+        <p class="hint" style="margin:2px 4px">文件夹命名规范（手册 §1.2）：<code>日期-任务-项目名</code>，如 20260927-项目周报-俄罗斯泵站
+          ｜ 🛡️ 合规审查前移：涉外项目在<b>初步分析阶段</b>完成合规初筛，工作台只调用审查结果，不重复审查。</p>
         <div class="toolbar">
           <input id="tp-materials" placeholder="资料清单（用逗号分隔），如 技术规格书.pdf, 澄清函.docx, 进度.xlsx" style="flex:1" />
         </div>
@@ -212,6 +248,8 @@
             <h3>我的会话</h3>
             <div id="session-list"></div>
             <button id="btn-new-free" class="secondary">+ 自由对话</button>
+            <button id="btn-kb-contribute" class="primary" style="margin-top:8px"
+              title="主动贡献知识库：上传文件 / 在线填写 / 自动总结，确认后写入简道云知识库">📚 贡献知识库</button>
           </aside>
           <section class="ws-main">
             <div class="ws-header">
@@ -220,6 +258,7 @@
                 <p id="ws-sub" class="muted"></p>
               </div>
               <div class="ws-actions">
+                <span id="ws-comp-status" class="badge hidden" title=""></span>
                 <span id="ws-review-status" class="badge exp hidden"></span>
                 <select id="ws-model">
                   <option value="mimo">Mimo V2.6（快）</option>
@@ -365,6 +404,14 @@
         <div class="proj-banner">
           <strong>出口管制初筛（签约前强制）：</strong>没有审查单（或结论未关闭）不签约、不发运、不发技术资料。
           两用物项无正式分类结论，按「不能出口」处理。最终放行由合规官书面作出。
+          <br/>🛡️ <strong>审查前移：</strong>合规审查在<b>项目初步分析阶段</b>完成（任务项目卡片一键发起），
+          工作台只调用审查结果、不重复审查；审查规则与资料在下方「规则与资料资产」中配置维护。
+        </div>
+        <div class="toolbar">
+          <select id="ec-project" title="关联任务项目：审查单绑定后，该项目工作台自动引用审查结论">
+            <option value="">— 不关联任务项目（独立审查单）—</option>
+          </select>
+          <span class="muted" style="font-size:12px;align-self:center">关联项目 = 项目初步分析阶段的合规审查凭据</span>
         </div>
         <div class="ws-form">
           <label>客户名称 *<textarea data-ec="customer_name" rows="1"></textarea></label>
@@ -381,6 +428,15 @@
           <button id="btn-ec-screen" class="primary">提交初筛（生成审查单）</button>
         </div>
         <div id="ec-result"></div>
+
+        <!-- 合规审查规则与资料资产（可调用配置；合规官/管理员可维护） -->
+        <h3 style="margin:16px 0 8px;font-size:14px">📚 规则与资料资产
+          <span class="muted" style="font-weight:400;font-size:12px">审查引擎实时调用以下配置；选型软件/清单/模板等资料随取随用</span>
+          <button id="btn-cr-reload" class="ghost" style="width:auto;padding:3px 10px;font-size:12px;margin-left:8px">刷新</button>
+        </h3>
+        <div id="cr-resources"></div>
+        <div id="cr-rules"></div>
+
         <h3 style="margin:14px 0 8px;font-size:14px">审查单列表（不可删改，留存 ≥5 年）</h3>
         <div id="ec-list" class="asset-list"></div>
       </main>
@@ -427,6 +483,6 @@
     </div>
     <div id="toast" class="toast hidden"></div>
   </div>
-  <script src="/static/app.js?v=20261012.3"></script>
+  <script src="/static/app.js?v=20261015.1"></script>
 </body>
 </html>

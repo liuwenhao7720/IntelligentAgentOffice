@@ -20,9 +20,12 @@ from .config import get_settings
 from .database import SessionLocal, init_db, migrate_db
 from .routers.api import router as api_router
 from .routers.chat import router as chat_router
+from .routers.compliance import router as compliance_router
 from .routers.jdy_data import router as jdy_data_router
+from .routers.knowledge import router as knowledge_router
 from .routers.wecom_auth import router as wecom_auth_router
 from .seed.scenarios import seed_scenarios
+from .services.compliance_rules import seed_compliance_rules
 from .services.mature_rules import seed_mature_rules
 
 # 门禁8（附件4）：异常必须处理并提示；日志不输出敏感信息（只记路径/状态码，不记 body）
@@ -47,6 +50,12 @@ app.include_router(wecom_auth_router, prefix="/api", include_in_schema=False)
 # 简道云本地镜像读取（单向拉取的读侧）
 app.include_router(jdy_data_router, prefix="/api/v1")
 app.include_router(jdy_data_router, prefix="/api", include_in_schema=False)
+# 主动贡献知识库（写侧：上传文件/在线填写/自动总结 → 简道云知识库表单）
+app.include_router(knowledge_router, prefix="/api/v1")
+app.include_router(knowledge_router, prefix="/api", include_in_schema=False)
+# 合规审查：规则/资料资产 + 项目初筛（审查前移）+ 项目合规状态（工作台只读结果）
+app.include_router(compliance_router, prefix="/api/v1")
+app.include_router(compliance_router, prefix="/api", include_in_schema=False)
 
 # CORS 白名单（附件4 技术基线·安全；默认空=仅同源）
 _cors = [o.strip() for o in get_settings().cors_origins.split(",") if o.strip()]
@@ -124,6 +133,9 @@ def on_startup() -> None:
                 n_rules = seed_mature_rules(db)
                 if n_rules:
                     print(f"[seed] 成熟规则 +{n_rules}")
+                n_cr = seed_compliance_rules(db)
+                if n_cr:
+                    print(f"[seed] 合规规则/资料资产 +{n_cr}")
                 break
             except (IntegrityError, OperationalError) as e:
                 # 其他 worker 已并发写入种子：回滚后重查（重复执行是幂等的）

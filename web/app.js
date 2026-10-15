@@ -10,6 +10,8 @@ let CURRENT = {
   finalized: false,
   reviewStatus: "",   // awaiting_review/approved/revising/rejected/""
   compareModel: null,
+  taskProjectCode: "",   // 会话所属任务项目（工作台合规闸口凭它读审查结果）
+  complianceState: "",   // 项目合规状态缓存：approved/reviewing/escalated/rejected/none/""
 };
 
 function $(sel) { return document.querySelector(sel); }
@@ -208,7 +210,7 @@ function switchTab(name) {
   panel.classList.remove("hidden");
   window.scrollTo(0, 0);
   if (name === "today") loadToday();
-  if (name === "briefing") { loadBriefingForm(); refreshJdyMode(); loadBriefingHistory(); loadJdyOverview(); loadJdyList(); }
+  if (name === "briefing") { loadBriefingForm(); refreshJdyMode(); loadBriefingHistory(); loadJdyOverview(); loadJdyDepts(); loadJdyList(); }
   if (name === "projects") loadTaskProjects();
   if (name === "scenarios") loadScenarios();
   if (name === "assets") { loadAssets(); loadMarket(); }
@@ -361,6 +363,10 @@ function resetWorkspaceState() {
   CURRENT.reviewStatus = "";
   CURRENT.lastAiText = "";
   CURRENT.compareModel = null;
+  CURRENT.taskProjectCode = "";
+  CURRENT.complianceState = "";
+  const cb = $("#ws-comp-status");
+  if (cb) cb.classList.add("hidden");
   $("#ws-review-row").classList.add("hidden");
   $("#ws-review-status").classList.add("hidden");
   $("#ws-pane-b").classList.add("hidden");
@@ -508,6 +514,20 @@ function validateRequiredVars() {
 }
 
 async function doGenerate(targetPane) {
+  // 合规审查前移闸口（前端预检，后端 409 为权威拦截）：出口管制/敏感场景 + 项目会话，
+  // 项目审查未放行时先引导去任务项目完成初步分析审查（工作台不重复审查）
+  const scLocked = CURRENT.scenario && ["export_control", "sensitive"].includes(CURRENT.scenario.security_level);
+  if (targetPane !== "B" && scLocked && CURRENT.taskProjectCode) {
+    await refreshWsCompliance();
+    if (CURRENT.complianceState && CURRENT.complianceState !== "approved") {
+      if (confirm("🛡️ 合规审查前移：该场景属于项目 " + CURRENT.taskProjectCode +
+        "，须先在项目初步分析阶段完成合规审查并放行（工作台只引用审查结论，不重复审查）。\n\n" +
+        "点「确定」前往任务项目发起/查看审查。")) {
+        switchTab("projects");
+      }
+      return;
+    }
+  }
   // 智能填参：先说人话，缺必填时自动 AI 识别，识别不了才展开面板补填
   if (targetPane !== "B" && validateRequiredVars().length && $("#ws-smart").value.trim()) {
     await smartExtract(true);
@@ -575,10 +595,23 @@ async function doGenerate(targetPane) {
   }
   $("#ws-output").innerText = r.text;
   CURRENT.lastAiText = r.text;
+  // 审查前移：生成响应带回项目合规结论（工作台只展示/留痕，不重复审查）
+  if (r.compliance && r.compliance.state) {
+    CURRENT.complianceState = r.compliance.state;
+    const cb = $("#ws-comp-status");
+    if (cb) {
+      const [cls, txt] = COMP_STATE_BADGE[r.compliance.state] || COMP_STATE_BADGE.none;
+      cb.className = `badge ${cls}`;
+      cb.textContent = `${txt}${r.compliance.case_no ? " · " + r.compliance.case_no : ""}`;
+      cb.title = r.compliance.message || "";
+      cb.classList.remove("hidden");
+    }
+  }
   // 附件3 §2.2：降级需提示「已切换至××，结果可能有差异」
   $("#ws-sub").textContent = `模型：${r.provider}:${r.model} · tokens ${r.tokens_in}/${r.tokens_out}` +
     (r.degraded ? ` · 已切换至 ${r.provider}:${r.model}，结果可能有差异` : "") +
-    (r.model_locked ? " · 🔒模型已锁定" : "");
+    (r.model_locked ? " · 🔒模型已锁定" : "") +
+    (r.compliance && r.compliance.case_no ? ` · 🛡️ ${r.compliance.case_no} 已放行` : "");
   if ((r.sensitive_hits || []).length) {
     toast("⚠️ 检测到敏感信息（" + r.sensitive_hits.join("、") + "），已标记；请勿输入受控技术参数");
   } else if (r.degraded) toast(`主模型不可用，已切换至 ${r.provider}:${r.model}，结果可能有差异`);
@@ -767,6 +800,16 @@ async function loadTaskProjects() {
       { k: "3 工作流", ok: p.status === "running" || p.status === "done" },
     ].map((s) => `<span class="pstep ${s.ok ? "done" : ""}">${s.k}</span>`).join("");
     const mats = (p.materials || []).map((m) => m.name || m).join("、");
+    // 审查前移：合规徽标（列表接口已装配审查结果摘要，工作台同样只读该结果）
+    const cp = p.compliance || null;
+    const CP_BADGE = {
+      approved: ["comp-ok", "✅ 已放行"], reviewing: ["comp-warn", "⏳ 待终审"],
+      escalated: ["comp-warn", "🔺 升级复核"], rejected: ["comp-bad", "⛔ 已否决"],
+      none: ["comp-none", "🛡️ 未审查"],
+    };
+    const [cpCls, cpTxt] = CP_BADGE[(cp && cp.state) || "none"] || CP_BADGE.none;
+    const cpBadge = `<span class="badge ${cpCls}" title="${esc((cp && cp.message) || "尚未发起合规审查（初步分析阶段完成）")}">
+      ${cpTxt}${cp && cp.case_no ? " " + esc(cp.case_no) : ""}</span>`;
     return `
     <div class="proj-card" data-code="${esc(p.code)}">
       <div class="code">${esc(p.code)} · ${esc(p.status)}</div>
@@ -774,8 +817,11 @@ async function loadTaskProjects() {
       <div class="muted">📁 ${esc(p.folder_path || p.folder_name || "未登记文件夹")}
         ${p.mimo_project ? " · 🤖 Mimo：" + esc(p.mimo_project) : ""}</div>
       <div class="muted">资料：${esc(mats || "（可稍后补）")}</div>
-      <div class="proj-steps">${steps}</div>
+      ${p.customer_name || p.country ? `<div class="muted">🏢 ${esc(p.customer_name || "—")} · 🌍 ${esc(p.country || "—")}</div>` : ""}
+      <div class="proj-steps">${steps}${cpBadge}</div>
       <div class="proj-actions">
+        <button class="secondary btn-tp-screen" data-code="${esc(p.code)}" style="width:auto"
+          title="项目初步分析阶段完成合规审查；工作台只调用审查结果，不重复审查">🛡️ 合规初筛</button>
         <input class="tp-mimo" placeholder="Mimo V2.6 项目名（新建后填写）" value="${esc(p.mimo_project || "")}" />
         <button class="secondary btn-tp-bind" data-code="${esc(p.code)}">绑定 Mimo 项目</button>
         <select class="tp-sc" data-code="${esc(p.code)}" style="width:auto" title="选择场景卡（按岗位节点）"></select>
@@ -783,6 +829,11 @@ async function loadTaskProjects() {
       </div>
     </div>`;
   }).join("") || `<div class="muted">暂无任务项目</div>`;
+
+  // 审查前移入口：项目初步分析阶段发起合规初筛（弹层内完成，无需离开本页）
+  $all(".btn-tp-screen").forEach((b) => {
+    b.onclick = () => openProjectScreening(b.dataset.code).catch((e) => toast(e.message));
+  });
 
   $all(".btn-tp-bind").forEach((b) => {
     b.onclick = async () => {
@@ -819,6 +870,7 @@ async function loadTaskProjects() {
         CURRENT.sessionId = s.id;
         CURRENT.scenarioId = sc.id;
         CURRENT.scenario = sc;
+        CURRENT.taskProjectCode = code;  // 项目会话：工作台合规闸口生效
         const locked = sc.security_level === "export_control" || sc.security_level === "sensitive";
         $("#ws-title").textContent = s.title;
         $("#ws-sub").textContent = `任务项目 ${code} · 已进入工作流` + (locked ? " · 🔒 敏感场景模型已锁定" : "");
@@ -827,6 +879,7 @@ async function loadTaskProjects() {
         $("#btn-compare").disabled = locked;
         renderForm(sc.variables || []);
         switchTab("workspace");
+        refreshWsCompliance();
         toast("已在任务项目下开启工作流");
       } catch (e) { toast(e.message); }
     };
@@ -836,6 +889,8 @@ async function loadTaskProjects() {
 $("#btn-tp-create").onclick = async () => {
   const name = $("#tp-name").value.trim();
   const folder = $("#tp-folder").value.trim();
+  const customer = ($("#tp-customer") && $("#tp-customer").value.trim()) || "";
+  const country = ($("#tp-country") && $("#tp-country").value.trim()) || "";
   if (!name) { toast("请填写任务名称"); return; }
   const mats = ($("#tp-materials").value || "").split(/[,，]/).map((x) => x.trim()).filter(Boolean)
     .map((n) => ({ name: n, type: n.split(".").pop() || "file" }));
@@ -845,13 +900,23 @@ $("#btn-tp-create").onclick = async () => {
     if (!confirm("文件夹名不符合「日期-任务-项目名」规范（如 20260927-项目周报-俄罗斯泵站）。仍要创建吗？")) return;
   }
   try {
-    await api("/task-projects", {
+    const p = await api("/task-projects", {
       method: "POST",
-      body: JSON.stringify({ name, folder_path: folder, materials: mats }),
+      body: JSON.stringify({ name, folder_path: folder, materials: mats, customer_name: customer, country }),
     });
     toast("任务项目已创建。下一步：在 Mimo V2.6 新建项目并绑定");
     $("#tp-name").value = ""; $("#tp-folder").value = ""; $("#tp-materials").value = "";
+    if ($("#tp-customer")) $("#tp-customer").value = "";
+    if ($("#tp-country")) $("#tp-country").value = "";
     loadTaskProjects();
+    // 审查前移引导：登记了客户/国别的涉外项目，提示立即做初步分析合规审查
+    if (customer || country) {
+      setTimeout(() => {
+        if (confirm("已登记客户/国别。是否现在完成「初步分析合规审查」？\n（审查前移：此刻审一次，工作台全程引用结论）")) {
+          openProjectScreening(p.code).catch((e) => toast(e.message));
+        }
+      }, 300);
+    }
   } catch (e) { toast(e.message); }
 };
 
@@ -1016,6 +1081,7 @@ async function openSessionInWorkspace(sessionId) {
   CURRENT.sessionId = s.id;
   CURRENT.scenarioId = s.scenario_id;
   CURRENT.reviewStatus = s.review_status || "";
+  CURRENT.taskProjectCode = s.task_project_code || "";  // 合规闸口：项目会话读取审查结果
   let sc = null;
   if (s.scenario_id) {
     try { sc = await api(`/scenarios/${s.scenario_id}`); } catch { sc = null; }
@@ -1042,6 +1108,7 @@ async function openSessionInWorkspace(sessionId) {
   $("#btn-compare").disabled = locked;
   if (s.rating) $$(".star").forEach((x) => x.classList.toggle("on", +x.dataset.r <= s.rating));
   updateReviewUI();
+  refreshWsCompliance();  // 项目会话：展示合规审查结论徽标（只读结果）
   loadSessions();
 }
 
@@ -1281,6 +1348,8 @@ $("#btn-bf-dept-stats").onclick = async () => {
 
 /* ---------- 🗂 简道云数据镜像（单向拉取：简道云 → 本系统，本地浏览） ---------- */
 const JDY_KIND_LABEL = { task: "任务管理", knowledge: "知识库" };
+// 列表分页状态（过滤条件/表单/每页条数变化时回到第 1 页）
+const JDY_LIST = { page: 1, size: 50, total: 0 };
 
 async function loadJdyOverview() {
   try {
@@ -1300,15 +1369,52 @@ async function loadJdyOverview() {
   }
 }
 
+async function loadJdyDepts() {
+  // 部门下拉选项来自镜像数据（逗号组合已拆分为原子部门）；失败不阻断列表
+  try {
+    const d = await api("/jdy/depts?kind=task");
+    const cur = $("#jdy-dept").value;
+    $("#jdy-dept").innerHTML = `<option value="">全部部门</option>` +
+      (d.depts || []).map((x) => `<option value="${esc(x)}">${esc(x)}</option>`).join("");
+    if (cur && (d.depts || []).includes(cur)) $("#jdy-dept").value = cur;
+  } catch (e) { /* 保持「全部部门」兜底 */ }
+}
+
+function jdyResetPage() { JDY_LIST.page = 1; loadJdyList(); }
+
 async function loadJdyList() {
   const kind = $("#jdy-kind").value;
   const q = $("#jdy-search").value.trim();
-  const params = new URLSearchParams({ limit: "100" });
+  const isTask = kind === "task";
+  $("#jdy-task-filters").classList.toggle("hidden", !isTask);
+  const size = +($("#jdy-page-size").value || 50);
+  JDY_LIST.size = size;
+  const params = new URLSearchParams({
+    limit: String(size),
+    offset: String((JDY_LIST.page - 1) * size),
+  });
   if (q) params.set("q", q);
+  // 任务管理：默认过滤条件（本周 + 按截止时间），避免一次性显示全部任务；可切换口径/时间段/部门/个人
+  if (isTask) {
+    params.set("period", $("#jdy-period").value);
+    params.set("date_field", $("#jdy-date-field").value);
+    const person = $("#jdy-person").value.trim();
+    if (person) params.set("person", person);
+    const dept = $("#jdy-dept").value;
+    if (dept) params.set("dept", dept);
+  }
   try {
     const d = await api(`/jdy/data/${kind}?${params}`);
+    JDY_LIST.total = d.total;
+    const pages = Math.max(1, Math.ceil(d.total / size));
+    if (JDY_LIST.page > pages) { JDY_LIST.page = pages; return loadJdyList(); }  // 数据收缩时收敛到末页
+    const filtered = isTask && (d.filters.period !== "all" || d.filters.person || d.filters.dept);
+    $("#jdy-total").textContent = isTask ? `共 ${d.total} 条${filtered ? "（已过滤）" : ""}` : "";
+    $("#jdy-page-info").textContent = `第 ${JDY_LIST.page} / ${pages} 页 · 共 ${d.total} 条`;
+    $("#btn-jdy-prev").disabled = JDY_LIST.page <= 1;
+    $("#btn-jdy-next").disabled = JDY_LIST.page >= pages;
     if (!d.items.length) {
-      $("#jdy-list").innerHTML = `<p class="muted">${d.mock ? "MOCK 模式暂无数据；配置凭证后由 poller 每小时自动拉取" : "暂无数据"}</p>`;
+      $("#jdy-list").innerHTML = `<p class="muted">${d.mock ? "MOCK 模式暂无数据；配置凭证后由 poller 每小时自动拉取" : (filtered ? "当前过滤条件下暂无任务（可切换到「全部时间段」或清除过滤条件）" : "暂无数据")}</p>`;
       return;
     }
     $("#jdy-list").innerHTML = d.items.map((r) => `
@@ -1361,14 +1467,25 @@ $("#jdy-logs-box").addEventListener("toggle", () => {
   if ($("#jdy-logs-box").open) loadJdyLogs();
 });
 
-$("#jdy-kind").onchange = () => loadJdyList();
-$("#jdy-search").oninput = debounce(loadJdyList, 300);
-$("#btn-jdy-reload").onclick = () => { loadJdyOverview(); loadJdyList(); };
+$("#jdy-kind").onchange = () => jdyResetPage();
+$("#jdy-search").oninput = debounce(jdyResetPage, 300);
+$("#jdy-period").onchange = () => jdyResetPage();
+$("#jdy-date-field").onchange = () => jdyResetPage();
+$("#jdy-dept").onchange = () => jdyResetPage();
+$("#jdy-person").oninput = debounce(jdyResetPage, 300);
+$("#jdy-page-size").onchange = () => jdyResetPage();
+$("#btn-jdy-prev").onclick = () => { if (JDY_LIST.page > 1) { JDY_LIST.page -= 1; loadJdyList(); } };
+$("#btn-jdy-next").onclick = () => {
+  const pages = Math.max(1, Math.ceil(JDY_LIST.total / JDY_LIST.size));
+  if (JDY_LIST.page < pages) { JDY_LIST.page += 1; loadJdyList(); }
+};
+$("#btn-jdy-reload").onclick = () => { loadJdyOverview(); loadJdyDepts(); loadJdyList(); };
 $("#btn-jdy-sync").onclick = () => withWaiting($("#btn-jdy-sync"), "同步中", async () => {
   const r = await api("/jdy/sync", { method: "POST", timeout: 120000 });
   const summary = Object.values(r.entries || {}).map((e) => e.message).filter(Boolean).join("；");
   toast(r.ok ? `同步完成：${summary}` : `部分失败：${summary}`);
   loadJdyOverview();
+  loadJdyDepts();
   loadJdyList();
   if ($("#jdy-logs-box").open) loadJdyLogs();
 }).catch((e) => toast(e.message));
@@ -1614,6 +1731,233 @@ $("#btn-chat-towork").onclick = async () => {
     toast("已载入工作台：编辑右侧内容后可「保存人工定稿」/「归档到知产库」");
   } catch (e) { toast(e.message); }
 };
+
+/* ---------- 📚 主动贡献知识库（上传文件 / 在线填写 / 自动总结 → 简道云知识库表单） ---------- */
+/* 数据流：本模块 → 简道云知识库表单（字段与表单 68ad15ab88c411d76390e0a2 一一对应）
+   → 本地镜像即时可见（「📮 简道云」页签 → 数据镜像 → 知识库，可展示/搜索） */
+const KB = {
+  method: "form",      // form 在线填写 / upload 上传文件 / summarize 自动总结
+  attachments: [],     // 已通过 /chat/uploads 上传的附件（草稿提取与附件推送共用）
+  fields: [],
+  departments: [],
+};
+
+const KB_METHOD_LABEL = { form: "✍️ 在线填写", upload: "📎 上传文件", summarize: "✨ 自动总结" };
+
+async function openKbModal() {
+  let meta;
+  try { meta = await api("/knowledge/fields"); }
+  catch (e) { toast(e.message); return; }
+  KB.fields = meta.fields || [];
+  KB.departments = meta.departments || [];
+  KB.attachments = [];
+  KB.method = "form";
+  const deptOpts = [...new Set([meta.default_department, ...KB.departments].filter(Boolean))];
+  $("#modal-body").innerHTML = `
+    <h2>📚 贡献知识库</h2>
+    <p class="muted" style="margin:4px 0 10px">
+      贡献的内容将写入简道云「知识库」表单（问题 / 回答 / 客户 / 项目 / 国家 / 备注 / 部门），
+      提交后同事即可检索复用。${esc(meta.hint || "")}
+    </p>
+    <div class="kb-tabs">
+      ${Object.entries(KB_METHOD_LABEL).map(([m, l]) =>
+        `<button class="kb-tab ${m === "form" ? "active" : ""}" data-m="${m}">${l}</button>`).join("")}
+    </div>
+    <div id="kb-method-box"></div>
+    <div id="kb-form" class="ws-form" style="padding:12px 0 0"></div>
+    <div class="ws-form" style="padding:6px 0 0">
+      <label>部门（写入简道云部门字段）
+        <select id="kb-dept">${deptOpts.map((d) =>
+          `<option ${d === meta.default_department ? "selected" : ""}>${esc(d)}</option>`).join("") ||
+          `<option>${esc(meta.default_department || "通用")}</option>`}</select>
+      </label>
+    </div>
+    <div id="kb-atts" class="chat-chips" style="margin-top:8px"></div>
+    <label class="leader-toggle hidden" id="kb-push-att-row" style="margin-top:6px">
+      <input type="checkbox" id="kb-push-att" checked />
+      同时将原文件上传到简道云附件字段（需 APIKey 已开通文件权限；失败时仅把文件名登记到备注）
+    </label>
+    <div class="ws-btns" style="margin-top:12px">
+      <button id="btn-kb-submit" class="primary">确认无误，提交知识库</button>
+      <span class="muted" style="font-size:12px">提交前请核对「问题 / 回答」内容准确、无敏感信息</span>
+    </div>`;
+  $all(".kb-tab").forEach((b) => b.onclick = () => { KB.method = b.dataset.m; renderKbMethod(); });
+  $("#btn-kb-submit").onclick = submitKb;
+  renderKbMethod();
+  fillKbForm({});
+  $("#modal").classList.remove("hidden");
+}
+
+function renderKbMethod() {
+  $all(".kb-tab").forEach((b) => b.classList.toggle("active", b.dataset.m === KB.method));
+  const box = $("#kb-method-box");
+  if (KB.method === "upload") {
+    box.innerHTML = `
+      <div class="kb-method">
+        <input type="file" id="kb-file" class="hidden" multiple
+          accept=".txt,.md,.csv,.log,.json,.docx,.xlsx,.pdf" />
+        <button id="btn-kb-upload" class="secondary" style="width:auto">📎 选择文件（≤10MB/个，最多5个）</button>
+        <button id="btn-kb-extract" class="primary hidden" style="width:auto">✨ AI 提取问答</button>
+        <span class="muted" style="font-size:12px">上传会议纪要/澄清函/技术资料，AI 自动提取「问题+回答」，可再修改</span>
+      </div>`;
+    $("#btn-kb-upload").onclick = () => $("#kb-file").click();
+    $("#kb-file").onchange = (e) => uploadKbFiles(e.target.files);
+    $("#btn-kb-extract").onclick = () => kbDraftFromUpload();
+  } else if (KB.method === "summarize") {
+    box.innerHTML = `
+      <div class="kb-method">
+        <textarea id="kb-text" rows="5" style="width:100%"
+          placeholder="粘贴原始素材：邮件、会议纪要、客户澄清、聊天要点……AI 将自动总结为「问题+回答」结构"></textarea>
+        <div class="ws-btns" style="margin-top:6px">
+          <button id="btn-kb-sum" class="primary" style="width:auto">✨ AI 总结为问答</button>
+          <button id="btn-kb-grab" class="ghost" style="width:auto"
+            title="把当前工作台右侧的生成/定稿内容取来总结">取工作台当前内容</button>
+        </div>
+      </div>`;
+    $("#btn-kb-sum").onclick = () => kbDraftFromText();
+    $("#btn-kb-grab").onclick = () => {
+      const t = ($("#ws-output").innerText || "").trim();
+      if (!t) { toast("工作台当前没有内容"); return; }
+      $("#kb-text").value = t;
+      toast("已取工作台内容，点击「AI 总结为问答」");
+    };
+  } else {
+    box.innerHTML = `<div class="kb-method muted" style="font-size:12px">
+      直接填写下方表单：「问题」「回答」必填，其余选填。也可随时切换到「上传文件 / 自动总结」让 AI 先起草。</div>`;
+  }
+  renderKbAtts();
+}
+
+function renderKbAtts() {
+  const box = $("#kb-atts");
+  if (!box) return;
+  box.innerHTML = KB.attachments.map((a, i) => {
+    const ok = a.extract_status === "ok";
+    return `<span class="chat-chip ${ok ? "" : "bad"}" title="${ok ? "已解析 " + a.text_len + " 字" : esc(a.note || "未解析出文本")}">
+      ${ok ? "✓" : "⚠"} ${esc(a.filename)} <b data-i="${i}" title="移除">×</b></span>`;
+  }).join("");
+  $all("#kb-atts b").forEach((x) => {
+    x.onclick = async () => {
+      const a = KB.attachments[+x.dataset.i];
+      try { await api(`/chat/uploads/${a.id}`, { method: "DELETE" }); } catch { /* 留痕附件删不掉就仅移除引用 */ }
+      KB.attachments.splice(+x.dataset.i, 1);
+      renderKbAtts();
+    };
+  });
+  const row = $("#kb-push-att-row");
+  if (row) row.classList.toggle("hidden", !KB.attachments.length);
+  const ex = $("#btn-kb-extract");
+  if (ex) ex.classList.toggle("hidden", !KB.attachments.length);
+}
+
+/* 上传文件：复用智能对话的上传接口（解析文本），附件待提交时一并推送简道云 */
+async function uploadKbFiles(fileList) {
+  if (!fileList || !fileList.length) return;
+  const fd = new FormData();
+  [...fileList].forEach((f) => fd.append("files", f));
+  const btn = $("#btn-kb-upload");
+  await withWaiting(btn, "上传解析中", async () => {
+    const res = await fetch(API + "/chat/uploads", {
+      method: "POST",
+      headers: TOKEN ? { Authorization: `Bearer ${TOKEN}` } : {},
+      body: fd,
+    });
+    const data = await res.json().catch(() => null);
+    if (res.status === 401) { logout(false); throw new Error("登录失效，请重新登录"); }
+    if (!res.ok) throw new Error(data?.message || data?.detail || `上传失败（HTTP ${res.status}）`);
+    KB.attachments.push(...data);
+    renderKbAtts();
+    toast(`已上传并解析 ${data.length} 个文件，点击「✨ AI 提取问答」起草`);
+  }).catch((e) => toast(e.message));
+  const fi = $("#kb-file");
+  if (fi) fi.value = "";
+}
+
+async function kbDraftFromUpload() {
+  if (!KB.attachments.length) { toast("请先上传文件"); return; }
+  const ids = KB.attachments.map((a) => a.id);
+  const btn = $("#btn-kb-extract");
+  await withWaiting(btn, "AI 提取中", async () => {
+    const r = await api("/knowledge/draft", {
+      method: "POST", timeout: 180000,
+      body: JSON.stringify({ attachment_ids: ids, model: "kimi" }),
+    });
+    fillKbForm(r.draft || {});
+    toast((r.mock_llm ? "MOCK 模式：已按规则提取，请人工核对；配置模型 Key 后 AI 自动总结" : "AI 已起草，请在下方核对修改") +
+      (r.truncated ? "（素材过长已截断）" : ""));
+  }).catch((e) => toast(e.message));
+}
+
+async function kbDraftFromText() {
+  const text = ($("#kb-text").value || "").trim();
+  if (!text) { toast("请先粘贴素材，或点「取工作台当前内容」"); return; }
+  const btn = $("#btn-kb-sum");
+  await withWaiting(btn, "AI 总结中", async () => {
+    const r = await api("/knowledge/draft", {
+      method: "POST", timeout: 180000,
+      body: JSON.stringify({ text, model: "kimi" }),
+    });
+    fillKbForm(r.draft || {});
+    toast(r.mock_llm ? "MOCK 模式：已按规则提取，请人工核对" : "AI 已总结为问答，请在下方核对修改");
+  }).catch((e) => toast(e.message));
+}
+
+function fillKbForm(draft) {
+  const box = $("#kb-form");
+  if (!box) return;
+  if (!box.children.length) {
+    box.innerHTML = KB.fields.map((f) => `
+      <label class="${f.multiline ? "full" : ""}">${esc(f.label)}${f.required ? " *" : ""}
+        <textarea data-kb="${esc(f.key)}" rows="${f.multiline ? 5 : 1}"
+          placeholder="${esc(f.ph || "")}"></textarea>
+      </label>`).join("");
+  }
+  KB.fields.forEach((f) => {
+    const el = box.querySelector(`[data-kb="${f.key}"]`);
+    if (el && draft[f.key] !== undefined && String(draft[f.key] || "").trim()) {
+      el.value = draft[f.key];
+      const lab = el.closest("label");
+      if (lab) lab.classList.remove("ws-miss");
+    }
+  });
+}
+
+async function submitKb() {
+  const body = { attachment_ids: KB.attachments.map((a) => a.id),
+                 push_attachments: !!($("#kb-push-att") && $("#kb-push-att").checked) };
+  $all("#kb-form [data-kb]").forEach((el) => { body[el.dataset.kb] = el.value.trim(); });
+  body.department = ($("#kb-dept") && $("#kb-dept").value) || "";
+  const missing = KB.fields.filter((f) => f.required && !body[f.key]);
+  if (missing.length) {
+    $all("#kb-form [data-kb]").forEach((el) => {
+      const lab = el.closest("label");
+      if (lab) lab.classList.toggle("ws-miss", missing.some((f) => f.key === el.dataset.kb));
+    });
+    toast("请填写必填项：" + missing.map((f) => f.label).join("、"));
+    return;
+  }
+  // 门禁7（附件4）：写简道云前显式确认
+  if (!confirm(`确认提交到简道云知识库？\n\n问题：${body.question}\n\n提交后同事即可在知识库中检索到该条经验。`)) return;
+  const btn = $("#btn-kb-submit");
+  await withWaiting(btn, "提交中", async () => {
+    const r = await api("/knowledge/contribute", {
+      method: "POST", timeout: 120000, body: JSON.stringify(body),
+    });
+    const extra = [];
+    if (r.attachments_pushed) extra.push(`附件已传 ${r.attachments_pushed} 个`);
+    if ((r.attachments_failed || []).length) extra.push(`附件未传（已记备注）：${r.attachments_failed.join("、")}`);
+    if (!r.dept_written && body.department) extra.push("部门未匹配到简道云编号，已写入备注");
+    toast(r.mode === "mock"
+      ? "MOCK 模式：已模拟提交（配置 JDY 凭证后真实写入）"
+      : `已写入简道云知识库 ✅${r.mirrored ? "，本地镜像已同步可见" : ""}${extra.length ? "；" + extra.join("；") : ""}`);
+    $("#modal").classList.add("hidden");
+    // 若「📮 简道云」页签已加载过镜像列表，直接刷新知识库视图（展示查找立即可见）
+    if ($("#jdy-list") && $("#jdy-kind") && $("#jdy-kind").value === "knowledge") {
+      loadJdyOverview(); loadJdyList();
+    }
+  }).catch((e) => toast(e.message));
+}
+$("#btn-kb-contribute").onclick = () => openKbModal();
 
 /* ---------- 启动 ---------- */
 (async function init() {
@@ -1870,6 +2214,94 @@ $("#btn-td-sync").onclick = async () => {
   finally { btn.disabled = false; btn.textContent = "⇅ 同步简道云"; }
 };
 
+/* ---------- 🛡️ 合规审查前移（项目初步分析阶段审查一次，工作台只调用审查结果） ---------- */
+const COMP_STATE_BADGE = {
+  approved: ["comp-ok", "✅ 合规已放行"], reviewing: ["comp-warn", "⏳ 合规待终审"],
+  escalated: ["comp-warn", "🔺 升级复核中"], rejected: ["comp-bad", "⛔ 合规已否决"],
+  none: ["comp-none", "🛡️ 未完成合规审查"],
+};
+
+function compBadgeHtml(state, caseNo) {
+  const [cls, txt] = COMP_STATE_BADGE[state] || COMP_STATE_BADGE.none;
+  return `<span class="badge ${cls}">${txt}${caseNo ? " " + esc(caseNo) : ""}</span>`;
+}
+
+/* 项目初步分析合规审查弹层：预填项目登记要素 → 提交初筛 → 展示审查单结论 */
+async function openProjectScreening(code) {
+  const p = await api(`/task-projects/${code}`);
+  const cp = p.compliance || { state: "none" };
+  const ro = cp.state === "approved" || cp.state === "rejected"; // 已有终局结论
+  $("#modal-body").innerHTML = `
+    <h2>🛡️ 项目初步分析 · 合规审查</h2>
+    <p class="muted" style="margin:4px 0 8px">
+      项目 ${esc(p.code)} · ${esc(p.name)}。审查在本阶段完成一次并绑定项目；
+      之后工作台生成只引用审查结论，不重复审查。
+    </p>
+    ${cp.case_no ? `<div class="proj-banner" style="margin-bottom:10px">当前审查结论：${compBadgeHtml(cp.state, cp.case_no)}
+      ${esc(cp.message || "")}${cp.reviewed_by ? "（终审：" + esc(cp.reviewed_by) + "）" : ""}</div>` : ""}
+    <div class="ws-form">
+      <label>客户名称 *<textarea data-psc="customer_name" rows="1">${esc(p.customer_name || "")}</textarea></label>
+      <label>目的地/签约国 *<textarea data-psc="country" rows="1" placeholder="如 俄罗斯 / UZ">${esc(p.country || "")}</textarea></label>
+      <label>中间商（如无留空）<textarea data-psc="middleman" rows="1"></textarea></label>
+      <label>最终用户<textarea data-psc="end_user" rows="1"></textarea></label>
+      <label>运抵国<textarea data-psc="arrival_country" rows="1"></textarea></label>
+      <label>最终用户所在国<textarea data-psc="end_user_country" rows="1"></textarea></label>
+      <label class="full">最终用途<textarea data-psc="end_use" rows="2" placeholder="民用/工业用途书面说明"></textarea></label>
+      <label class="full">产品描述<textarea data-psc="product_desc" rows="2" placeholder="型号、参数、材质（屏蔽泵/密封/变频等将触发两用物项升级分类）"></textarea></label>
+      <label>HS 编码<textarea data-psc="hs_code" rows="1"></textarea></label>
+    </div>
+    ${ro ? `<label class="leader-toggle" style="margin:6px 0"><input type="checkbox" id="psc-force" />
+      客户/物项/用途等情况已变化，重新审查（生成新审查单并换绑）</label>` : ""}
+    <div class="ws-btns" style="margin-top:8px">
+      <button id="btn-psc-submit" class="primary" style="width:auto">提交初步分析审查</button>
+      <span class="muted" style="font-size:12px">提交后由合规官终审；结论自动绑定本项目</span>
+    </div>
+    <div id="psc-result" style="margin-top:10px"></div>`;
+  $("#modal").classList.remove("hidden");
+  $("#btn-psc-submit").onclick = () => {
+    const body = {};
+    $all("[data-psc]").forEach((el) => { body[el.dataset.psc] = el.value.trim(); });
+    if (!body.customer_name || !body.country) { toast("客户名称与目的地/签约国为必填"); return; }
+    const force = $("#psc-force") && $("#psc-force").checked;
+    if (force) body.force = true;
+    const btn = $("#btn-psc-submit");
+    withWaiting(btn, "审查中", async () => {
+      try {
+        const r = await api(`/task-projects/${code}/screening`, {
+          method: "POST", timeout: 60000, body: JSON.stringify(body),
+        });
+        $("#psc-result").innerHTML = ecRender(r);
+        toast("审查单已生成并绑定项目：" + r.case_no + "（" + (DECISION_LABEL[r.decision] || r.decision) + "）");
+        loadTaskProjects();
+      } catch (e) {
+        // 409 = 已有在途/放行单（不重复审查）；展示现状即可
+        $("#psc-result").innerHTML = `<div class="proj-banner">⚠️ ${esc(e.message)}</div>`;
+      }
+    });
+  };
+}
+
+/* ---------- 工作台：合规状态展示与闸口（只读审查结果，不重复审查） ---------- */
+async function refreshWsCompliance() {
+  const badge = $("#ws-comp-status");
+  const code = CURRENT.taskProjectCode;
+  if (!code || !badge) { if (badge) badge.classList.add("hidden"); return; }
+  try {
+    const cp = await api(`/task-projects/${code}/compliance`);
+    CURRENT.complianceState = cp.state;
+    const [cls, txt] = COMP_STATE_BADGE[cp.state] || COMP_STATE_BADGE.none;
+    badge.className = `badge ${cls}`;
+    badge.textContent = `${txt}${cp.case_no ? " · " + cp.case_no : ""}`;
+    badge.title = cp.message || "";
+    badge.classList.remove("hidden");
+    badge.style.cursor = "pointer";
+    badge.onclick = () => switchTab("projects");
+  } catch {
+    badge.classList.add("hidden");
+    CURRENT.complianceState = "";
+  }
+}
+
 /* ---------- 出口管制（附件1 §二：G1→G2→G5；附件5 §3.3 红线） ---------- */
 const DECISION_LABEL = {
   pending: "待放行（完成清单+合规官审核后放行）",
@@ -1882,6 +2314,9 @@ const DECISION_LABEL = {
 function ecCollect() {
   const body = {};
   $all("[data-ec]").forEach((el) => { body[el.dataset.ec] = el.value.trim(); });
+  // 审查前移：审查单可绑定任务项目（项目初步分析阶段的审查凭据）
+  const proj = $("#ec-project");
+  if (proj && proj.value) body.task_project_code = proj.value;
   return body;
 }
 
@@ -1916,21 +2351,106 @@ function ecRender(r) {
     </div>`;
 }
 
+/* 规则与资料资产（可调用配置；合规官/管理员可维护，全员可查可用） */
+async function loadComplianceAssets() {
+  // 资料资产（选型软件/法规文档/模板）
+  try {
+    const res = await api("/compliance/resources");
+    $("#cr-resources").innerHTML = res.map((r) => {
+      const v = r.value || {};
+      return `<div class="asset-item">
+        <h4>📦 ${esc(r.name)} <span class="badge">${esc(v.type || "资料")}</span>
+          ${v.version ? `<span class="badge">${esc(v.version)}</span>` : ""}</h4>
+        <div class="muted">🔗 ${esc(v.link || "（路径待补）")}</div>
+        <div class="muted">适用：${esc(v.applicable || r.description || "—")}</div>
+      </div>`;
+    }).join("") || `<p class="muted">暂无资料资产</p>`;
+  } catch (e) { $("#cr-resources").innerHTML = `<p class="muted">资料资产加载失败：${esc(e.message)}</p>`; }
+  // 审查规则（分组展示；可维护者显示启停开关）
+  try {
+    const d = await api("/compliance/rules");
+    $("#cr-rules").innerHTML = (d.categories || []).filter((g) => g.category !== "resource").map((g) => `
+      <details class="ws-params" style="margin-bottom:6px">
+        <summary>${esc(g.label)}（${g.items.length} 项）</summary>
+        <div style="padding:8px 14px">
+          ${g.items.map((r) => `
+            <div class="cand-item">
+              <span class="badge ${r.enabled ? "" : "exp"}">${r.enabled ? "启用" : "停用"}</span>
+              <span><b>${esc(r.name)}</b> <span class="muted">${esc(r.code)}</span>
+                <div class="muted" style="font-size:12px">${esc(crRuleSummary(r))}</div>
+                ${r.description ? `<div class="muted" style="font-size:12px">${esc(r.description)}</div>` : ""}
+              </span>
+              ${d.can_edit ? `<button class="ghost btn-cr-toggle" style="width:auto;margin-left:auto"
+                data-id="${r.id}" data-on="${r.enabled ? 1 : 0}">${r.enabled ? "停用" : "启用"}</button>` : ""}
+            </div>`).join("")}
+        </div>
+      </details>`).join("") || `<p class="muted">暂无规则配置</p>`;
+    $all(".btn-cr-toggle").forEach((b) => {
+      b.onclick = async () => {
+        try {
+          await api(`/compliance/rules/${b.dataset.id}`, {
+            method: "PATCH", body: JSON.stringify({ enabled: b.dataset.on !== "1" }),
+          });
+          toast("已" + (b.dataset.on === "1" ? "停用" : "启用") + "，审查引擎即时生效");
+          loadComplianceAssets();
+        } catch (e) { toast(e.message); }
+      };
+    });
+  } catch (e) { $("#cr-rules").innerHTML = `<p class="muted">规则加载失败：${esc(e.message)}</p>`; }
+}
+$("#btn-cr-reload").onclick = () => loadComplianceAssets();
+
+function crRuleSummary(r) {
+  const v = r.value || {};
+  if (Array.isArray(v.codes)) return v.codes.join(" / ");
+  if (Array.isArray(v.words)) return v.words.slice(0, 12).join("、") + (v.words.length > 12 ? ` …共${v.words.length}词` : "");
+  if (v.trigger) return `触发：${v.trigger}`;
+  if (v.text) return v.text.slice(0, 80) + (v.text.length > 80 ? "…" : "");
+  if (v.required !== undefined) return v.required ? "必查项" : "选查项";
+  return "";
+}
+
+/* 审查单关联项目下拉（我的任务项目，供前移绑定） */
+async function loadEcProjects() {
+  const sel = $("#ec-project");
+  if (!sel) return;
+  try {
+    const list = await api("/task-projects");
+    const cur = sel.value;
+    sel.innerHTML = `<option value="">— 不关联任务项目（独立审查单）—</option>` +
+      list.map((p) => `<option value="${esc(p.code)}" ${p.code === cur ? "selected" : ""}>
+        ${esc(p.code)} ${esc(p.name)}${p.compliance && p.compliance.state === "approved" ? "（已放行）" : ""}</option>`).join("");
+    sel.onchange = () => {
+      const p = list.find((x) => x.code === sel.value);
+      if (!p) return;
+      // 选中项目后回填登记的客户/国别（可再修改）
+      const cu = document.querySelector('[data-ec="customer_name"]');
+      const co = document.querySelector('[data-ec="country"]');
+      if (cu && !cu.value.trim() && p.customer_name) cu.value = p.customer_name;
+      if (co && !co.value.trim() && p.country) co.value = p.country;
+    };
+  } catch { /* 项目列表失败不阻断独立审查 */ }
+}
+
 async function loadCompliance(keepResult) {
+  loadEcProjects();
+  loadComplianceAssets();
   try {
     const list = await api("/export-checks");
-    const isAdmin = USER && USER.role === "admin";
+    // 合规官与管理员可终审（后端权限点 export.review；提交人不能自审由后端拦截）
+    const canReview = USER && (USER.role === "admin" || USER.role === "compliance");
     $("#ec-list").innerHTML = list.map((r) => `
       <div class="asset-item">
         <h4>${esc(r.case_no)} · ${esc(r.customer_name)}（${esc(r.country)}）
           <span class="badge ${r.decision === "reject" ? "exp" : ""}">${esc(DECISION_LABEL[r.decision] || r.decision)}</span>
           <span class="badge">${esc(r.status)}</span>
+          ${r.task_project_code ? `<span class="badge comp-ok" title="审查前移：该单为项目初步分析阶段审查凭据">📁 ${esc(r.task_project_code)}</span>` : ""}
         </h4>
         <div class="muted">${new Date(r.created_at).toLocaleString()} ｜ 物项 ${esc(r.item_control)} ｜ 红旗 ${(r.red_flags || []).length} 项</div>
         ${r.reviewed_by ? `<div class="muted">终审：${esc(r.reviewed_by)} ${esc(r.review_note || "")}</div>` : ""}
         <div class="td-actions">
           <button class="ghost btn-ec-view" data-no="${esc(r.case_no)}" style="width:auto">查看清单</button>
-          ${isAdmin && r.status === "submitted" ? `
+          ${canReview && r.status === "submitted" ? `
             <button class="primary btn-ec-approve" data-no="${esc(r.case_no)}" style="width:auto">合规官放行</button>
             <button class="secondary btn-ec-cond" data-no="${esc(r.case_no)}" style="width:auto">附条件放行</button>
             <button class="ghost btn-ec-reject" data-no="${esc(r.case_no)}" style="width:auto">否决</button>` : ""}
